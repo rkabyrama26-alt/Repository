@@ -63,6 +63,19 @@
             overflow-y: auto;
             padding: 50px 20px calc(var(--nav-height) + 30px);
             scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .viewport-area::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            background: transparent;
+        }
+
+        .viewport-area::-webkit-scrollbar-thumb {
+            display: none;
+            background: transparent;
         }
 
         .section-pane {
@@ -693,14 +706,6 @@
             align-items: center;
             gap: 12px;
         }
-
-        ::-webkit-scrollbar {
-            width: 3px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-        }
     </style>
 </head>
 <body>
@@ -1120,10 +1125,10 @@
                 const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=100');
                 const data = await response.json();
                 
-                // جلب أكثر من 50 خبر وترجمتها
+                // جلب أكثر من 50 خبر وترجمتها للعربية دائماً
                 const articlesToProcess = data.articles.slice(0, 60); // 60 خبر
                 
-                // ترجمة العناوين والأوصاف
+                // ترجمة العناوين والأوصاف للعربية دائماً
                 const translatedArticles = await Promise.all(
                     articlesToProcess.map(async (article) => {
                         const titleAr = await translateText(article.headline);
@@ -1136,7 +1141,7 @@
                             description: descriptionAr,
                             image: article.images ? article.images[0].url : '',
                             published: getTimeAgo(article.published),
-                            source: currentLanguage === 'ar' ? translations.ar.starScreens : translations.en.starScreens,
+                            source: translations.ar.starScreens,
                             publishedDate: new Date(article.published)
                         };
                     })
@@ -1146,31 +1151,30 @@
                 renderNewsSlides();
             } catch (error) {
                 console.error('Error fetching news:', error);
-                // بيانات احتياطية في حالة الفشل
-                const sourceText = currentLanguage === 'ar' ? translations.ar.starScreens : translations.en.starScreens;
+                // بيانات احتياطية في حالة الفشل - بالعربية دائماً
                 newsData = [
                     {
-                        title: currentLanguage === 'ar' ? "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي" : "Chelsea prepares to face Hull City in the Premier League",
-                        description: currentLanguage === 'ar' ? "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال" : "Chelsea seeks to return to victories after losing to Arsenal",
+                        title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
+                        description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال",
                         image: "",
                         published: getTimeAgo(new Date().toISOString()),
-                        source: sourceText,
+                        source: translations.ar.starScreens,
                         publishedDate: new Date()
                     },
                     {
-                        title: currentLanguage === 'ar' ? "ليفربول يواجه فولهام في قمة الأسبوع" : "Liverpool faces Fulham in the week's summit",
-                        description: currentLanguage === 'ar' ? "مباراة قوية منتظرة بين ليفربول وفولهام" : "A strong match expected between Liverpool and Fulham",
+                        title: "ليفربول يواجه فولهام في قمة الأسبوع",
+                        description: "مباراة قوية منتظرة بين ليفربول وفولهام",
                         image: "",
                         published: getTimeAgo(new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()),
-                        source: sourceText,
+                        source: translations.ar.starScreens,
                         publishedDate: new Date()
                     },
                     {
-                        title: currentLanguage === 'ar' ? "مانشستر سيتي يواصل صدارته للدوري" : "Manchester City continues to lead the league",
-                        description: currentLanguage === 'ar' ? "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة" : "City achieves a new victory and maintains the lead",
+                        title: "مانشستر سيتي يواصل صدارته للدوري",
+                        description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة",
                         image: "",
                         published: getTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
-                        source: sourceText,
+                        source: translations.ar.starScreens,
                         publishedDate: new Date()
                     }
                 ];
@@ -1369,13 +1373,17 @@
                         centerContent = `<div class="match-time">${timeStr}</div>`;
                     }
 
+                    // ترجمة أسماء الفرق للعربية
+                    const homeTeamNameAr = translateTeamName(homeTeam.shortDisplayName || homeTeam.name);
+                    const awayTeamNameAr = translateTeamName(awayTeam.shortDisplayName || awayTeam.name);
+
                     const matchCard = document.createElement('div');
                     matchCard.className = 'match-card';
                     matchCard.innerHTML = `
                         <div class="match-teams">
                             <div class="match-team">
                                 <img src="${homeTeam.logo}" alt="${homeTeam.name}" class="match-team-logo" onerror="this.src='https://via.placeholder.com/46?text=H'">
-                                <div class="match-team-name">${homeTeam.shortDisplayName || homeTeam.name}</div>
+                                <div class="match-team-name">${homeTeamNameAr}</div>
                             </div>
                             <div class="match-center">
                                 ${centerContent}
@@ -1383,7 +1391,7 @@
                             </div>
                             <div class="match-team">
                                 <img src="${awayTeam.logo}" alt="${awayTeam.name}" class="match-team-logo" onerror="this.src='https://via.placeholder.com/46?text=A'">
-                                <div class="match-team-name">${awayTeam.shortDisplayName || awayTeam.name}</div>
+                                <div class="match-team-name">${awayTeamNameAr}</div>
                             </div>
                         </div>
                     `;
@@ -1399,6 +1407,91 @@
                     </div>
                 `;
             }
+        }
+
+        // دالة لترجمة أسماء الفرق الشائعة
+        function translateTeamName(englishName) {
+            const teamTranslations = {
+                'Brentford': 'برينتفورد',
+                'Bournemouth': 'بورنموث',
+                'Nottm Forest': 'نوتنغهام',
+                'Nottingham Forest': 'نوتنغهام',
+                'Aston Villa': 'أستون فيلا',
+                'Hull': 'هال',
+                'Hull City': 'هال سيتي',
+                'Chelsea': 'تشيلسي',
+                'Ipswich': 'إيبسويتش',
+                'Ipswich Town': 'إيبسويتش',
+                'C Palace': 'كريستال بالاس',
+                'Crystal Palace': 'كريستال بالاس',
+                'Fulham': 'فولهام',
+                'Liverpool': 'ليفربول',
+                'Man City': 'مانشستر سيتي',
+                'Manchester City': 'مانشستر سيتي',
+                'Man United': 'مانشستر يونايتد',
+                'Manchester United': 'مانشستر يونايتد',
+                'Arsenal': 'أرسنال',
+                'Tottenham': 'توتنهام',
+                'Tottenham Hotspur': 'توتنهام',
+                'Newcastle': 'نيوكاسل',
+                'Newcastle United': 'نيوكاسل',
+                'Brighton': 'برايتون',
+                'Brighton & Hove Albion': 'برايتون',
+                'West Ham': 'وست هام',
+                'West Ham United': 'وست هام',
+                'Everton': 'إيفرتون',
+                'Wolves': 'وولفرهامبتون',
+                'Wolverhampton': 'وولفرهامبتون',
+                'Wolverhampton Wanderers': 'وولفرهامبتون',
+                'Leicester': 'ليستر',
+                'Leicester City': 'ليستر',
+                'Southampton': 'ساوثهامبتون',
+                'Burnley': 'بيرنلي',
+                'Sheffield Utd': 'شيفيلد',
+                'Sheffield United': 'شيفيلد',
+                'Luton': 'لوتون',
+                'Luton Town': 'لوتون',
+                'Brentford': 'برينتفورد',
+                'Real Madrid': 'ريال مدريد',
+                'Barcelona': 'برشلونة',
+                'Atletico Madrid': 'أتلتيكو مدريد',
+                'Sevilla': 'إشبيلية',
+                'Valencia': 'فالنسيا',
+                'Villarreal': 'فياريال',
+                'Real Sociedad': 'ريال سوسيداد',
+                'Athletic Bilbao': 'أتلتيك بيلباو',
+                'Bayern Munich': 'بايرن ميونخ',
+                'Borussia Dortmund': 'بوروسيا دورتموند',
+                'RB Leipzig': 'لايبزيغ',
+                'Bayer Leverkusen': 'باير ليفركوزن',
+                'PSG': 'باريس سان جيرمان',
+                'Paris Saint-Germain': 'باريس سان جيرمان',
+                'Marseille': 'مارسيليا',
+                'Lyon': 'ليون',
+                'Monaco': 'موناكو',
+                'Juventus': 'يوفنتوس',
+                'AC Milan': 'ميلان',
+                'Inter Milan': 'إنتر ميلان',
+                'Inter': 'إنتر ميلان',
+                'Napoli': 'نابولي',
+                'Roma': 'روما',
+                'AS Roma': 'روما',
+                'Lazio': 'لاتسيو',
+                'Atalanta': 'أتالانتا',
+                'Ajax': 'أياكس',
+                'PSV': 'آيندهوفن',
+                'Feyenoord': 'فاينورد',
+                'Benfica': 'بنفيكا',
+                'Porto': 'بورتو',
+                'Sporting CP': 'سبورتينغ',
+                'Celtic': 'سيلتيك',
+                'Rangers': 'رينجرز',
+                'Galatasaray': 'غلطة سراي',
+                'Fenerbahce': 'فنربخشة',
+                'Besiktas': 'بيشكتاش'
+            };
+
+            return teamTranslations[englishName] || englishName;
         }
 
         // Touch support for news - Swipe up/down to navigate
