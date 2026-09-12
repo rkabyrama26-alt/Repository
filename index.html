@@ -925,44 +925,99 @@
             }
         }
 
+        // وظيفة الترجمة من الإنجليزية إلى العربية
+        async function translateText(text) {
+            try {
+                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`);
+                const data = await response.json();
+                if (data.responseStatus === 200) {
+                    return data.responseData.translatedText;
+                }
+                return text;
+            } catch (error) {
+                console.error('Translation error:', error);
+                return text;
+            }
+        }
+
+        // وظيفة حساب الوقت المنقضي
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) {
+                return 'الآن';
+            } else if (diffMins < 60) {
+                return `منذ ${diffMins} دقيقة`;
+            } else if (diffHours < 24) {
+                return `منذ ${diffHours} ساعة`;
+            } else if (diffDays < 7) {
+                return `منذ ${diffDays} يوم`;
+            } else {
+                return date.toLocaleDateString('ar-SA');
+            }
+        }
+
         async function fetchNews() {
             try {
                 const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=100');
                 const data = await response.json();
                 
-                newsData = data.articles.map(article => ({
-                    title: article.headline,
-                    description: article.description || article.headline,
-                    image: article.images ? article.images[0].url : '',
-                    published: new Date(article.published).toLocaleDateString('ar-SA'),
-                    source: article.source
-                }));
+                // جلب أكثر من 50 خبر وترجمتها
+                const articlesToProcess = data.articles.slice(0, 60); // 60 خبر
+                
+                // ترجمة العناوين والأوصاف
+                const translatedArticles = await Promise.all(
+                    articlesToProcess.map(async (article) => {
+                        const titleAr = await translateText(article.headline);
+                        const descriptionAr = article.description 
+                            ? await translateText(article.description) 
+                            : titleAr;
+                        
+                        return {
+                            title: titleAr,
+                            description: descriptionAr,
+                            image: article.images ? article.images[0].url : '',
+                            published: getTimeAgo(article.published),
+                            source: 'نجم الشاشات',
+                            publishedDate: new Date(article.published)
+                        };
+                    })
+                );
 
+                newsData = translatedArticles;
                 renderNewsSlides();
             } catch (error) {
                 console.error('Error fetching news:', error);
-                // Fallback data
+                // بيانات احتياطية في حالة الفشل
                 newsData = [
                     {
                         title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
                         description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال",
                         image: "",
-                        published: new Date().toLocaleDateString('ar-SA'),
-                        source: "ESPN"
+                        published: "منذ ساعتين",
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
                     },
                     {
                         title: "ليفربول يواجه فولهام في قمة الأسبوع",
                         description: "مباراة قوية منتظرة بين ليفربول وفولهام",
                         image: "",
-                        published: new Date().toLocaleDateString('ar-SA'),
-                        source: "ESPN"
+                        published: "منذ 3 ساعات",
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
                     },
                     {
                         title: "مانشستر سيتي يواصل صدارته للدوري",
                         description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة",
                         image: "",
-                        published: new Date().toLocaleDateString('ar-SA'),
-                        source: "ESPN"
+                        published: "منذ 5 ساعات",
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
                     }
                 ];
                 renderNewsSlides();
