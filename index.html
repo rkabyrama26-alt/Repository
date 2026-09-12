@@ -560,6 +560,140 @@
             height: 40px;
         }
 
+        /* Schedule / Match Card Styles - New Beautiful Design */
+        .match-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 18px 16px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .match-card:hover {
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+            border-color: var(--border-glow);
+        }
+
+        .match-league {
+            font-size: 0.72rem;
+            color: var(--accent-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 10px;
+        }
+
+        .match-league i {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .match-team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            gap: 10px;
+        }
+
+        .match-team-logo {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+
+        .match-card:hover .match-team-logo {
+            transform: scale(1.1);
+        }
+
+        .match-team-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+            line-height: 1.3;
+            max-width: 100px;
+        }
+
+        .match-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            gap: 8px;
+        }
+
+        .match-score {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--text-main);
+            letter-spacing: 3px;
+            font-family: 'Alexandria', sans-serif;
+        }
+
+        .match-score.live {
+            color: #ef4444;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .match-status {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            border: 1px solid var(--border-glass);
+        }
+
+        .match-status.live {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+            animation: pulseLive 1.5s infinite;
+        }
+
+        @keyframes pulseLive {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .match-time {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent-secondary);
+            letter-spacing: 1px;
+        }
+
+        .schedule-loading {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
         ::-webkit-scrollbar {
             width: 3px;
         }
@@ -630,21 +764,10 @@
             </div>
 
             <div id="pane-schedule" class="section-pane">
-                <div class="pane-header-title" data-key="dailySchedule">جدول المواعيد اليومية</div>
-                <div class="stack-list">
-                    <div class="stack-item">
-                        <div class="stack-icon-box" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);"><i class="fa-regular fa-clock"></i></div>
-                        <div class="stack-info-box">
-                            <div class="stack-item-title" data-key="eveningProgram">البرنامج المسائي الرئيسي</div>
-                            <div class="stack-item-sub" data-key="eveningProgramTime">تبدأ في تمام الساعة 08:00 مساءً</div>
-                        </div>
-                    </div>
-                    <div class="stack-item">
-                        <div class="stack-icon-box" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);"><i class="fa-regular fa-clock"></i></div>
-                        <div class="stack-info-box">
-                            <div class="stack-item-title" data-key="newsBulletin">النشرة الإخبارية الشاملة</div>
-                            <div class="stack-item-sub" data-key="newsBulletinTime">تبدأ في تمام الساعة 10:00 مساءً</div>
-                        </div>
+                <div class="stack-list" id="scheduleList">
+                    <div class="schedule-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i>
+                        <span>جاري تحميل أحدث المباريات...</span>
                     </div>
                 </div>
             </div>
@@ -821,7 +944,7 @@
                 sportsChannelDesc: "جودة فائقة HD • سيرفرات متعددة",
                 varietyChannel: "قناة المنوعات العامة",
                 varietyChannelDesc: "عروض وبرامج حصرية طوال اليوم",
-                dailySchedule: "جدول المواعيد اليومية",
+                dailySchedule: "جدول المباريات",
                 eveningProgram: "البرنامج المسائي الرئيسي",
                 eveningProgramTime: "تبدأ في تمام الساعة 08:00 مساءً",
                 newsBulletin: "النشرة الإخبارية الشاملة",
@@ -877,7 +1000,7 @@
                 sportsChannelDesc: "Ultra HD Quality • Multiple servers",
                 varietyChannel: "General Variety Channel",
                 varietyChannelDesc: "Exclusive shows and programs all day",
-                dailySchedule: "Daily Schedule",
+                dailySchedule: "Match Schedule",
                 eveningProgram: "Main Evening Program",
                 eveningProgramTime: "Starts at 08:00 PM",
                 newsBulletin: "Comprehensive News Bulletin",
@@ -926,15 +1049,15 @@
 
             document.querySelector('.viewport-area').scrollTop = 0;
 
-            // If switching to news pane, start the auto-scroll
             if (index === 4) {
                 if (newsData.length === 0) {
                     fetchNews();
                 } else {
                     startNewsAutoScroll();
                 }
+            } else if (index === 2) {
+                fetchSchedule();
             } else {
-                // If leaving news pane, stop the auto-scroll
                 if (newsInterval) {
                     clearInterval(newsInterval);
                 }
@@ -1174,6 +1297,107 @@
             const selectedOption = document.getElementById(`sheet-lang-${currentLanguage}`);
             if (selectedOption) {
                 selectedOption.classList.add('selected');
+            }
+        }
+
+        // وظيفة جلب جدول المباريات من ESPN API
+        async function fetchSchedule() {
+            const container = document.getElementById('scheduleList');
+            if (!container) return;
+            
+            // إظهار التحميل فقط إذا كانت القائمة فارغة أو تحتوي على رسالة تحميل
+            if (container.children.length === 0 || container.querySelector('.schedule-loading')) {
+                container.innerHTML = `
+                    <div class="schedule-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i>
+                        <span>جاري تحميل أحدث المباريات...</span>
+                    </div>
+                `;
+            }
+            
+            try {
+                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/scoreboard');
+                const data = await response.json();
+                
+                container.innerHTML = '';
+                
+                if (!data.events || data.events.length === 0) {
+                    container.innerHTML = '<div class="schedule-loading">لا توجد مباريات متاحة حالياً في الجدول</div>';
+                    return;
+                }
+
+                data.events.forEach(event => {
+                    const competition = event.competitions ? event.competitions[0] : null;
+                    if (!competition) return;
+                    
+                    const status = event.status || competition.status;
+                    const isLive = status && status.type && status.type.state === 'in';
+                    const isCompleted = status && status.type && status.type.completed;
+                    
+                    const homeCompetitor = competition.competitors ? competition.competitors.find(c => c.homeAway === 'home') : null;
+                    const awayCompetitor = competition.competitors ? competition.competitors.find(c => c.homeAway === 'away') : null;
+                    
+                    const homeTeam = homeCompetitor && homeCompetitor.team ? homeCompetitor.team : { name: 'غير معروف', shortDisplayName: 'غير معروف', logo: '' };
+                    const awayTeam = awayCompetitor && awayCompetitor.team ? awayCompetitor.team : { name: 'غير معروف', shortDisplayName: 'غير معروف', logo: '' };
+                    
+                    const homeScore = homeCompetitor ? (homeCompetitor.score !== undefined ? homeCompetitor.score : '-') : '-';
+                    const awayScore = awayCompetitor ? (awayCompetitor.score !== undefined ? awayCompetitor.score : '-') : '-';
+                    
+                    let leagueName = 'دوري غير محدد';
+                    if (event.leagues && event.leagues.length > 0 && event.leagues[0].name) {
+                        leagueName = event.leagues[0].name;
+                    } else if (competition.group && competition.group.name) {
+                        leagueName = competition.group.name;
+                    }
+                    
+                    let statusText = '';
+                    let statusClass = '';
+                    let centerContent = '';
+                    
+                    if (isLive) {
+                        statusText = 'مباشر';
+                        statusClass = 'live';
+                        centerContent = `<div class="match-score live">${homeScore} - ${awayScore}</div>`;
+                    } else if (isCompleted) {
+                        statusText = 'انتهت';
+                        centerContent = `<div class="match-score">${homeScore} - ${awayScore}</div>`;
+                    } else {
+                        const matchDate = new Date(event.date || competition.date);
+                        const timeStr = matchDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+                        const dateStr = matchDate.toLocaleDateString('ar-SA', { weekday: 'short', month: 'short', day: 'numeric' });
+                        statusText = `${dateStr}`;
+                        centerContent = `<div class="match-time">${timeStr}</div>`;
+                    }
+
+                    const matchCard = document.createElement('div');
+                    matchCard.className = 'match-card';
+                    matchCard.innerHTML = `
+                        <div class="match-teams">
+                            <div class="match-team">
+                                <img src="${homeTeam.logo}" alt="${homeTeam.name}" class="match-team-logo" onerror="this.src='https://via.placeholder.com/46?text=H'">
+                                <div class="match-team-name">${homeTeam.shortDisplayName || homeTeam.name}</div>
+                            </div>
+                            <div class="match-center">
+                                ${centerContent}
+                                <div class="match-status ${statusClass}">${statusText}</div>
+                            </div>
+                            <div class="match-team">
+                                <img src="${awayTeam.logo}" alt="${awayTeam.name}" class="match-team-logo" onerror="this.src='https://via.placeholder.com/46?text=A'">
+                                <div class="match-team-name">${awayTeam.shortDisplayName || awayTeam.name}</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(matchCard);
+                });
+                
+            } catch (error) {
+                console.error('Error fetching schedule:', error);
+                container.innerHTML = `
+                    <div class="schedule-loading" style="color: #ef4444;">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem; margin-bottom: 10px;"></i>
+                        <span>فشل في تحميل الجدول. يرجى التحقق من الاتصال.</span>
+                    </div>
+                `;
             }
         }
 
