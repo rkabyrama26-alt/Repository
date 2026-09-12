@@ -321,119 +321,115 @@
             color: var(--accent-secondary);
         }
 
-        /* Language Page Styles */
-        .language-page {
+        /* Language Bottom Sheet Styles */
+        .language-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--bg-base);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
-            flex-direction: column;
-            padding: 20px;
         }
 
-        .language-page.active {
-            display: flex;
+        .language-overlay.active {
+            display: block;
         }
 
-        .language-page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 32px;
-            padding-top: 20px;
+        .language-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            border-radius: 20px 20px 0 0;
+            padding: 12px 20px 40px;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .language-page-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--text-main);
+        .language-sheet.active {
+            transform: translateY(0);
         }
 
-        .language-page-close {
+        .sheet-handle {
             width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: var(--surface-glass);
-            border: none;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .sheet-title {
+            font-size: 1.15rem;
+            font-weight: 700;
             color: var(--text-main);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+            margin-bottom: 18px;
+            text-align: right;
         }
 
-        .language-page-close:hover {
-            background: var(--surface-hover);
-        }
-
-        .language-option-new {
+        .sheet-language-option {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 24px;
-            margin-bottom: 12px;
-            border-radius: 50px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-radius: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
         }
 
-        .language-option-new.selected {
-            background: var(--text-main);
-            color: var(--bg-base);
+        .sheet-language-option.selected {
+            background: #ffffff;
         }
 
-        .language-option-new:not(.selected) {
-            background: var(--surface-glass);
-            color: var(--text-muted);
+        .sheet-language-option:not(.selected) {
+            background: #333333;
         }
 
-        .language-option-new:hover {
-            transform: scale(1.02);
-        }
-
-        .language-option-text-new {
-            font-size: 1.1rem;
+        .sheet-language-option-text {
+            font-size: 1.05rem;
             font-weight: 700;
         }
 
-        .language-radio {
-            width: 28px;
-            height: 28px;
+        .sheet-language-option.selected .sheet-language-option-text {
+            color: #000000;
+        }
+
+        .sheet-language-option:not(.selected) .sheet-language-option-text {
+            color: #ffffff;
+        }
+
+        .sheet-radio {
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            border: 3px solid;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
             flex-shrink: 0;
         }
 
-        .language-option-new.selected .language-radio {
-            border-color: var(--bg-base);
-            background: var(--bg-base);
+        .sheet-language-option.selected .sheet-radio {
+            background: #000000;
+            border: none;
         }
 
-        .language-option-new:not(.selected) .language-radio {
-            border-color: var(--text-muted);
+        .sheet-language-option:not(.selected) .sheet-radio {
+            border: 2px solid #ffffff;
+            background: transparent;
         }
 
-        .language-radio-check {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--text-main);
+        .sheet-radio-check {
             display: none;
         }
 
-        .language-option-new.selected .language-radio-check {
+        .sheet-language-option.selected .sheet-radio-check {
             display: block;
+            color: #ffffff;
+            font-size: 0.85rem;
         }
 
         ::-webkit-scrollbar {
@@ -558,7 +554,7 @@
                 
                 <div class="stack-list">
                     <!-- قسم اللغة -->
-                    <div class="stack-item" onclick="openLanguagePage()">
+                    <div class="stack-item" onclick="openLanguageSheet()">
                         <div class="stack-icon-box" style="color: #6366f1; background: rgba(99, 102, 241, 0.1);">
                             <i class="fa-solid fa-language"></i>
                         </div>
@@ -654,26 +650,23 @@
 
     </div>
 
-    <!-- Language Selection Page -->
-    <div class="language-page" id="languagePage">
-        <div class="language-page-header">
-            <div class="language-page-title" data-key="language">اللغة</div>
-            <button class="language-page-close" onclick="closeLanguagePage()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+    <!-- Language Bottom Sheet -->
+    <div class="language-overlay" id="languageOverlay" onclick="closeLanguageSheet()"></div>
+    <div class="language-sheet" id="languageSheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title" data-key="language">اللغة</div>
 
-        <div class="language-option-new selected" onclick="changeLanguage('ar')" id="lang-option-ar">
-            <span class="language-option-text-new">العربية</span>
-            <div class="language-radio">
-                <div class="language-radio-check"></div>
+        <div class="sheet-language-option selected" onclick="changeLanguage('ar')" id="sheet-lang-ar">
+            <span class="sheet-language-option-text">العربية</span>
+            <div class="sheet-radio">
+                <i class="fa-solid fa-check sheet-radio-check"></i>
             </div>
         </div>
 
-        <div class="language-option-new" onclick="changeLanguage('en')" id="lang-option-en">
-            <span class="language-option-text-new">English</span>
-            <div class="language-radio">
-                <div class="language-radio-check"></div>
+        <div class="sheet-language-option" onclick="changeLanguage('en')" id="sheet-lang-en">
+            <span class="sheet-language-option-text">English</span>
+            <div class="sheet-radio">
+                <i class="fa-solid fa-check sheet-radio-check"></i>
             </div>
         </div>
     </div>
@@ -792,13 +785,15 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        function openLanguagePage() {
-            document.getElementById('languagePage').classList.add('active');
+        function openLanguageSheet() {
+            document.getElementById('languageOverlay').classList.add('active');
+            document.getElementById('languageSheet').classList.add('active');
             updateLanguageSelection();
         }
 
-        function closeLanguagePage() {
-            document.getElementById('languagePage').classList.remove('active');
+        function closeLanguageSheet() {
+            document.getElementById('languageOverlay').classList.remove('active');
+            document.getElementById('languageSheet').classList.remove('active');
         }
 
         function changeLanguage(lang) {
@@ -821,14 +816,19 @@
 
             // Update selected state
             updateLanguageSelection();
+
+            // Close sheet after short delay
+            setTimeout(() => {
+                closeLanguageSheet();
+            }, 300);
         }
 
         function updateLanguageSelection() {
-            document.querySelectorAll('.language-option-new').forEach(option => {
+            document.querySelectorAll('.sheet-language-option').forEach(option => {
                 option.classList.remove('selected');
             });
             
-            const selectedOption = document.getElementById(`lang-option-${currentLanguage}`);
+            const selectedOption = document.getElementById(`sheet-lang-${currentLanguage}`);
             if (selectedOption) {
                 selectedOption.classList.add('selected');
             }
