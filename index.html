@@ -849,7 +849,15 @@
                 navSchedule: "جدول",
                 navSeries: "مسلسلات",
                 navNews: "أخبار",
-                navSettings: "الإعدادات"
+                navSettings: "الإعدادات",
+                now: "الآن",
+                minutesAgo: "منذ",
+                minute: "دقيقة",
+                hour: "ساعة",
+                hours: "ساعة",
+                day: "يوم",
+                days: "يوم",
+                starScreens: "نجم الشاشات"
             },
             en: {
                 live: "Live",
@@ -897,7 +905,15 @@
                 navSchedule: "Schedule",
                 navSeries: "Series",
                 navNews: "News",
-                navSettings: "Settings"
+                navSettings: "Settings",
+                now: "Now",
+                minutesAgo: "",
+                minute: "minute",
+                hour: "hour",
+                hours: "hours",
+                day: "day",
+                days: "days",
+                starScreens: "Star Screens"
             }
         };
 
@@ -949,16 +965,30 @@
             const diffHours = Math.floor(diffMins / 60);
             const diffDays = Math.floor(diffHours / 24);
 
-            if (diffMins < 1) {
-                return 'الآن';
-            } else if (diffMins < 60) {
-                return `منذ ${diffMins} دقيقة`;
-            } else if (diffHours < 24) {
-                return `منذ ${diffHours} ساعة`;
-            } else if (diffDays < 7) {
-                return `منذ ${diffDays} يوم`;
+            if (currentLanguage === 'ar') {
+                if (diffMins < 1) {
+                    return translations.ar.now;
+                } else if (diffMins < 60) {
+                    return `${translations.ar.minutesAgo} ${diffMins} ${translations.ar.minute}`;
+                } else if (diffHours < 24) {
+                    return `${translations.ar.minutesAgo} ${diffHours} ${translations.ar.hour}`;
+                } else if (diffDays < 7) {
+                    return `${translations.ar.minutesAgo} ${diffDays} ${translations.ar.day}`;
+                } else {
+                    return date.toLocaleDateString('ar-SA');
+                }
             } else {
-                return date.toLocaleDateString('ar-SA');
+                if (diffMins < 1) {
+                    return translations.en.now;
+                } else if (diffMins < 60) {
+                    return `${diffMins} ${translations.en.minute}${diffMins > 1 ? 's' : ''} ${translations.en.minutesAgo}`;
+                } else if (diffHours < 24) {
+                    return `${diffHours} ${translations.en.hour}${diffHours > 1 ? 's' : ''} ${translations.en.minutesAgo}`;
+                } else if (diffDays < 7) {
+                    return `${diffDays} ${translations.en.day}${diffDays > 1 ? 's' : ''} ${translations.en.minutesAgo}`;
+                } else {
+                    return date.toLocaleDateString('en-US');
+                }
             }
         }
 
@@ -983,7 +1013,7 @@
                             description: descriptionAr,
                             image: article.images ? article.images[0].url : '',
                             published: getTimeAgo(article.published),
-                            source: 'نجم الشاشات',
+                            source: currentLanguage === 'ar' ? translations.ar.starScreens : translations.en.starScreens,
                             publishedDate: new Date(article.published)
                         };
                     })
@@ -994,29 +1024,30 @@
             } catch (error) {
                 console.error('Error fetching news:', error);
                 // بيانات احتياطية في حالة الفشل
+                const sourceText = currentLanguage === 'ar' ? translations.ar.starScreens : translations.en.starScreens;
                 newsData = [
                     {
-                        title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
-                        description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال",
+                        title: currentLanguage === 'ar' ? "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي" : "Chelsea prepares to face Hull City in the Premier League",
+                        description: currentLanguage === 'ar' ? "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال" : "Chelsea seeks to return to victories after losing to Arsenal",
                         image: "",
-                        published: "منذ ساعتين",
-                        source: "نجم الشاشات",
+                        published: getTimeAgo(new Date().toISOString()),
+                        source: sourceText,
                         publishedDate: new Date()
                     },
                     {
-                        title: "ليفربول يواجه فولهام في قمة الأسبوع",
-                        description: "مباراة قوية منتظرة بين ليفربول وفولهام",
+                        title: currentLanguage === 'ar' ? "ليفربول يواجه فولهام في قمة الأسبوع" : "Liverpool faces Fulham in the week's summit",
+                        description: currentLanguage === 'ar' ? "مباراة قوية منتظرة بين ليفربول وفولهام" : "A strong match expected between Liverpool and Fulham",
                         image: "",
-                        published: "منذ 3 ساعات",
-                        source: "نجم الشاشات",
+                        published: getTimeAgo(new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()),
+                        source: sourceText,
                         publishedDate: new Date()
                     },
                     {
-                        title: "مانشستر سيتي يواصل صدارته للدوري",
-                        description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة",
+                        title: currentLanguage === 'ar' ? "مانشستر سيتي يواصل صدارته للدوري" : "Manchester City continues to lead the league",
+                        description: currentLanguage === 'ar' ? "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة" : "City achieves a new victory and maintains the lead",
                         image: "",
-                        published: "منذ 5 ساعات",
-                        source: "نجم الشاشات",
+                        published: getTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
+                        source: sourceText,
                         publishedDate: new Date()
                     }
                 ];
@@ -1122,6 +1153,13 @@
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
             updateLanguageSelection();
+
+            // Re-fetch news if in news section to update language
+            if (document.getElementById('pane-news').classList.contains('active')) {
+                if (newsData.length > 0) {
+                    fetchNews();
+                }
+            }
 
             setTimeout(() => {
                 closeLanguageSheet();
