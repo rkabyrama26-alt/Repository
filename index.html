@@ -6,6 +6,8 @@
     <title>تطبيق احترافي بملء الشاشة</title>
     <!-- خط Alexandria الاحترافي -->
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- خط Cairo للأخبار -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -423,23 +425,23 @@
             display: block;
         }
 
-        /* News Feed Styles */
-        .news-feed-overlay {
+        /* News Feed Styles - Full Screen Without Any Borders */
+        #pane-news {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(3, 7, 18, 0.98);
-            z-index: 2000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            z-index: 50;
+            background: var(--bg-base);
         }
 
-        .news-feed-overlay.active {
+        #pane-news.active {
             display: block;
-            opacity: 1;
         }
 
         .news-feed-container {
@@ -447,6 +449,8 @@
             height: 100%;
             position: relative;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         .news-slide {
@@ -458,6 +462,8 @@
             opacity: 0;
             transition: opacity 0.5s ease;
             pointer-events: none;
+            margin: 0;
+            padding: 0;
         }
 
         .news-slide.active {
@@ -471,6 +477,17 @@
             height: 100%;
             object-fit: cover;
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            margin: 0;
+            padding: 0;
+        }
+
+        .news-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            margin: 0;
+            padding: 0;
         }
 
         .news-content {
@@ -485,16 +502,20 @@
         }
 
         .news-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            line-height: 1.4;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            letter-spacing: -0.5px;
         }
 
         .news-description {
-            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--text-muted);
-            line-height: 1.6;
+            line-height: 1.7;
             margin-bottom: 15px;
         }
 
@@ -502,7 +523,9 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            font-size: 0.8rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
             color: var(--text-muted);
         }
 
@@ -510,24 +533,6 @@
             display: flex;
             align-items: center;
             gap: 5px;
-        }
-
-        .news-close-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            z-index: 20;
         }
 
         .news-navigation {
@@ -568,17 +573,6 @@
 
     <div class="app-container">
 
-        <!-- News Feed Overlay -->
-        <div class="news-feed-overlay" id="newsFeedOverlay">
-            <button class="news-close-btn" onclick="closeNewsFeed()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="news-feed-container" id="newsFeedContainer">
-                <div class="news-navigation" id="newsNavigation"></div>
-                <div id="newsSlidesContainer"></div>
-            </div>
-        </div>
-
         <div class="viewport-area">
 
             <div id="pane-home" class="section-pane active">
@@ -605,7 +599,7 @@
                         <h3 data-key="series">مسلسلات</h3>
                         <p data-key="seriesDesc">مكتبة الأعمال الفنية</p>
                     </div>
-                    <div class="grid-card" onclick="openNewsFeed()">
+                    <div class="grid-card" onclick="switchPane(4)">
                         <i class="fa-solid fa-newspaper"></i>
                         <h3 data-key="news">أخبار</h3>
                         <p data-key="newsDesc">آخر المستجدات</p>
@@ -671,16 +665,11 @@
                 </div>
             </div>
 
+            <!-- News Section - Full Screen Without Any Borders -->
             <div id="pane-news" class="section-pane">
-                <div class="pane-header-title" data-key="latestNews">آخر الأخبار والمقالات</div>
-                <div class="stack-list">
-                    <div class="stack-item" onclick="openNewsFeed()">
-                        <div class="stack-icon-box" style="color: #38bdf8; background: rgba(56, 189, 248, 0.1);"><i class="fa-solid fa-bullhorn"></i></div>
-                        <div class="stack-info-box">
-                            <div class="stack-item-title" data-key="platformUpdate">تحديثات برمجية جديدة في المنصة</div>
-                            <div class="stack-item-sub" data-key="platformUpdateDesc">منذ ساعتين • فريق التطوير</div>
-                        </div>
-                    </div>
+                <div class="news-feed-container" id="newsFeedContainer">
+                    <div class="news-navigation" id="newsNavigation"></div>
+                    <div id="newsSlidesContainer"></div>
                 </div>
             </div>
 
@@ -772,7 +761,7 @@
                 <i class="fa-solid fa-film"></i>
                 <span data-key="navSeries">مسلسلات</span>
             </button>
-            <button class="dock-tab-btn" onclick="openNewsFeed()">
+            <button class="dock-tab-btn" onclick="switchPane(4)">
                 <i class="fa-solid fa-newspaper"></i>
                 <span data-key="navNews">أخبار</span>
             </button>
@@ -920,6 +909,20 @@
             dockBtnsArr[index].classList.add('active');
 
             document.querySelector('.viewport-area').scrollTop = 0;
+
+            // If switching to news pane, start the auto-scroll
+            if (index === 4) {
+                if (newsData.length === 0) {
+                    fetchNews();
+                } else {
+                    startNewsAutoScroll();
+                }
+            } else {
+                // If leaving news pane, stop the auto-scroll
+                if (newsInterval) {
+                    clearInterval(newsInterval);
+                }
+            }
         }
 
         async function fetchNews() {
@@ -977,8 +980,8 @@
                 const slide = document.createElement('div');
                 slide.className = `news-slide ${index === 0 ? 'active' : ''}`;
                 slide.innerHTML = `
-                    <div class="news-background" style="background: ${getRandomGradient()}">
-                        ${news.image ? `<img src="${news.image}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;" onerror="this.style.display='none'">` : ''}
+                    <div class="news-background">
+                        ${news.image ? `<img src="${news.image}" onerror="this.style.display='none'">` : ''}
                     </div>
                     <div class="news-content">
                         <div class="news-title">${news.title}</div>
@@ -1013,13 +1016,14 @@
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
             
+            // 12000 milliseconds = 12 seconds
             newsInterval = setInterval(() => {
                 if (currentNewsIndex < newsData.length - 1) {
                     goToNewsSlide(currentNewsIndex + 1);
                 } else {
                     goToNewsSlide(0);
                 }
-            }, 12000);
+            }, 12000); // 12 seconds
         }
 
         function goToNewsSlide(index) {
@@ -1033,26 +1037,6 @@
             
             slides[currentNewsIndex].classList.add('active');
             dots[currentNewsIndex].classList.add('active');
-        }
-
-        function openNewsFeed() {
-            const overlay = document.getElementById('newsFeedOverlay');
-            overlay.classList.add('active');
-            
-            if (newsData.length === 0) {
-                fetchNews();
-            } else {
-                startNewsAutoScroll();
-            }
-        }
-
-        function closeNewsFeed() {
-            const overlay = document.getElementById('newsFeedOverlay');
-            overlay.classList.remove('active');
-            
-            if (newsInterval) {
-                clearInterval(newsInterval);
-            }
         }
 
         function openLanguageSheet() {
@@ -1100,33 +1084,45 @@
             }
         }
 
-        // Touch support for news
+        // Touch support for news - Swipe up/down to navigate
         let touchStartY = 0;
         let touchEndY = 0;
 
         document.addEventListener('touchstart', e => {
             touchStartY = e.changedTouches[0].screenY;
-        });
+        }, {passive: true});
 
         document.addEventListener('touchend', e => {
             touchEndY = e.changedTouches[0].screenY;
             handleNewsSwipe();
-        });
+        }, {passive: true});
 
         function handleNewsSwipe() {
             const swipeThreshold = 50;
             const diff = touchStartY - touchEndY;
             
-            if (Math.abs(diff) > swipeThreshold && document.getElementById('newsFeedOverlay').classList.contains('active')) {
+            // Only handle swipe if we're in the news section
+            if (Math.abs(diff) > swipeThreshold && document.getElementById('pane-news').classList.contains('active')) {
                 if (diff > 0) {
+                    // Swipe up - go to next news
                     if (currentNewsIndex < newsData.length - 1) {
                         goToNewsSlide(currentNewsIndex + 1);
+                        resetNewsTimer();
                     }
                 } else {
+                    // Swipe down - go to previous news
                     if (currentNewsIndex > 0) {
                         goToNewsSlide(currentNewsIndex - 1);
+                        resetNewsTimer();
                     }
                 }
+            }
+        }
+
+        function resetNewsTimer() {
+            if (newsInterval) {
+                clearInterval(newsInterval);
+                startNewsAutoScroll();
             }
         }
 
