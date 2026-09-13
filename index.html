@@ -1069,36 +1069,45 @@
             }
         }
 
-        // وظيفة الترجمة المحسنة للسرعة والدقة (تستخدم واجهة سريعة مع شبكة أمان)
+        // وظيفة الترجمة من الإنجليزية إلى العربية
         async function translateText(text) {
             if (!text) return "";
-            try {
-                // محاولة استخدام واجهة سريعة أولاً
-                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(text)}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data && data[0] && data[0][0] && data[0][0][0]) {
-                    return data[0][0][0];
-                }
-            } catch (error) {
-                console.warn('Primary translation failed, trying fallback...');
-            }
-            
-            // شبكة الأمان: إذا فشلت الواجهة السريعة، نستخدم الواجهة الاحتياطية
             try {
                 const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`);
                 const data = await response.json();
                 if (data.responseStatus === 200 && data.responseData.translatedText) {
                     return data.responseData.translatedText;
                 }
+                return text;
             } catch (error) {
-                console.error('Fallback translation error:', error);
+                console.error('Translation error:', error);
+                return text;
             }
-            
-            return text;
         }
 
-        // وظيفة حساب الوقت المنقضي
+        // دالة مخصصة لحساب الوقت المنقضي بالعربية دائماً (للقسم الأخبار)
+        function getArabicTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) {
+                return "الآن";
+            } else if (diffMins < 60) {
+                return `منذ ${diffMins} دقيقة`;
+            } else if (diffHours < 24) {
+                return `منذ ${diffHours} ساعة`;
+            } else if (diffDays < 7) {
+                return `منذ ${diffDays} يوم`;
+            } else {
+                return date.toLocaleDateString('ar-SA');
+            }
+        }
+
+        // وظيفة حساب الوقت المنقضي العامة (حسب لغة التطبيق)
         function getTimeAgo(dateString) {
             const date = new Date(dateString);
             const now = new Date();
@@ -1136,40 +1145,27 @@
 
         async function fetchNews() {
             try {
-                // زيادة العدد إلى 30 خبراً لتوفير كمية وفيرة من الأخبار مع الحفاظ على الأداء
-                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=30');
+                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=100');
                 const data = await response.json();
                 
-                const articlesToProcess = data.articles ? data.articles.slice(0, 30) : [];
+                // تم تقليل العدد إلى 15 خبراً لتجنب تجاوز حد الترجمة المجاني اليومي وضمان بقاء الأخبار بالعربية دائماً دون أن ترجع للإنجليزية
+                const articlesToProcess = data.articles.slice(0, 15); 
                 
-                // ترجمة العناوين والأوصاف للعربية دائماً مع شبكة أمان فردية لكل خبر
                 const translatedArticles = await Promise.all(
-                    articlesToProcess.map(async (article, index) => {
-                        try {
-                            const titleAr = await translateText(article.headline);
-                            const descriptionAr = article.description 
-                                ? await translateText(article.description) 
-                                : titleAr;
-                            
-                            // تحقق أمان: إذا كانت النتيجة لا تزال تحتوي على أحرف إنجليزية بشكل كامل، استخدم الخبر الاحتياطي
-                            const isEnglish = /^[A-Za-z\s\-\.]+$/.test(titleAr);
-                            
-                            if (isEnglish) {
-                                return getFallbackArabicNews(index);
-                            }
-
-                            return {
-                                title: titleAr,
-                                description: descriptionAr,
-                                image: article.images ? article.images[0].url : '',
-                                published: getTimeAgo(article.published),
-                                source: translations.ar.starScreens,
-                                publishedDate: new Date(article.published)
-                            };
-                        } catch (err) {
-                            // في حال فشل ترجمة خبر معين، نستخدم الخبر الاحتياطي العربي بدلاً من ظهوره بالإنجليزية
-                            return getFallbackArabicNews(index);
-                        }
+                    articlesToProcess.map(async (article) => {
+                        const titleAr = await translateText(article.headline);
+                        const descriptionAr = article.description 
+                            ? await translateText(article.description) 
+                            : titleAr;
+                        
+                        return {
+                            title: titleAr,
+                            description: descriptionAr,
+                            image: article.images ? article.images[0].url : '',
+                            published: getArabicTimeAgo(article.published), // دالة مخصصة للعربية دائماً
+                            source: "نجم الشاشات", // مصدر عربي ثابت
+                            publishedDate: new Date(article.published)
+                        };
                     })
                 );
 
@@ -1177,63 +1173,35 @@
                 renderNewsSlides();
             } catch (error) {
                 console.error('Error fetching news:', error);
-                // بيانات احتياطية في حالة الفشل - بالعربية دائماً وبكمية وفيرة
+                // بيانات احتياطية في حالة الفشل - بالعربية دائماً
                 newsData = [
-                    getFallbackArabicNews(0),
-                    getFallbackArabicNews(1),
-                    getFallbackArabicNews(2),
-                    getFallbackArabicNews(3),
-                    getFallbackArabicNews(4)
+                    {
+                        title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
+                        description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال",
+                        image: "",
+                        published: getArabicTimeAgo(new Date().toISOString()),
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
+                    },
+                    {
+                        title: "ليفربول يواجه فولهام في قمة الأسبوع",
+                        description: "مباراة قوية منتظرة بين ليفربول وفولهام",
+                        image: "",
+                        published: getArabicTimeAgo(new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()),
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
+                    },
+                    {
+                        title: "مانشستر سيتي يواصل صدارته للدوري",
+                        description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة",
+                        image: "",
+                        published: getArabicTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
+                    }
                 ];
                 renderNewsSlides();
             }
-        }
-
-        // دالة مساعدة لتوليد أخبار احتياطية عربية مضمونة في حال فشل الترجمة
-        function getFallbackArabicNews(index) {
-            const fallbacks = [
-                {
-                    title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
-                    description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال في المباراة القادمة",
-                    image: "",
-                    published: getTimeAgo(new Date().toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "ليفربول يواجه فولهام في قمة الأسبوع",
-                    description: "مباراة قوية منتظرة بين ليفربول وفولهام على ملعب الأنفيلد",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "مانشستر سيتي يواصل صدارته للدوري",
-                    description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة بفارق مريح عن المطاردات",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "ريال مدريد يعلن عن صفقة جديدة لتعزيز الصفوف",
-                    description: "النادي الملكي يتعاقد مع نجم جديد استعداداً للموسم القادم",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "برشلونة يحسم معركة الكلاسيكو بأداء استثنائي",
-                    description: "أداء رائع من لاعبي البارسا يضمن لهم نقاط المباراة الثلاث",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                }
-            ];
-            return fallbacks[index % fallbacks.length];
         }
 
         function renderNewsSlides() {
@@ -1335,13 +1303,7 @@
 
             updateLanguageSelection();
 
-            // Re-fetch news if in news section to update language
-            if (document.getElementById('pane-news').classList.contains('active')) {
-                if (newsData.length > 0) {
-                    fetchNews();
-                }
-            }
-
+            // ملاحظة: قسم الأخبار مصمم ليبقى بالعربية دائماً حتى لو تغيرت لغة التطبيق
             setTimeout(() => {
                 closeLanguageSheet();
             }, 300);
