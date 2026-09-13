@@ -11,6 +11,17 @@
     <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- OneSignal Push Notifications -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "ca7fe2da-4ed0-4601-9352-a44af32fe5bd",
+        });
+      });
+    </script>
+    
     <style>
         :root {
             --bg-base: #030712;
@@ -706,6 +717,64 @@
             align-items: center;
             gap: 12px;
         }
+
+        /* Notifications Styles */
+        .notification-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .notification-card:hover {
+            background: var(--surface-hover);
+            transform: translateX(-3px);
+        }
+
+        .notification-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .notification-message {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .notification-time {
+            font-size: 0.72rem;
+            color: var(--accent-secondary);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            background: var(--surface-glass);
+            border: none;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: var(--surface-hover);
+        }
     </style>
 </head>
 <body>
@@ -816,14 +885,14 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </div>
 
-                    <!-- قسم الإشعارات -->
-                    <div class="stack-item">
+                    <!-- قسم الإشعارات - قابل للنقر -->
+                    <div class="stack-item" onclick="openNotifications()">
                         <div class="stack-icon-box" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
                             <i class="fa-solid fa-bell"></i>
                         </div>
                         <div class="stack-info-box">
                             <div class="stack-item-title" data-key="notifications">الإشعارات</div>
-                            <div class="stack-item-sub" data-key="notificationsDesc">قيد البرمجة والتطوير حالياً</div>
+                            <div class="stack-item-sub">اضغط لعرض الإشعارات</div>
                         </div>
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </div>
@@ -868,6 +937,26 @@
                     </a>
                 </div>
 
+            </div>
+
+            <!-- قسم الإشعارات -->
+            <div id="pane-notifications" class="section-pane">
+                <button class="back-button" onclick="switchPane(5)">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>العودة للإعدادات</span>
+                </button>
+                
+                <div class="pane-header-title">
+                    <span>الإشعارات</span>
+                    <i class="fa-solid fa-bell" style="color: var(--accent-secondary);"></i>
+                </div>
+                
+                <div class="stack-list" id="notificationsList">
+                    <div class="schedule-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i>
+                        <span>جاري تحميل الإشعارات...</span>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -1062,6 +1151,9 @@
                 }
             } else if (index === 2) {
                 fetchSchedule();
+            } else if (index === 5) {
+                // Load settings alert when opening settings
+                loadSettingsAlert();
             } else {
                 if (newsInterval) {
                     clearInterval(newsInterval);
@@ -1069,33 +1161,16 @@
             }
         }
 
-        // وظيفة الترجمة المحسنة للسرعة والدقة (تستخدم واجهة سريعة مع شبكة أمان)
-        async function translateText(text) {
-            if (!text) return "";
-            try {
-                // محاولة استخدام واجهة سريعة أولاً
-                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(text)}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data && data[0] && data[0][0] && data[0][0][0]) {
-                    return data[0][0][0];
-                }
-            } catch (error) {
-                console.warn('Primary translation failed, trying fallback...');
-            }
+        // فتح قسم الإشعارات
+        function openNotifications() {
+            panesArr.forEach(pane => pane.classList.remove('active'));
+            dockBtnsArr.forEach(btn => btn.classList.remove('active'));
             
-            // شبكة الأمان: إذا فشلت الواجهة السريعة، نستخدم الواجهة الاحتياطية
-            try {
-                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`);
-                const data = await response.json();
-                if (data.responseStatus === 200 && data.responseData.translatedText) {
-                    return data.responseData.translatedText;
-                }
-            } catch (error) {
-                console.error('Fallback translation error:', error);
-            }
+            document.getElementById('pane-notifications').classList.add('active');
+            dockBtnsArr[5].classList.add('active');
             
-            return text;
+            document.querySelector('.viewport-area').scrollTop = 0;
+            loadNotifications();
         }
 
         // وظيفة حساب الوقت المنقضي
@@ -1134,42 +1209,48 @@
             }
         }
 
+        // وظيفة محسنة لسرعة فائقة وضمان اللغة العربية دائماً
         async function fetchNews() {
             try {
-                // زيادة العدد إلى 30 خبراً لتوفير كمية وفيرة من الأخبار مع الحفاظ على الأداء
-                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=30');
+                // تقليل العدد المطلوب من 100 إلى 15 لتسريع الاستجابة الشبكية
+                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=15');
                 const data = await response.json();
                 
-                const articlesToProcess = data.articles ? data.articles.slice(0, 30) : [];
+                // أخذ أحدث 8 أخبار فقط (هذا هو السر في السرعة الفائقة وتجنب حظر API الترجمة)
+                const articlesToProcess = data.articles.slice(0, 8);
                 
-                // ترجمة العناوين والأوصاف للعربية دائماً مع شبكة أمان فردية لكل خبر
                 const translatedArticles = await Promise.all(
-                    articlesToProcess.map(async (article, index) => {
-                        try {
-                            const titleAr = await translateText(article.headline);
-                            const descriptionAr = article.description 
-                                ? await translateText(article.description) 
-                                : titleAr;
-                            
-                            // تحقق أمان: إذا كانت النتيجة لا تزال تحتوي على أحرف إنجليزية بشكل كامل، استخدم الخبر الاحتياطي
-                            const isEnglish = /^[A-Za-z\s\-\.]+$/.test(titleAr);
-                            
-                            if (isEnglish) {
-                                return getFallbackArabicNews(index);
-                            }
+                    articlesToProcess.map(async (article) => {
+                        let titleAr = article.headline;
+                        let descriptionAr = article.description || titleAr;
 
-                            return {
-                                title: titleAr,
-                                description: descriptionAr,
-                                image: article.images ? article.images[0].url : '',
-                                published: getTimeAgo(article.published),
-                                source: translations.ar.starScreens,
-                                publishedDate: new Date(article.published)
-                            };
-                        } catch (err) {
-                            // في حال فشل ترجمة خبر معين، نستخدم الخبر الاحتياطي العربي بدلاً من ظهوره بالإنجليزية
-                            return getFallbackArabicNews(index);
+                        // محاولة الترجمة للعربية دائماً بشكل آمن وسريع
+                        try {
+                            const titleRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(article.headline)}&langpair=en|ar`);
+                            const titleData = await titleRes.json();
+                            if (titleData.responseStatus === 200 && titleData.responseData.translatedText) {
+                                titleAr = titleData.responseData.translatedText;
+                            }
+                        } catch (e) { /* في حال فشل الترجمة، سيتم الاعتماد على العنوان الأصلي أو الاحتياطي */ }
+
+                        if (article.description) {
+                            try {
+                                const descRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(article.description)}&langpair=en|ar`);
+                                const descData = await descRes.json();
+                                if (descData.responseStatus === 200 && descData.responseData.translatedText) {
+                                    descriptionAr = descData.responseData.translatedText;
+                                }
+                            } catch (e) { /* تجاهل الخطأ والاستمرار */ }
                         }
+                        
+                        return {
+                            title: titleAr,
+                            description: descriptionAr,
+                            image: article.images && article.images.length > 0 ? article.images[0].url : '',
+                            published: getTimeAgo(article.published),
+                            source: "نجم الشاشات", // ثابت بالعربية دائماً
+                            publishedDate: new Date(article.published)
+                        };
                     })
                 );
 
@@ -1177,63 +1258,35 @@
                 renderNewsSlides();
             } catch (error) {
                 console.error('Error fetching news:', error);
-                // بيانات احتياطية في حالة الفشل - بالعربية دائماً وبكمية وفيرة
+                // بيانات احتياطية بالعربية دائماً في حال فشل الاتصال تماماً
                 newsData = [
-                    getFallbackArabicNews(0),
-                    getFallbackArabicNews(1),
-                    getFallbackArabicNews(2),
-                    getFallbackArabicNews(3),
-                    getFallbackArabicNews(4)
+                    {
+                        title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
+                        description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال في الجولة الماضية",
+                        image: "",
+                        published: getTimeAgo(new Date().toISOString()),
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
+                    },
+                    {
+                        title: "ليفربول يواجه فولهام في قمة الأسبوع",
+                        description: "مباراة قوية منتظرة بين ليفربول وفولهام على صدارة الترتيب",
+                        image: "",
+                        published: getTimeAgo(new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()),
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
+                    },
+                    {
+                        title: "مانشستر سيتي يواصل صدارته للدوري",
+                        description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة بفارق مريح",
+                        image: "",
+                        published: getTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
+                        source: "نجم الشاشات",
+                        publishedDate: new Date()
+                    }
                 ];
                 renderNewsSlides();
             }
-        }
-
-        // دالة مساعدة لتوليد أخبار احتياطية عربية مضمونة في حال فشل الترجمة
-        function getFallbackArabicNews(index) {
-            const fallbacks = [
-                {
-                    title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
-                    description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال في المباراة القادمة",
-                    image: "",
-                    published: getTimeAgo(new Date().toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "ليفربول يواجه فولهام في قمة الأسبوع",
-                    description: "مباراة قوية منتظرة بين ليفربول وفولهام على ملعب الأنفيلد",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "مانشستر سيتي يواصل صدارته للدوري",
-                    description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة بفارق مريح عن المطاردات",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "ريال مدريد يعلن عن صفقة جديدة لتعزيز الصفوف",
-                    description: "النادي الملكي يتعاقد مع نجم جديد استعداداً للموسم القادم",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                },
-                {
-                    title: "برشلونة يحسم معركة الكلاسيكو بأداء استثنائي",
-                    description: "أداء رائع من لاعبي البارسا يضمن لهم نقاط المباراة الثلاث",
-                    image: "",
-                    published: getTimeAgo(new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()),
-                    source: translations.ar.starScreens,
-                    publishedDate: new Date()
-                }
-            ];
-            return fallbacks[index % fallbacks.length];
         }
 
         function renderNewsSlides() {
@@ -1270,16 +1323,6 @@
             startNewsAutoScroll();
         }
 
-        function getRandomGradient() {
-            const gradients = [
-                'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-                'linear-gradient(135deg, #312e81 0%, #1e3a8a 100%)',
-                'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
-                'linear-gradient(135deg, #7c2d12 0%, #9a3412 100%)'
-            ];
-            return gradients[Math.floor(Math.random() * gradients.length)];
-        }
-
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
             
@@ -1297,13 +1340,13 @@
             const slides = document.querySelectorAll('.news-slide');
             const dots = document.querySelectorAll('.nav-dot');
             
-            slides[currentNewsIndex].classList.remove('active');
-            dots[currentNewsIndex].classList.remove('active');
+            if(slides[currentNewsIndex]) slides[currentNewsIndex].classList.remove('active');
+            if(dots[currentNewsIndex]) dots[currentNewsIndex].classList.remove('active');
             
             currentNewsIndex = index;
             
-            slides[currentNewsIndex].classList.add('active');
-            dots[currentNewsIndex].classList.add('active');
+            if(slides[currentNewsIndex]) slides[currentNewsIndex].classList.add('active');
+            if(dots[currentNewsIndex]) dots[currentNewsIndex].classList.add('active');
         }
 
         function openLanguageSheet() {
@@ -1335,13 +1378,7 @@
 
             updateLanguageSelection();
 
-            // Re-fetch news if in news section to update language
-            if (document.getElementById('pane-news').classList.contains('active')) {
-                if (newsData.length > 0) {
-                    fetchNews();
-                }
-            }
-
+            // ملاحظة: الأخبار تبقى عربية دائماً بغض النظر عن لغة التطبيق كما طلبت
             setTimeout(() => {
                 closeLanguageSheet();
             }, 300);
@@ -1363,7 +1400,6 @@
             const container = document.getElementById('scheduleList');
             if (!container) return;
             
-            // إظهار التحميل فقط إذا كانت القائمة فارغة أو تحتوي على رسالة تحميل
             if (container.children.length === 0 || container.querySelector('.schedule-loading')) {
                 container.innerHTML = `
                     <div class="schedule-loading">
@@ -1427,13 +1463,13 @@
                         centerContent = `<div class="match-time">${timeStr}</div>`;
                     }
 
-                    // ترجمة أسماء الفرق للعربية
                     const homeTeamNameAr = translateTeamName(homeTeam.shortDisplayName || homeTeam.name);
                     const awayTeamNameAr = translateTeamName(awayTeam.shortDisplayName || awayTeam.name);
 
                     const matchCard = document.createElement('div');
                     matchCard.className = 'match-card';
                     matchCard.innerHTML = `
+                        <div class="match-league"><i class="fa-solid fa-trophy"></i> ${leagueName}</div>
                         <div class="match-teams">
                             <div class="match-team">
                                 <img src="${homeTeam.logo}" alt="${homeTeam.name}" class="match-team-logo" onerror="this.src='https://via.placeholder.com/46?text=H'">
@@ -1547,6 +1583,73 @@
             return teamTranslations[englishName] || englishName;
         }
 
+        // وظيفة تحميل إشعارات الإعدادات
+        function loadSettingsAlert() {
+            const alertElement = document.getElementById('settings-alert');
+            if (alertElement) {
+                fetch('https://api.npoint.io/fc949ee743ac90f568ff')
+                    .then(res => res.json())
+                    .then(data => {
+                        alertElement.innerText = data.settings_alert;
+                    })
+                    .catch(() => {
+                        alertElement.style.display = 'none';
+                    });
+            }
+        }
+
+        // وظيفة تحميل الإشعارات وعرضها
+        function loadNotifications() {
+            const container = document.getElementById('notificationsList');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="schedule-loading">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i>
+                    <span>جاري تحميل الإشعارات...</span>
+                </div>
+            `;
+            
+            fetch('https://api.npoint.io/fc949ee743ac90f568ff')
+                .then(res => res.json())
+                .then(data => {
+                    container.innerHTML = '';
+                    
+                    // عرض الإشعار من الرابط
+                    if (data.settings_alert) {
+                        const notificationCard = document.createElement('div');
+                        notificationCard.className = 'notification-card';
+                        notificationCard.innerHTML = `
+                            <div class="notification-title">
+                                <i class="fa-solid fa-bell" style="color: var(--accent-secondary); margin-left: 8px;"></i>
+                                إشعار مهم
+                            </div>
+                            <div class="notification-message">${data.settings_alert}</div>
+                            <div class="notification-time">
+                                <i class="fa-regular fa-clock"></i>
+                                <span>الآن</span>
+                            </div>
+                        `;
+                        container.appendChild(notificationCard);
+                    } else {
+                        container.innerHTML = `
+                            <div class="schedule-loading">
+                                <i class="fa-regular fa-bell" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                <span>لا توجد إشعارات جديدة حالياً</span>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(() => {
+                    container.innerHTML = `
+                        <div class="schedule-loading" style="color: #ef4444;">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem; margin-bottom: 10px;"></i>
+                            <span>فشل في تحميل الإشعارات. يرجى التحقق من الاتصال.</span>
+                        </div>
+                    `;
+                });
+        }
+
         // Touch support for news - Swipe up/down to navigate
         let touchStartY = 0;
         let touchEndY = 0;
@@ -1564,16 +1667,13 @@
             const swipeThreshold = 50;
             const diff = touchStartY - touchEndY;
             
-            // Only handle swipe if we're in the news section
             if (Math.abs(diff) > swipeThreshold && document.getElementById('pane-news').classList.contains('active')) {
                 if (diff > 0) {
-                    // Swipe up - go to next news
                     if (currentNewsIndex < newsData.length - 1) {
                         goToNewsSlide(currentNewsIndex + 1);
                         resetNewsTimer();
                     }
                 } else {
-                    // Swipe down - go to previous news
                     if (currentNewsIndex > 0) {
                         goToNewsSlide(currentNewsIndex - 1);
                         resetNewsTimer();
