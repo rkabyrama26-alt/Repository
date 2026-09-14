@@ -438,6 +438,129 @@
             display: block;
         }
 
+        /* Share Bottom Sheet Styles */
+        .share-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .share-overlay.active {
+            display: block;
+        }
+
+        .share-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-base);
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .share-sheet.active {
+            transform: translateY(0);
+        }
+
+        .share-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .share-options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 8px;
+            background: var(--surface-glass);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-glass);
+        }
+
+        .share-option:hover {
+            background: var(--surface-hover);
+            transform: translateY(-4px);
+        }
+
+        .share-option-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .share-option.facebook .share-option-icon {
+            background: linear-gradient(135deg, #1877f2 0%, #0d5cb6 100%);
+        }
+
+        .share-option.whatsapp .share-option-icon {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+        }
+
+        .share-option.telegram .share-option-icon {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+        }
+
+        .share-option.twitter .share-option-icon {
+            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+        }
+
+        .share-option.copy .share-option-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+        }
+
+        .share-option-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .share-cancel-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .share-cancel-btn:hover {
+            background: var(--surface-hover);
+        }
+
         /* News Feed Styles - Full Screen Without Any Borders */
         #pane-news {
             position: fixed;
@@ -816,14 +939,14 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </div>
 
-                    <!-- قسم الإشعارات -->
-                    <div class="stack-item">
-                        <div class="stack-icon-box" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
-                            <i class="fa-solid fa-bell"></i>
+                    <!-- قسم المشاركة -->
+                    <div class="stack-item" onclick="openShareSheet()">
+                        <div class="stack-icon-box" style="color: #10b981; background: rgba(16, 185, 129, 0.1);">
+                            <i class="fa-solid fa-share-nodes"></i>
                         </div>
                         <div class="stack-info-box">
-                            <div class="stack-item-title" data-key="notifications">الإشعارات</div>
-                            <div class="stack-item-sub" data-key="notificationsDesc">قيد البرمجة والتطوير حالياً</div>
+                            <div class="stack-item-title" data-key="shareApp">مشاركة التطبيق</div>
+                            <div class="stack-item-sub" data-key="shareAppDesc">شارك التطبيق مع أصدقائك</div>
                         </div>
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </div>
@@ -922,6 +1045,52 @@
         </div>
     </div>
 
+    <!-- Share Bottom Sheet -->
+    <div class="share-overlay" id="shareOverlay" onclick="closeShareSheet()"></div>
+    <div class="share-sheet" id="shareSheet">
+        <div class="sheet-handle"></div>
+        <div class="share-title" data-key="shareTitle">مشاركة التطبيق</div>
+        
+        <div class="share-options-grid">
+            <div class="share-option facebook" onclick="shareToFacebook()">
+                <div class="share-option-icon">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </div>
+                <span class="share-option-text" data-key="facebook">فيسبوك</span>
+            </div>
+            
+            <div class="share-option whatsapp" onclick="shareToWhatsApp()">
+                <div class="share-option-icon">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <span class="share-option-text" data-key="whatsapp">واتساب</span>
+            </div>
+            
+            <div class="share-option telegram" onclick="shareToTelegram()">
+                <div class="share-option-icon">
+                    <i class="fa-brands fa-telegram-plane"></i>
+                </div>
+                <span class="share-option-text" data-key="telegram">تيليجرام</span>
+            </div>
+            
+            <div class="share-option twitter" onclick="shareToTwitter()">
+                <div class="share-option-icon">
+                    <i class="fa-brands fa-twitter"></i>
+                </div>
+                <span class="share-option-text" data-key="twitter">تويتر</span>
+            </div>
+        </div>
+        
+        <div class="share-option copy" onclick="copyLink()" style="margin-bottom: 16px;">
+            <div class="share-option-icon" style="width: 56px; height: 56px; border-radius: 16px;">
+                <i class="fa-solid fa-link"></i>
+            </div>
+            <span class="share-option-text" data-key="copyLink">نسخ الرابط</span>
+        </div>
+        
+        <button class="share-cancel-btn" onclick="closeShareSheet()" data-key="cancel">إلغاء</button>
+    </div>
+
     <script>
         const panesArr = document.querySelectorAll('.section-pane');
         const dockBtnsArr = document.querySelectorAll('.dock-tab-btn');
@@ -929,6 +1098,7 @@
         let currentNewsIndex = 0;
         let newsData = [];
         let newsInterval;
+        const appUrl = window.location.href; // رابط التطبيق الحالي
 
         const translations = {
             ar: {
@@ -963,8 +1133,15 @@
                 platformUpdate: "تحديثات برمجية جديدة في المنصة",
                 platformUpdateDesc: "منذ ساعتين • فريق التطوير",
                 language: "اللغة",
-                notifications: "الإشعارات",
-                notificationsDesc: "قيد البرمجة والتطوير حالياً",
+                shareApp: "مشاركة التطبيق",
+                shareAppDesc: "شارك التطبيق مع أصدقائك",
+                shareTitle: "مشاركة التطبيق",
+                facebook: "فيسبوك",
+                whatsapp: "واتساب",
+                telegram: "تيليجرام",
+                twitter: "تويتر",
+                copyLink: "نسخ الرابط",
+                cancel: "إلغاء",
                 socialSupport: "مواقع التواصل والدعم",
                 telegramChannel: "قناة التلغرام",
                 telegramDesc: "انضم لقناتنا على تلغرام",
@@ -1019,8 +1196,15 @@
                 platformUpdate: "New software updates on the platform",
                 platformUpdateDesc: "2 hours ago • Development Team",
                 language: "Language",
-                notifications: "Notifications",
-                notificationsDesc: "Currently under programming and development",
+                shareApp: "Share App",
+                shareAppDesc: "Share the app with your friends",
+                shareTitle: "Share App",
+                facebook: "Facebook",
+                whatsapp: "WhatsApp",
+                telegram: "Telegram",
+                twitter: "Twitter",
+                copyLink: "Copy Link",
+                cancel: "Cancel",
                 socialSupport: "Social Media and Support",
                 telegramChannel: "Telegram Channel",
                 telegramDesc: "Join our channel on Telegram",
@@ -1319,6 +1503,128 @@
                 selectedOption.classList.add('selected');
             }
         }
+
+        // Share Functions
+        function openShareSheet() {
+            document.getElementById('shareOverlay').classList.add('active');
+            document.getElementById('shareSheet').classList.add('active');
+        }
+
+        function closeShareSheet() {
+            document.getElementById('shareOverlay').classList.remove('active');
+            document.getElementById('shareSheet').classList.remove('active');
+        }
+
+        function shareToFacebook() {
+            const shareText = currentLanguage === 'ar' 
+                ? 'تطبيق نجم الشاشات - أفضل منصة للبث المباشر' 
+                : 'Star Screens App - Best Live Streaming Platform';
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(shareText)}`;
+            window.open(url, '_blank', 'width=600,height=400');
+            closeShareSheet();
+        }
+
+        function shareToWhatsApp() {
+            const shareText = currentLanguage === 'ar' 
+                ? `📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n${appUrl}` 
+                : `📺 Star Screens App\nBest Live Streaming Platform\n${appUrl}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+            window.open(url, '_blank');
+            closeShareSheet();
+        }
+
+        function shareToTelegram() {
+            const shareText = currentLanguage === 'ar' 
+                ? 'تطبيق نجم الشاشات - أفضل منصة للبث المباشر' 
+                : 'Star Screens App - Best Live Streaming Platform';
+            const url = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(shareText)}`;
+            window.open(url, '_blank');
+            closeShareSheet();
+        }
+
+        function shareToTwitter() {
+            const shareText = currentLanguage === 'ar' 
+                ? 'تطبيق نجم الشاشات - أفضل منصة للبث المباشر' 
+                : 'Star Screens App - Best Live Streaming Platform';
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
+            window.open(url, '_blank', 'width=600,height=400');
+            closeShareSheet();
+        }
+
+        async function copyLink() {
+            try {
+                await navigator.clipboard.writeText(appUrl);
+                
+                // Show success message
+                const toast = document.createElement('div');
+                toast.textContent = currentLanguage === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Link copied successfully!';
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(16, 185, 129, 0.95);
+                    color: white;
+                    padding: 16px 32px;
+                    border-radius: 12px;
+                    font-weight: 700;
+                    z-index: 9999;
+                    animation: fadeInOut 2s ease;
+                `;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 2000);
+                
+                closeShareSheet();
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = appUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const toast = document.createElement('div');
+                toast.textContent = currentLanguage === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Link copied successfully!';
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(16, 185, 129, 0.95);
+                    color: white;
+                    padding: 16px 32px;
+                    border-radius: 12px;
+                    font-weight: 700;
+                    z-index: 9999;
+                    animation: fadeInOut 2s ease;
+                `;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 2000);
+                
+                closeShareSheet();
+            }
+        }
+
+        // Add animation for toast
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
 
         // وظيفة جلب جدول المباريات من ESPN API
         async function fetchSchedule() {
