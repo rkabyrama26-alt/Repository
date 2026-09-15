@@ -838,7 +838,6 @@
             margin-bottom: 12px;
             backdrop-filter: blur(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /* تم حذف الحدود البيضاء */
             border: none;
         }
 
@@ -858,7 +857,6 @@
             align-items: center;
             gap: 6px;
             padding-bottom: 10px;
-            /* تم حذف الخط السفلي */
             border-bottom: none;
         }
 
@@ -1704,7 +1702,7 @@
             
             setTimeout(() => {
                 toast.classList.remove('show');
-            }, 2000);
+            }, 2500);
         }
 
         function getShareText() {
@@ -1758,25 +1756,90 @@
             setTimeout(closeShareSheet, 500);
         }
 
-        // Instagram - لا يدعم المشاركة المباشرة عبر URL، نستخدم Web Share API
+        // Instagram - إنشاء صورة ومشاركتها عبر قائمة النظام (مطابق للصورة)
         async function shareToInstagram() {
+            const shareText = getShareTextShort();
+            
+            // إنشاء صورة عبر Canvas
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1080;
+                canvas.height = 1080;
+                const ctx = canvas.getContext('2d');
+                
+                // الخلفية
+                ctx.fillStyle = '#030712';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // العنوان
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 70px Alexandria, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('تطبيق نجم الشاشات', canvas.width / 2, canvas.height / 2 - 80);
+                
+                // الوصف
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = '45px Alexandria, sans-serif';
+                ctx.fillText('أفضل منصة للبث المباشر', canvas.width / 2, canvas.height / 2 + 20);
+                
+                // الرابط
+                ctx.fillStyle = '#6366f1';
+                ctx.font = '35px Alexandria, sans-serif';
+                ctx.fillText(appUrl, canvas.width / 2, canvas.height / 2 + 130);
+
+                // تحويل الصورة إلى ملف
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        fallbackShare(shareText);
+                        return;
+                    }
+                    
+                    const file = new File([blob], 'star-screens.jpg', { type: 'image/jpeg' });
+                    
+                    // التحقق من دعم مشاركة الملفات
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
+                                text: shareText
+                            });
+                            closeShareSheet();
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                fallbackShare(shareText);
+                            }
+                        }
+                    } else {
+                        fallbackShare(shareText);
+                    }
+                }, 'image/jpeg', 0.95);
+                
+            } catch (e) {
+                fallbackShare(shareText);
+            }
+        }
+
+        // دالة احتياطية في حال عدم دعم مشاركة الملفات
+        async function fallbackShare(shareText) {
             if (navigator.share) {
                 try {
                     await navigator.share({
                         title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
-                        text: getShareTextShort(),
+                        text: shareText,
                         url: appUrl
                     });
                     closeShareSheet();
                 } catch (err) {
                     if (err.name !== 'AbortError') {
                         copyLink();
-                        showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، الصقه في انستغرام' : 'Link copied, paste it in Instagram');
+                        showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، افتح انستغرام والصقه' : 'Link copied, open Instagram and paste it');
                     }
                 }
             } else {
                 copyLink();
-                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، الصقه في انستغرام' : 'Link copied, paste it in Instagram');
+                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، افتح انستغرام والصقه' : 'Link copied, open Instagram and paste it');
             }
         }
 
@@ -1806,7 +1869,7 @@
             try {
                 await navigator.clipboard.writeText(appUrl);
                 showToast(translations[currentLanguage].linkCopied);
-                setTimeout(closeShareSheet, 1000);
+                setTimeout(closeShareSheet, 1500);
             } catch (err) {
                 const textArea = document.createElement('textarea');
                 textArea.value = appUrl;
@@ -1816,7 +1879,7 @@
                 document.body.removeChild(textArea);
                 
                 showToast(translations[currentLanguage].linkCopied);
-                setTimeout(closeShareSheet, 1000);
+                setTimeout(closeShareSheet, 1500);
             }
         }
 
@@ -2043,5 +2106,15 @@
             updateLanguageSelection();
         });
     </script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "01bc5102-ce07-4701-b95a-f864b9877ddf",
+    });
+  });
+</script>
+
 </body>
 </html>
