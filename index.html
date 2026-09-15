@@ -336,7 +336,7 @@
             color: var(--accent-secondary);
         }
 
-        /* Language Bottom Sheet Styles - Matching App Theme */
+        /* Language Bottom Sheet Styles */
         .language-overlay {
             display: none;
             position: fixed;
@@ -438,7 +438,9 @@
             display: block;
         }
 
-        /* Share Bottom Sheet Styles - Matching Screenshot Design */
+        /* ============================================
+           Share Bottom Sheet - التصميم الجديد مطابق للصورة
+           ============================================ */
         .share-overlay {
             display: none;
             position: fixed;
@@ -462,160 +464,212 @@
             right: 0;
             background: #0a0f1c;
             border-radius: 24px 24px 0 0;
-            padding: 24px 16px 32px;
+            padding: 18px 18px 24px;
             z-index: 2001;
             transform: translateY(100%);
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 92vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+            border-top: none;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .share-sheet::-webkit-scrollbar {
+            display: none;
         }
 
         .share-sheet.active {
             transform: translateY(0);
         }
 
-        .share-sheet-handle {
-            width: 40px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            margin: 0 auto 24px;
+        .share-close-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .share-close-btn:active {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .share-sheet-title {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 28px;
+            margin-top: 30px;
+            margin-bottom: 8px;
             text-align: center;
+            font-family: 'Alexandria', sans-serif;
+            letter-spacing: -0.5px;
         }
 
-        .share-options-row {
+        .share-sheet-subtitle {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 22px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        /* شبكة أيقونات التطبيقات - استخدام Flexbox لتوسيط الأزرار بالتساوي */
+        .share-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px 10px;
+            margin-bottom: 22px;
+            padding: 0 4px;
+        }
+
+        .share-grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            user-select: none;
+            width: calc(25% - 10px);
+            max-width: 80px;
+        }
+
+        .share-grid-item:active {
+            transform: scale(0.9);
+        }
+
+        .share-grid-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ألوان الأيقونات - مطابقة للصورة */
+        .share-grid-icon.instagram {
+            background: linear-gradient(45deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+        }
+
+        .share-grid-icon.facebook {
+            background: #1877f2;
+        }
+
+        .share-grid-icon.whatsapp {
+            background: #25d366;
+        }
+
+        .share-grid-icon.messages {
+            background: #34c759;
+        }
+
+        .share-grid-icon.email {
+            background: #1e88e5;
+        }
+
+        .share-grid-icon.viber {
+            background: #7360f2;
+        }
+
+        .share-grid-icon.telegram {
+            background: #229ED9;
+        }
+
+        .share-grid-item span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* زر المزيد وزر نسخ الرابط */
+        .share-actions-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+            padding: 0 4px;
         }
 
-        .share-option-item {
+        .share-action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            padding: 16px 8px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .share-option-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            transform: translateY(-2px);
-        }
-
-        .share-option-item:active {
-            transform: scale(0.95);
-        }
-
-        .share-option-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .share-option-item.twitter .share-option-icon {
-            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
-        }
-
-        .share-option-item.telegram .share-option-icon {
-            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
-        }
-
-        .share-option-item.whatsapp .share-option-icon {
-            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-        }
-
-        .share-option-item.facebook .share-option-icon {
-            background: linear-gradient(135deg, #1877f2 0%, #0d5cb6 100%);
-        }
-
-        .share-option-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .share-copy-section {
-            margin: 16px 0 20px;
-        }
-
-        .share-copy-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            padding: 24px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 16px;
+            gap: 10px;
+            padding: 18px 10px;
+            background: rgba(255, 255, 255, 0.045);
+            border-radius: 18px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            width: 100%;
+            transition: all 0.25s ease;
+            user-select: none;
+            border: none;
         }
 
-        .share-copy-button:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .share-copy-button:active {
-            transform: scale(0.98);
-        }
-
-        .share-copy-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .share-copy-label {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .share-cancel-button {
-            width: 100%;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            color: var(--text-main);
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 8px;
-        }
-
-        .share-cancel-button:hover {
+        .share-action-btn:hover {
             background: rgba(255, 255, 255, 0.08);
         }
 
+        .share-action-btn:active {
+            transform: scale(0.96);
+        }
+
+        .share-action-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: rgba(99, 102, 241, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--accent-secondary);
+        }
+
+        .share-action-btn span {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* زر الإلغاء - أخضر */
+        .share-cancel-button {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            color: #22c55e;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: 'Alexandria', sans-serif;
+            border-top: none;
+            margin-top: 6px;
+        }
+
         .share-cancel-button:active {
-            transform: scale(0.98);
+            opacity: 0.6;
         }
 
         /* Toast Notification */
@@ -641,7 +695,7 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* News Feed Styles - Full Screen Without Any Borders */
+        /* News Feed Styles */
         #pane-news {
             position: fixed;
             top: 0;
@@ -776,21 +830,21 @@
             height: 40px;
         }
 
-        /* Schedule / Match Card Styles - New Beautiful Design */
+        /* Schedule / Match Card Styles - تم إزالة الخطوط البيضاء */
         .match-card {
             background: var(--surface-glass);
-            border: 1px solid var(--border-glass);
             border-radius: 20px;
             padding: 18px 16px;
             margin-bottom: 12px;
             backdrop-filter: blur(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* تم حذف الحدود البيضاء */
+            border: none;
         }
 
         .match-card:hover {
             background: var(--surface-hover);
             transform: translateY(-2px);
-            border-color: var(--border-glow);
         }
 
         .match-league {
@@ -803,8 +857,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            border-bottom: 1px solid var(--border-glass);
             padding-bottom: 10px;
+            /* تم حذف الخط السفلي */
+            border-bottom: none;
         }
 
         .match-league i {
@@ -876,7 +931,7 @@
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.06);
             color: var(--text-muted);
-            border: 1px solid var(--border-glass);
+            border: none;
         }
 
         .match-status.live {
@@ -1058,7 +1113,7 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </a>
 
-                    <!-- البريد الإلكتروني - الاسم فقط -->
+                    <!-- البريد الإلكتروني -->
                     <a href="mailto:zjffjxvh8885@gmail.com" class="stack-item" style="text-decoration: none; color: inherit;">
                         <div class="stack-icon-box" style="color: #ea4335; background: rgba(234, 67, 53, 0.1);">
                             <i class="fa-solid fa-envelope"></i>
@@ -1125,48 +1180,89 @@
         </div>
     </div>
 
-    <!-- Share Bottom Sheet -->
+    <!-- ============================================
+         Share Bottom Sheet - التصميم الجديد مطابق للصورة
+         ============================================ -->
     <div class="share-overlay" id="shareOverlay" onclick="closeShareSheet()"></div>
     <div class="share-sheet" id="shareSheet">
-        <div class="share-sheet-handle"></div>
-        <div class="share-sheet-title" data-key="shareTitle">مشاركة التطبيق</div>
+        <button class="share-close-btn" onclick="closeShareSheet()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
         
-        <div class="share-options-row">
-            <div class="share-option-item twitter" onclick="shareToTwitter()">
-                <div class="share-option-icon">
-                    <i class="fa-brands fa-twitter"></i>
+        <div class="share-sheet-title" data-key="shareTitle">انشر تطبيق نجم الشاشات</div>
+        <div class="share-sheet-subtitle" data-key="shareSubtitle">شكراً لدعمكم تطبيق نجم الشاشات</div>
+        
+        <div class="share-grid">
+            <!-- انستغرام -->
+            <div class="share-grid-item" onclick="shareToInstagram()">
+                <div class="share-grid-icon instagram">
+                    <i class="fa-brands fa-instagram"></i>
                 </div>
-                <span class="share-option-label" data-key="twitter">تويتر</span>
+                <span data-key="instagram">انستغرام</span>
             </div>
             
-            <div class="share-option-item telegram" onclick="shareToTelegram()">
-                <div class="share-option-icon">
-                    <i class="fa-brands fa-telegram-plane"></i>
-                </div>
-                <span class="share-option-label" data-key="telegram">تيليجرام</span>
-            </div>
-            
-            <div class="share-option-item whatsapp" onclick="shareToWhatsApp()">
-                <div class="share-option-icon">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </div>
-                <span class="share-option-label" data-key="whatsapp">واتساب</span>
-            </div>
-            
-            <div class="share-option-item facebook" onclick="shareToFacebook()">
-                <div class="share-option-icon">
+            <!-- فيسبوك -->
+            <div class="share-grid-item" onclick="shareToFacebook()">
+                <div class="share-grid-icon facebook">
                     <i class="fa-brands fa-facebook-f"></i>
                 </div>
-                <span class="share-option-label" data-key="facebook">فيسبوك</span>
+                <span data-key="facebook">فيسبوك</span>
+            </div>
+            
+            <!-- واتساب -->
+            <div class="share-grid-item" onclick="shareToWhatsApp()">
+                <div class="share-grid-icon whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <span data-key="whatsapp">واتساب</span>
+            </div>
+            
+            <!-- رسالة -->
+            <div class="share-grid-item" onclick="shareToMessages()">
+                <div class="share-grid-icon messages">
+                    <i class="fa-solid fa-comment-sms"></i>
+                </div>
+                <span data-key="messages">رسالة</span>
+            </div>
+            
+            <!-- البريد -->
+            <div class="share-grid-item" onclick="shareToEmail()">
+                <div class="share-grid-icon email">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <span data-key="email">البريد</span>
+            </div>
+            
+            <!-- فايبر -->
+            <div class="share-grid-item" onclick="shareToViber()">
+                <div class="share-grid-icon viber">
+                    <i class="fa-brands fa-viber"></i>
+                </div>
+                <span data-key="viber">فايبر</span>
+            </div>
+            
+            <!-- تيليجرام -->
+            <div class="share-grid-item" onclick="shareToTelegram()">
+                <div class="share-grid-icon telegram">
+                    <i class="fa-brands fa-telegram"></i>
+                </div>
+                <span data-key="telegram">تيليجرام</span>
             </div>
         </div>
         
-        <div class="share-copy-section">
-            <div class="share-copy-button" onclick="copyLink()">
-                <div class="share-copy-icon">
-                    <i class="fa-solid fa-link"></i>
+        <!-- زر المزيد وزر نسخ الرابط -->
+        <div class="share-actions-row">
+            <div class="share-action-btn" onclick="shareMore()">
+                <div class="share-action-icon">
+                    <i class="fa-solid fa-ellipsis"></i>
                 </div>
-                <span class="share-copy-label" data-key="copyLink">نسخ الرابط</span>
+                <span data-key="moreOptions">المزيد</span>
+            </div>
+            <div class="share-action-btn" onclick="copyLink()">
+                <div class="share-action-icon">
+                    <i class="fa-regular fa-copy"></i>
+                </div>
+                <span data-key="copyLink">نسخ الرابط</span>
             </div>
         </div>
         
@@ -1220,11 +1316,16 @@
                 language: "اللغة",
                 shareApp: "مشاركة التطبيق",
                 shareAppDesc: "شارك التطبيق مع أصدقائك",
-                shareTitle: "مشاركة التطبيق",
+                shareTitle: "انشر تطبيق نجم الشاشات",
+                shareSubtitle: "شكراً لدعمكم تطبيق نجم الشاشات",
                 facebook: "فيسبوك",
                 whatsapp: "واتساب",
                 telegram: "تيليجرام",
-                twitter: "تويتر",
+                instagram: "انستغرام",
+                messages: "رسالة",
+                email: "البريد",
+                viber: "فايبر",
+                moreOptions: "المزيد",
                 copyLink: "نسخ الرابط",
                 cancel: "إلغاء",
                 socialSupport: "مواقع التواصل والدعم",
@@ -1248,7 +1349,9 @@
                 day: "يوم",
                 days: "يوم",
                 starScreens: "نجم الشاشات",
-                linkCopied: "تم نسخ الرابط بنجاح!"
+                linkCopied: "تم نسخ الرابط بنجاح!",
+                shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
+                shareTextShort: "تطبيق نجم الشاشات - أفضل منصة للبث المباشر"
             },
             en: {
                 live: "Live",
@@ -1284,11 +1387,16 @@
                 language: "Language",
                 shareApp: "Share App",
                 shareAppDesc: "Share the app with your friends",
-                shareTitle: "Share App",
+                shareTitle: "Share Star Screens App",
+                shareSubtitle: "Thank you for supporting Star Screens App",
                 facebook: "Facebook",
                 whatsapp: "WhatsApp",
                 telegram: "Telegram",
-                twitter: "Twitter",
+                instagram: "Instagram",
+                messages: "Messages",
+                email: "Email",
+                viber: "Viber",
+                moreOptions: "More",
                 copyLink: "Copy Link",
                 cancel: "Cancel",
                 socialSupport: "Social Media and Support",
@@ -1312,7 +1420,9 @@
                 day: "day",
                 days: "days",
                 starScreens: "Star Screens",
-                linkCopied: "Link copied successfully!"
+                linkCopied: "Link copied successfully!",
+                shareText: "📺 Star Screens App\nBest Live Streaming Platform\n",
+                shareTextShort: "Star Screens App - Best Live Streaming Platform"
             }
         };
 
@@ -1340,7 +1450,6 @@
             }
         }
 
-        // وظيفة الترجمة من الإنجليزية إلى العربية
         async function translateText(text) {
             if (!text) return "";
             try {
@@ -1356,7 +1465,6 @@
             }
         }
 
-        // دالة مخصصة لحساب الوقت المنقضي بالعربية دائماً (للقسم الأخبار)
         function getArabicTimeAgo(dateString) {
             const date = new Date(dateString);
             const now = new Date();
@@ -1378,7 +1486,6 @@
             }
         }
 
-        // وظيفة حساب الوقت المنقضي العامة (حسب لغة التطبيق)
         function getTimeAgo(dateString) {
             const date = new Date(dateString);
             const now = new Date();
@@ -1507,16 +1614,6 @@
             startNewsAutoScroll();
         }
 
-        function getRandomGradient() {
-            const gradients = [
-                'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-                'linear-gradient(135deg, #312e81 0%, #1e3a8a 100%)',
-                'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
-                'linear-gradient(135deg, #7c2d12 0%, #9a3412 100%)'
-            ];
-            return gradients[Math.floor(Math.random() * gradients.length)];
-        }
-
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
             
@@ -1587,7 +1684,9 @@
             }
         }
 
+        // ============================================
         // Share Functions
+        // ============================================
         function openShareSheet() {
             document.getElementById('shareOverlay').classList.add('active');
             document.getElementById('shareSheet').classList.add('active');
@@ -1608,40 +1707,99 @@
             }, 2000);
         }
 
+        function getShareText() {
+            return currentLanguage === 'ar' 
+                ? translations.ar.shareText + appUrl 
+                : translations.en.shareText + appUrl;
+        }
+
+        function getShareTextShort() {
+            return currentLanguage === 'ar' 
+                ? translations.ar.shareTextShort 
+                : translations.en.shareTextShort;
+        }
+
+        // زر المزيد - يفتح قائمة المشاركة الكاملة للهاتف
+        async function shareMore() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
+                        text: getShareTextShort(),
+                        url: appUrl
+                    });
+                    closeShareSheet();
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.log('Share failed:', err);
+                    }
+                }
+            } else {
+                copyLink();
+                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط' : 'Link copied');
+            }
+        }
+
         function shareToFacebook() {
-            const shareText = currentLanguage === 'ar' 
-                ? 'تطبيق نجم الشاشات - أفضل منصة للبث المباشر' 
-                : 'Star Screens App - Best Live Streaming Platform';
-            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(shareText)}`;
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(getShareTextShort())}`;
             window.open(url, '_blank', 'width=600,height=400');
             setTimeout(closeShareSheet, 500);
         }
 
         function shareToWhatsApp() {
-            const shareText = currentLanguage === 'ar' 
-                ? `📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n${appUrl}` 
-                : `📺 Star Screens App\nBest Live Streaming Platform\n${appUrl}`;
-            const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(getShareText())}`;
             window.open(url, '_blank');
             setTimeout(closeShareSheet, 500);
         }
 
         function shareToTelegram() {
-            const shareText = currentLanguage === 'ar' 
-                ? 'تطبيق نجم الشاشات - أفضل منصة للبث المباشر' 
-                : 'Star Screens App - Best Live Streaming Platform';
-            const url = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(shareText)}`;
+            const url = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(getShareTextShort())}`;
             window.open(url, '_blank');
             setTimeout(closeShareSheet, 500);
         }
 
-        function shareToTwitter() {
-            const shareText = currentLanguage === 'ar' 
-                ? 'تطبيق نجم الشاشات - أفضل منصة للبث المباشر' 
-                : 'Star Screens App - Best Live Streaming Platform';
-            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`;
-            window.open(url, '_blank', 'width=600,height=400');
-            setTimeout(closeShareSheet, 500);
+        // Instagram - لا يدعم المشاركة المباشرة عبر URL، نستخدم Web Share API
+        async function shareToInstagram() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
+                        text: getShareTextShort(),
+                        url: appUrl
+                    });
+                    closeShareSheet();
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        copyLink();
+                        showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، الصقه في انستغرام' : 'Link copied, paste it in Instagram');
+                    }
+                }
+            } else {
+                copyLink();
+                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، الصقه في انستغرام' : 'Link copied, paste it in Instagram');
+            }
+        }
+
+        // الرسائل SMS
+        function shareToMessages() {
+            const body = getShareText();
+            window.location.href = `sms:?body=${encodeURIComponent(body)}`;
+            setTimeout(closeShareSheet, 800);
+        }
+
+        // البريد الإلكتروني
+        function shareToEmail() {
+            const subject = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
+            const body = getShareText();
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            setTimeout(closeShareSheet, 800);
+        }
+
+        // فايبر
+        function shareToViber() {
+            const text = getShareText();
+            window.location.href = `viber://forward?text=${encodeURIComponent(text)}`;
+            setTimeout(closeShareSheet, 800);
         }
 
         async function copyLink() {
@@ -1662,7 +1820,9 @@
             }
         }
 
-        // وظيفة جلب جدول المباريات من ESPN API
+        // ============================================
+        // Schedule - جدول المباريات
+        // ============================================
         async function fetchSchedule() {
             const container = document.getElementById('scheduleList');
             if (!container) return;
@@ -1703,13 +1863,6 @@
                     
                     const homeScore = homeCompetitor ? (homeCompetitor.score !== undefined ? homeCompetitor.score : '-') : '-';
                     const awayScore = awayCompetitor ? (awayCompetitor.score !== undefined ? awayCompetitor.score : '-') : '-';
-                    
-                    let leagueName = 'دوري غير محدد';
-                    if (event.leagues && event.leagues.length > 0 && event.leagues[0].name) {
-                        leagueName = event.leagues[0].name;
-                    } else if (competition.group && competition.group.name) {
-                        leagueName = competition.group.name;
-                    }
                     
                     let statusText = '';
                     let statusClass = '';
