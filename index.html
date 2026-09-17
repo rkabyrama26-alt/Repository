@@ -1739,7 +1739,7 @@
         }
 
         function shareToFacebook() {
-            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(getShareTextShort())}`;
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}"e=${encodeURIComponent(getShareTextShort())}`;
             window.open(url, '_blank', 'width=600,height=400');
             setTimeout(closeShareSheet, 500);
         }
@@ -2106,15 +2106,5 @@
             updateLanguageSelection();
         });
     </script>
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "01bc5102-ce07-4701-b95a-f864b9877ddf",
-    });
-  });
-</script>
-
 </body>
 </html>
