@@ -379,7 +379,7 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
+            border: none; /* تم حذف الحواف البيضاء */
             position: relative;
             overflow: hidden;
         }
@@ -406,7 +406,7 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: none; /* تم حذف الحواف البيضاء */
         }
 
         .channel-logo-wrap::before {
