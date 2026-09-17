@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تطبيق احترافي بملء الشاشة</title>
-    <!-- خط Alexandria الاحترافي -->
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- خط Cairo للأخبار -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <style>
         :root {
@@ -73,11 +71,6 @@
             background: transparent;
         }
 
-        .viewport-area::-webkit-scrollbar-thumb {
-            display: none;
-            background: transparent;
-        }
-
         .section-pane {
             display: none;
             opacity: 0;
@@ -90,14 +83,8 @@
         }
 
         @keyframes paneEnter {
-            from { 
-                opacity: 0; 
-                transform: translateY(15px) scale(0.97); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
+            from { opacity: 0; transform: translateY(15px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .hero-banner {
@@ -270,6 +257,333 @@
             display: block;
         }
 
+        /* ==========================================
+           Categories & Channels Grid
+           ========================================== */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 110px;
+            border-radius: 22px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(56, 189, 248, 0.15));
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 32px rgba(99, 102, 241, 0.25);
+        }
+
+        .category-card:active {
+            transform: scale(0.98);
+        }
+
+        .category-card-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+
+        .category-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to left, rgba(3,7,18,0.15), rgba(3,7,18,0.92));
+        }
+
+        .category-card-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 12px 18px 14px;
+        }
+
+        .category-card-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        /* Channels List Header */
+        .channels-list-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(20px);
+            flex-shrink: 0;
+        }
+
+        .back-btn:active {
+            transform: scale(0.92);
+            background: var(--surface-hover);
+        }
+
+        .channels-list-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+
+        /* ==========================================
+           Channels Grid
+           ========================================== */
+        .channels-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .channel-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            background: var(--surface-glass);
+            border-radius: 20px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-card:hover {
+            transform: translateX(-4px);
+            background: var(--surface-hover);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.18);
+            border-color: var(--border-glow);
+        }
+
+        .channel-card:active {
+            transform: scale(0.98);
+        }
+
+        .channel-logo-wrap {
+            width: 62px;
+            height: 62px;
+            flex-shrink: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(56, 189, 248, 0.05));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .channel-logo-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15), transparent 65%);
+            pointer-events: none;
+        }
+
+        .channel-logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+            transition: transform 0.4s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .channel-card:hover .channel-logo-wrap img {
+            transform: scale(1.1);
+        }
+
+        .channel-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: right;
+            justify-content: center;
+        }
+
+        .channel-name {
+            font-size: 0.8rem; /* تم تصغير حجم الخط هنا */
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
+            letter-spacing: -0.2px;
+            padding: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .live-badge {
+            position: static; /* تم التعديل ليصبح ضمن السطر */
+            flex-shrink: 0;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 4px 9px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 3;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.45);
+            letter-spacing: 0.3px;
+        }
+
+        .live-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #ffffff;
+            animation: pulseDot 1.2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.85); }
+        }
+
+        /* ==========================================
+           Video Player Modal
+           ========================================== */
+        .video-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.96);
+            backdrop-filter: blur(10px);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .video-modal.active {
+            display: flex;
+        }
+
+        .video-modal-content {
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            animation: videoIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes videoIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .video-player-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.25);
+            position: relative;
+        }
+
+        .video-player-wrap video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #000;
+        }
+
+        .video-close {
+            position: absolute;
+            top: -52px;
+            left: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(20px);
+        }
+
+        .video-close:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .video-title-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            justify-content: center;
+        }
+
+        .video-title-bar .live-badge {
+            position: static;
+            box-shadow: none;
+        }
+
+        .video-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-secondary);
+            font-size: 2rem;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
         .bottom-dock {
             position: absolute;
             bottom: 0;
@@ -316,11 +630,6 @@
             color: var(--text-muted);
         }
 
-        .dock-tab-btn:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.03);
-        }
-
         .dock-tab-btn.active {
             color: var(--accent-secondary);
             background: rgba(99, 102, 241, 0.12);
@@ -336,21 +645,15 @@
             color: var(--accent-secondary);
         }
 
-        /* Language Bottom Sheet Styles */
         .language-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
         }
 
-        .language-overlay.active {
-            display: block;
-        }
+        .language-overlay.active { display: block; }
 
         .language-sheet {
             position: fixed;
@@ -366,9 +669,7 @@
             border-top: 1px solid var(--border-glass);
         }
 
-        .language-sheet.active {
-            transform: translateY(0);
-        }
+        .language-sheet.active { transform: translateY(0); }
 
         .sheet-handle {
             width: 40px;
@@ -434,28 +735,18 @@
             font-size: 0.75rem;
         }
 
-        .sheet-language-option.selected .sheet-radio-check {
-            display: block;
-        }
+        .sheet-language-option.selected .sheet-radio-check { display: block; }
 
-        /* ============================================
-           Share Bottom Sheet - التصميم الجديد مطابق للصورة
-           ============================================ */
         .share-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(4px);
             z-index: 2000;
         }
 
-        .share-overlay.active {
-            display: block;
-        }
+        .share-overlay.active { display: block; }
 
         .share-sheet {
             position: fixed;
@@ -471,17 +762,11 @@
             max-height: 92vh;
             overflow-y: auto;
             scrollbar-width: none;
-            border-top: none;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
         }
 
-        .share-sheet::-webkit-scrollbar {
-            display: none;
-        }
-
-        .share-sheet.active {
-            transform: translateY(0);
-        }
+        .share-sheet::-webkit-scrollbar { display: none; }
+        .share-sheet.active { transform: translateY(0); }
 
         .share-close-btn {
             position: absolute;
@@ -498,11 +783,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s ease;
-        }
-
-        .share-close-btn:active {
-            background: rgba(255, 255, 255, 0.1);
         }
 
         .share-sheet-title {
@@ -512,7 +792,6 @@
             margin-top: 30px;
             margin-bottom: 8px;
             text-align: center;
-            font-family: 'Alexandria', sans-serif;
             letter-spacing: -0.5px;
         }
 
@@ -525,7 +804,6 @@
             line-height: 1.5;
         }
 
-        /* شبكة أيقونات التطبيقات - استخدام Flexbox لتوسيط الأزرار بالتساوي */
         .share-grid {
             display: flex;
             flex-wrap: wrap;
@@ -542,14 +820,11 @@
             gap: 8px;
             cursor: pointer;
             transition: transform 0.2s ease;
-            user-select: none;
             width: calc(25% - 10px);
             max-width: 80px;
         }
 
-        .share-grid-item:active {
-            transform: scale(0.9);
-        }
+        .share-grid-item:active { transform: scale(0.9); }
 
         .share-grid-icon {
             width: 58px;
@@ -561,38 +836,15 @@
             font-size: 1.7rem;
             color: #ffffff;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-            position: relative;
-            overflow: hidden;
         }
 
-        /* ألوان الأيقونات - مطابقة للصورة */
-        .share-grid-icon.instagram {
-            background: linear-gradient(45deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
-        }
-
-        .share-grid-icon.facebook {
-            background: #1877f2;
-        }
-
-        .share-grid-icon.whatsapp {
-            background: #25d366;
-        }
-
-        .share-grid-icon.messages {
-            background: #34c759;
-        }
-
-        .share-grid-icon.email {
-            background: #1e88e5;
-        }
-
-        .share-grid-icon.viber {
-            background: #7360f2;
-        }
-
-        .share-grid-icon.telegram {
-            background: #229ED9;
-        }
+        .share-grid-icon.instagram { background: linear-gradient(45deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%); }
+        .share-grid-icon.facebook { background: #1877f2; }
+        .share-grid-icon.whatsapp { background: #25d366; }
+        .share-grid-icon.messages { background: #34c759; }
+        .share-grid-icon.email { background: #1e88e5; }
+        .share-grid-icon.viber { background: #7360f2; }
+        .share-grid-icon.telegram { background: #229ED9; }
 
         .share-grid-item span {
             font-size: 0.7rem;
@@ -602,7 +854,6 @@
             line-height: 1.2;
         }
 
-        /* زر المزيد وزر نسخ الرابط */
         .share-actions-row {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -622,17 +873,10 @@
             border-radius: 18px;
             cursor: pointer;
             transition: all 0.25s ease;
-            user-select: none;
             border: none;
         }
 
-        .share-action-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .share-action-btn:active {
-            transform: scale(0.96);
-        }
+        .share-action-btn:active { transform: scale(0.96); }
 
         .share-action-icon {
             width: 44px;
@@ -652,7 +896,6 @@
             color: var(--text-main);
         }
 
-        /* زر الإلغاء - أخضر */
         .share-cancel-button {
             width: 100%;
             padding: 16px;
@@ -662,17 +905,10 @@
             font-size: 1.05rem;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.25s ease;
             font-family: 'Alexandria', sans-serif;
-            border-top: none;
             margin-top: 6px;
         }
 
-        .share-cancel-button:active {
-            opacity: 0.6;
-        }
-
-        /* Toast Notification */
         .toast-notification {
             position: fixed;
             top: 50%;
@@ -695,7 +931,6 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* News Feed Styles */
         #pane-news {
             position: fixed;
             top: 0;
@@ -710,9 +945,7 @@
             background: var(--bg-base);
         }
 
-        #pane-news.active {
-            display: block;
-        }
+        #pane-news.active { display: block; }
 
         .news-feed-container {
             width: 100%;
@@ -732,8 +965,6 @@
             opacity: 0;
             transition: opacity 0.5s ease;
             pointer-events: none;
-            margin: 0;
-            padding: 0;
         }
 
         .news-slide.active {
@@ -747,8 +978,6 @@
             height: 100%;
             object-fit: cover;
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            margin: 0;
-            padding: 0;
         }
 
         .news-background img {
@@ -756,8 +985,6 @@
             height: 100%;
             object-fit: cover;
             opacity: 0.4;
-            margin: 0;
-            padding: 0;
         }
 
         .news-content {
@@ -830,7 +1057,6 @@
             height: 40px;
         }
 
-        /* Schedule / Match Card Styles - تم إزالة الخطوط البيضاء */
         .match-card {
             background: var(--surface-glass);
             border-radius: 20px;
@@ -838,31 +1064,6 @@
             margin-bottom: 12px;
             backdrop-filter: blur(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-        }
-
-        .match-card:hover {
-            background: var(--surface-hover);
-            transform: translateY(-2px);
-        }
-
-        .match-league {
-            font-size: 0.72rem;
-            color: var(--accent-secondary);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-bottom: 10px;
-            border-bottom: none;
-        }
-
-        .match-league i {
-            font-size: 0.7rem;
-            opacity: 0.8;
         }
 
         .match-teams {
@@ -887,9 +1088,7 @@
             transition: transform 0.3s ease;
         }
 
-        .match-card:hover .match-team-logo {
-            transform: scale(1.1);
-        }
+        .match-card:hover .match-team-logo { transform: scale(1.1); }
 
         .match-team-name {
             font-size: 0.82rem;
@@ -914,7 +1113,6 @@
             font-weight: 900;
             color: var(--text-main);
             letter-spacing: 3px;
-            font-family: 'Alexandria', sans-serif;
         }
 
         .match-score.live {
@@ -929,13 +1127,11 @@
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.06);
             color: var(--text-muted);
-            border: none;
         }
 
         .match-status.live {
             background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
-            border-color: rgba(239, 68, 68, 0.3);
             animation: pulseLive 1.5s infinite;
         }
 
@@ -1002,26 +1198,35 @@
                 </div>
             </div>
 
+            <!-- ==========================================================
+                 CHANNELS PANE (Categories -> Channels List)
+                 ========================================================== -->
             <div id="pane-channels" class="section-pane">
-                <div class="pane-header-title" data-key="liveChannels">القنوات المباشرة</div>
-                <div class="stack-list">
-                    <div class="stack-item">
-                        <div class="stack-icon-box"><i class="fa-solid fa-satellite-dish"></i></div>
-                        <div class="stack-info-box">
-                            <div class="stack-item-title" data-key="sportsChannel">البث الرياضي المباشر</div>
-                            <div class="stack-item-sub" data-key="sportsChannelDesc">جودة فائقة HD • سيرفرات متعددة</div>
+
+                <!-- Categories View -->
+                <div id="channelsCategoriesView">
+                    <div class="categories-grid">
+                        <div class="category-card" onclick="openCategory('mbc')">
+                            <img class="category-card-image" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
+                            <div class="category-card-overlay"></div>
+                            <div class="category-card-content">
+                                <div class="category-card-title">قنوات ام بي سي</div>
+                            </div>
                         </div>
-                        <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
-                    </div>
-                    <div class="stack-item">
-                        <div class="stack-icon-box"><i class="fa-solid fa-clapperboard"></i></div>
-                        <div class="stack-info-box">
-                            <div class="stack-item-title" data-key="varietyChannel">قناة المنوعات العامة</div>
-                            <div class="stack-item-sub" data-key="varietyChannelDesc">عروض وبرامج حصرية طوال اليوم</div>
-                        </div>
-                        <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </div>
                 </div>
+
+                <!-- Channels List View -->
+                <div id="channelsListView" style="display: none;">
+                    <div class="channels-list-header">
+                        <button class="back-btn" onclick="closeCategory()">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <div class="channels-list-title" id="categoryTitle">قنوات ام بي سي</div>
+                    </div>
+                    <div class="channels-grid" id="channelsGrid"></div>
+                </div>
+
             </div>
 
             <div id="pane-schedule" class="section-pane">
@@ -1049,7 +1254,6 @@
                 </div>
             </div>
 
-            <!-- News Section - Full Screen Without Any Borders -->
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
                     <div class="news-navigation" id="newsNavigation"></div>
@@ -1060,7 +1264,6 @@
             <div id="pane-settings" class="section-pane">
                 
                 <div class="stack-list">
-                    <!-- قسم اللغة -->
                     <div class="stack-item" onclick="openLanguageSheet()">
                         <div class="stack-icon-box" style="color: #6366f1; background: rgba(99, 102, 241, 0.1);">
                             <i class="fa-solid fa-language"></i>
@@ -1072,7 +1275,6 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </div>
 
-                    <!-- قسم المشاركة -->
                     <div class="stack-item" onclick="openShareSheet()">
                         <div class="stack-icon-box" style="color: #10b981; background: rgba(16, 185, 129, 0.1);">
                             <i class="fa-solid fa-share-nodes"></i>
@@ -1087,7 +1289,6 @@
 
                 <div class="pane-header-title" style="margin-top: 8px;" data-key="socialSupport">مواقع التواصل والدعم</div>
                 <div class="stack-list">
-                    <!-- تلغرام -->
                     <a href="https://t.me/azcajfaj" target="_blank" class="stack-item" style="text-decoration: none; color: inherit;">
                         <div class="stack-icon-box" style="color: #229ED9; background: rgba(34, 158, 217, 0.1);">
                             <i class="fa-brands fa-telegram"></i>
@@ -1099,7 +1300,6 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </a>
 
-                    <!-- يوتيوب -->
                     <a href="https://youtube.com/@screen.star123?si=9T9FKR_Wn5rK1f8I" target="_blank" class="stack-item" style="text-decoration: none; color: inherit;">
                         <div class="stack-icon-box" style="color: #FF0000; background: rgba(255, 0, 0, 0.1);">
                             <i class="fa-brands fa-youtube"></i>
@@ -1111,7 +1311,6 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </a>
 
-                    <!-- البريد الإلكتروني -->
                     <a href="mailto:zjffjxvh8885@gmail.com" class="stack-item" style="text-decoration: none; color: inherit;">
                         <div class="stack-icon-box" style="color: #ea4335; background: rgba(234, 67, 53, 0.1);">
                             <i class="fa-solid fa-envelope"></i>
@@ -1157,6 +1356,25 @@
 
     </div>
 
+    <!-- Video Player Modal -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-content">
+            <button class="video-close" onclick="closeVideoPlayer()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="video-player-wrap">
+                <video id="videoPlayer" controls playsinline webkit-playsinline></video>
+                <div class="video-loading" id="videoLoading">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                </div>
+            </div>
+            <div class="video-title-bar">
+                <span class="live-badge">مباشر</span>
+                <span id="videoTitle">اسم القناة</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Language Bottom Sheet -->
     <div class="language-overlay" id="languageOverlay" onclick="closeLanguageSheet()"></div>
     <div class="language-sheet" id="languageSheet">
@@ -1178,9 +1396,7 @@
         </div>
     </div>
 
-    <!-- ============================================
-         Share Bottom Sheet - التصميم الجديد مطابق للصورة
-         ============================================ -->
+    <!-- Share Bottom Sheet -->
     <div class="share-overlay" id="shareOverlay" onclick="closeShareSheet()"></div>
     <div class="share-sheet" id="shareSheet">
         <button class="share-close-btn" onclick="closeShareSheet()">
@@ -1191,75 +1407,43 @@
         <div class="share-sheet-subtitle" data-key="shareSubtitle">شكراً لدعمكم تطبيق نجم الشاشات</div>
         
         <div class="share-grid">
-            <!-- انستغرام -->
             <div class="share-grid-item" onclick="shareToInstagram()">
-                <div class="share-grid-icon instagram">
-                    <i class="fa-brands fa-instagram"></i>
-                </div>
+                <div class="share-grid-icon instagram"><i class="fa-brands fa-instagram"></i></div>
                 <span data-key="instagram">انستغرام</span>
             </div>
-            
-            <!-- فيسبوك -->
             <div class="share-grid-item" onclick="shareToFacebook()">
-                <div class="share-grid-icon facebook">
-                    <i class="fa-brands fa-facebook-f"></i>
-                </div>
+                <div class="share-grid-icon facebook"><i class="fa-brands fa-facebook-f"></i></div>
                 <span data-key="facebook">فيسبوك</span>
             </div>
-            
-            <!-- واتساب -->
             <div class="share-grid-item" onclick="shareToWhatsApp()">
-                <div class="share-grid-icon whatsapp">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </div>
+                <div class="share-grid-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
                 <span data-key="whatsapp">واتساب</span>
             </div>
-            
-            <!-- رسالة -->
             <div class="share-grid-item" onclick="shareToMessages()">
-                <div class="share-grid-icon messages">
-                    <i class="fa-solid fa-comment-sms"></i>
-                </div>
+                <div class="share-grid-icon messages"><i class="fa-solid fa-comment-sms"></i></div>
                 <span data-key="messages">رسالة</span>
             </div>
-            
-            <!-- البريد -->
             <div class="share-grid-item" onclick="shareToEmail()">
-                <div class="share-grid-icon email">
-                    <i class="fa-solid fa-envelope"></i>
-                </div>
+                <div class="share-grid-icon email"><i class="fa-solid fa-envelope"></i></div>
                 <span data-key="email">البريد</span>
             </div>
-            
-            <!-- فايبر -->
             <div class="share-grid-item" onclick="shareToViber()">
-                <div class="share-grid-icon viber">
-                    <i class="fa-brands fa-viber"></i>
-                </div>
+                <div class="share-grid-icon viber"><i class="fa-brands fa-viber"></i></div>
                 <span data-key="viber">فايبر</span>
             </div>
-            
-            <!-- تيليجرام -->
             <div class="share-grid-item" onclick="shareToTelegram()">
-                <div class="share-grid-icon telegram">
-                    <i class="fa-brands fa-telegram"></i>
-                </div>
+                <div class="share-grid-icon telegram"><i class="fa-brands fa-telegram"></i></div>
                 <span data-key="telegram">تيليجرام</span>
             </div>
         </div>
         
-        <!-- زر المزيد وزر نسخ الرابط -->
         <div class="share-actions-row">
             <div class="share-action-btn" onclick="shareMore()">
-                <div class="share-action-icon">
-                    <i class="fa-solid fa-ellipsis"></i>
-                </div>
+                <div class="share-action-icon"><i class="fa-solid fa-ellipsis"></i></div>
                 <span data-key="moreOptions">المزيد</span>
             </div>
             <div class="share-action-btn" onclick="copyLink()">
-                <div class="share-action-icon">
-                    <i class="fa-regular fa-copy"></i>
-                </div>
+                <div class="share-action-icon"><i class="fa-regular fa-copy"></i></div>
                 <span data-key="copyLink">نسخ الرابط</span>
             </div>
         </div>
@@ -1267,10 +1451,157 @@
         <button class="share-cancel-button" onclick="closeShareSheet()" data-key="cancel">إلغاء</button>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast-notification" id="toastNotification"></div>
 
     <script>
+        // =============================================================
+        // Data: Categories & Channels
+        // =============================================================
+        const categoriesData = {
+            mbc: {
+                name: 'قنوات ام بي سي',
+                channels: [
+                    {
+                        name: 'MBC 1',
+                        logo: 'https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8'
+                    },
+                    {
+                        name: 'MBC العراق',
+                        logo: 'https://i.ibb.co/n8PMP8hM/Picsart-26-07-15-13-52-14-477.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-iraq/e38c44b1b43474e1c39cb5b90203691e/index.m3u8'
+                    },
+                    {
+                        name: 'MBC 4',
+                        logo: 'https://i.ibb.co/mrbTSLw2/Picsart-26-07-15-13-49-05-832.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8'
+                    },
+                    {
+                        name: 'MBC 5 المغربية',
+                        logo: 'https://i.ibb.co/vvxmrcN6/Picsart-26-07-15-13-49-23-266.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8'
+                    },
+                    {
+                        name: 'MBC مصر 2',
+                        logo: 'https://i.ibb.co/BK4fLC8X/Picsart-26-07-15-13-47-57-588.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8'
+                    },
+                    {
+                        name: 'MBC مصر',
+                        logo: 'https://i.ibb.co/rRgSzwt7/Picsart-26-07-15-13-48-42-409.webp',
+                        url: 'https://shd-gcp-live.lg.mncdn.com/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8'
+                    },
+                    {
+                        name: 'باب الحارة',
+                        logo: 'https://i.ibb.co/XfPPTgnS/Picsart-26-07-15-13-52-33-966.webp',
+                        url: 'https://shd-amg-fast.edgenextcdn.net/tx010/playlist.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&'
+                    }
+                ]
+            }
+        };
+
+        // =============================================================
+        // Categories / Channels Navigation
+        // =============================================================
+        let currentCategory = null;
+
+        function openCategory(catKey) {
+            const cat = categoriesData[catKey];
+            if (!cat) return;
+            currentCategory = catKey;
+
+            document.getElementById('channelsCategoriesView').style.display = 'none';
+            document.getElementById('channelsListView').style.display = 'block';
+            document.getElementById('categoryTitle').textContent = cat.name;
+
+            const grid = document.getElementById('channelsGrid');
+            
+            grid.innerHTML = cat.channels.map((ch) => `
+                <div class="channel-card" onclick="playChannel('${encodeURIComponent(ch.url)}', '${ch.name.replace(/'/g, "\\'")}')">
+                    <div class="channel-logo-wrap">
+                        <img src="${ch.logo}" alt="${ch.name}" onerror="this.style.opacity='0.15'">
+                    </div>
+                    <div class="channel-info">
+                        <div class="channel-name">${ch.name}</div>
+                    </div>
+                    <span class="live-badge">مباشر</span>
+                </div>
+            `).join('');
+
+            document.querySelector('.viewport-area').scrollTop = 0;
+        }
+
+        function closeCategory() {
+            document.getElementById('channelsCategoriesView').style.display = 'block';
+            document.getElementById('channelsListView').style.display = 'none';
+            currentCategory = null;
+            document.querySelector('.viewport-area').scrollTop = 0;
+        }
+
+        // =============================================================
+        // Video Player (HLS)
+        // =============================================================
+        let hlsPlayer = null;
+
+        function playChannel(encodedUrl, name) {
+            const url = decodeURIComponent(encodedUrl);
+            const video = document.getElementById('videoPlayer');
+            const modal = document.getElementById('videoModal');
+            const loading = document.getElementById('videoLoading');
+
+            document.getElementById('videoTitle').textContent = name;
+            modal.classList.add('active');
+            loading.style.display = 'flex';
+
+            if (hlsPlayer) {
+                hlsPlayer.destroy();
+                hlsPlayer = null;
+            }
+
+            const onPlaying = () => { loading.style.display = 'none'; };
+            video.addEventListener('playing', onPlaying, { once: true });
+
+            if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play().catch(() => {});
+            } else if (window.Hls && Hls.isSupported()) {
+                hlsPlayer = new Hls({
+                    lowLatencyMode: true,
+                    enableWorker: true
+                });
+                hlsPlayer.loadSource(url);
+                hlsPlayer.attachMedia(video);
+                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(() => {});
+                });
+                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        loading.style.display = 'none';
+                        console.warn('HLS fatal error:', data);
+                    }
+                });
+            } else {
+                video.src = url;
+                video.play().catch(() => {});
+            }
+        }
+
+        function closeVideoPlayer() {
+            const video = document.getElementById('videoPlayer');
+            const modal = document.getElementById('videoModal');
+            try { video.pause(); } catch(e) {}
+            video.removeAttribute('src');
+            try { video.load(); } catch(e) {}
+            if (hlsPlayer) {
+                hlsPlayer.destroy();
+                hlsPlayer = null;
+            }
+            modal.classList.remove('active');
+        }
+
+        // =============================================================
+        // Panes / Docks
+        // =============================================================
         const panesArr = document.querySelectorAll('.section-pane');
         const dockBtnsArr = document.querySelectorAll('.dock-tab-btn');
         let currentLanguage = 'ar';
@@ -1281,150 +1612,52 @@
 
         const translations = {
             ar: {
-                live: "مباشر",
-                heroTitle: "المنصة الاحترافية المتكاملة",
-                heroSubtitle: "استمتع بتجربة بث عالي الأداء وبدون تقطيع",
-                quickNav: "التنقل السريع",
-                channels: "قنوات",
-                channelsDesc: "بث مباشر متواصل",
-                schedule: "جدول",
-                scheduleDesc: "المواعيد والبرامج",
-                series: "مسلسلات",
-                seriesDesc: "مكتبة الأعمال الفنية",
-                news: "أخبار",
-                newsDesc: "آخر المستجدات",
-                liveChannels: "القنوات المباشرة",
-                sportsChannel: "البث الرياضي المباشر",
-                sportsChannelDesc: "جودة فائقة HD • سيرفرات متعددة",
-                varietyChannel: "قناة المنوعات العامة",
-                varietyChannelDesc: "عروض وبرامج حصرية طوال اليوم",
-                dailySchedule: "جدول المباريات",
-                eveningProgram: "البرنامج المسائي الرئيسي",
-                eveningProgramTime: "تبدأ في تمام الساعة 08:00 مساءً",
-                newsBulletin: "النشرة الإخبارية الشاملة",
-                newsBulletinTime: "تبدأ في تمام الساعة 10:00 مساءً",
-                topSeries: "أبرز المسلسلات والدراما",
-                seasonSeries: "مسلسل الموسم",
-                seasonSeriesDesc: "30 حلقة • كاملة",
-                ramadanDrama: "دراما رمضان",
-                ramadanDramaDesc: "عرض حصري جديد",
-                latestNews: "آخر الأخبار والمقالات",
-                platformUpdate: "تحديثات برمجية جديدة في المنصة",
-                platformUpdateDesc: "منذ ساعتين • فريق التطوير",
-                language: "اللغة",
-                shareApp: "مشاركة التطبيق",
-                shareAppDesc: "شارك التطبيق مع أصدقائك",
-                shareTitle: "انشر تطبيق نجم الشاشات",
-                shareSubtitle: "شكراً لدعمكم تطبيق نجم الشاشات",
-                facebook: "فيسبوك",
-                whatsapp: "واتساب",
-                telegram: "تيليجرام",
-                instagram: "انستغرام",
-                messages: "رسالة",
-                email: "البريد",
-                viber: "فايبر",
-                moreOptions: "المزيد",
-                copyLink: "نسخ الرابط",
-                cancel: "إلغاء",
-                socialSupport: "مواقع التواصل والدعم",
-                telegramChannel: "قناة التلغرام",
-                telegramDesc: "انضم لقناتنا على تلغرام",
-                youtubeChannel: "قناة اليوتيوب",
-                youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
-                emailSupport: "الدعم الفني",
-                emailSupportDesc: "تواصل مع فريق نجم الشاشات",
-                navHome: "الرئيسية",
-                navChannels: "قنوات",
-                navSchedule: "جدول",
-                navSeries: "مسلسلات",
-                navNews: "أخبار",
-                navSettings: "الإعدادات",
-                now: "الآن",
-                minutesAgo: "منذ",
-                minute: "دقيقة",
-                hour: "ساعة",
-                hours: "ساعة",
-                day: "يوم",
-                days: "يوم",
-                starScreens: "نجم الشاشات",
-                linkCopied: "تم نسخ الرابط بنجاح!",
+                live: "مباشر", heroTitle: "المنصة الاحترافية المتكاملة", heroSubtitle: "استمتع بتجربة بث عالي الأداء وبدون تقطيع",
+                quickNav: "التنقل السريع", channels: "قنوات", channelsDesc: "بث مباشر متواصل",
+                schedule: "جدول", scheduleDesc: "المواعيد والبرامج", series: "مسلسلات", seriesDesc: "مكتبة الأعمال الفنية",
+                news: "أخبار", newsDesc: "آخر المستجدات", liveChannels: "القنوات المباشرة",
+                topSeries: "أبرز المسلسلات والدراما", seasonSeries: "مسلسل الموسم", seasonSeriesDesc: "30 حلقة • كاملة",
+                ramadanDrama: "دراما رمضان", ramadanDramaDesc: "عرض حصري جديد",
+                language: "اللغة", shareApp: "مشاركة التطبيق", shareAppDesc: "شارك التطبيق مع أصدقائك",
+                shareTitle: "انشر تطبيق نجم الشاشات", shareSubtitle: "شكراً لدعمكم تطبيق نجم الشاشات",
+                facebook: "فيسبوك", whatsapp: "واتساب", telegram: "تيليجرام", instagram: "انستغرام",
+                messages: "رسالة", email: "البريد", viber: "فايبر", moreOptions: "المزيد", copyLink: "نسخ الرابط", cancel: "إلغاء",
+                socialSupport: "مواقع التواصل والدعم", telegramChannel: "قناة التلغرام", telegramDesc: "انضم لقناتنا على تلغرام",
+                youtubeChannel: "قناة اليوتيوب", youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
+                emailSupport: "الدعم الفني", emailSupportDesc: "تواصل مع فريق نجم الشاشات",
+                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navSettings: "الإعدادات",
+                now: "الآن", minutesAgo: "منذ", minute: "دقيقة", hour: "ساعة", day: "يوم",
+                starScreens: "نجم الشاشات", linkCopied: "تم نسخ الرابط بنجاح!",
                 shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
                 shareTextShort: "تطبيق نجم الشاشات - أفضل منصة للبث المباشر"
             },
             en: {
-                live: "Live",
-                heroTitle: "Professional Integrated Platform",
-                heroSubtitle: "Enjoy a high-performance streaming experience without interruption",
-                quickNav: "Quick Navigation",
-                channels: "Channels",
-                channelsDesc: "Continuous live streaming",
-                schedule: "Schedule",
-                scheduleDesc: "Dates and programs",
-                series: "Series",
-                seriesDesc: "Library of artistic works",
-                news: "News",
-                newsDesc: "Latest developments",
-                liveChannels: "Live Channels",
-                sportsChannel: "Live Sports Broadcasting",
-                sportsChannelDesc: "Ultra HD Quality • Multiple servers",
-                varietyChannel: "General Variety Channel",
-                varietyChannelDesc: "Exclusive shows and programs all day",
-                dailySchedule: "Match Schedule",
-                eveningProgram: "Main Evening Program",
-                eveningProgramTime: "Starts at 08:00 PM",
-                newsBulletin: "Comprehensive News Bulletin",
-                newsBulletinTime: "Starts at 10:00 PM",
-                topSeries: "Top Series and Drama",
-                seasonSeries: "Season Series",
-                seasonSeriesDesc: "30 Episodes • Complete",
-                ramadanDrama: "Ramadan Drama",
-                ramadanDramaDesc: "New exclusive show",
-                latestNews: "Latest News and Articles",
-                platformUpdate: "New software updates on the platform",
-                platformUpdateDesc: "2 hours ago • Development Team",
-                language: "Language",
-                shareApp: "Share App",
-                shareAppDesc: "Share the app with your friends",
-                shareTitle: "Share Star Screens App",
-                shareSubtitle: "Thank you for supporting Star Screens App",
-                facebook: "Facebook",
-                whatsapp: "WhatsApp",
-                telegram: "Telegram",
-                instagram: "Instagram",
-                messages: "Messages",
-                email: "Email",
-                viber: "Viber",
-                moreOptions: "More",
-                copyLink: "Copy Link",
-                cancel: "Cancel",
-                socialSupport: "Social Media and Support",
-                telegramChannel: "Telegram Channel",
-                telegramDesc: "Join our channel on Telegram",
-                youtubeChannel: "YouTube Channel",
-                youtubeDesc: "Watch the latest videos and shows",
-                emailSupport: "Technical Support",
-                emailSupportDesc: "Contact Star Screens Team",
-                navHome: "Home",
-                navChannels: "Channels",
-                navSchedule: "Schedule",
-                navSeries: "Series",
-                navNews: "News",
-                navSettings: "Settings",
-                now: "Now",
-                minutesAgo: "",
-                minute: "minute",
-                hour: "hour",
-                hours: "hours",
-                day: "day",
-                days: "days",
-                starScreens: "Star Screens",
-                linkCopied: "Link copied successfully!",
+                live: "Live", heroTitle: "Professional Integrated Platform", heroSubtitle: "Enjoy a high-performance streaming experience without interruption",
+                quickNav: "Quick Navigation", channels: "Channels", channelsDesc: "Continuous live streaming",
+                schedule: "Schedule", scheduleDesc: "Dates and programs", series: "Series", seriesDesc: "Library of artistic works",
+                news: "News", newsDesc: "Latest developments", liveChannels: "Live Channels",
+                topSeries: "Top Series and Drama", seasonSeries: "Season Series", seasonSeriesDesc: "30 Episodes • Complete",
+                ramadanDrama: "Ramadan Drama", ramadanDramaDesc: "New exclusive show",
+                language: "Language", shareApp: "Share App", shareAppDesc: "Share the app with your friends",
+                shareTitle: "Share Star Screens App", shareSubtitle: "Thank you for supporting Star Screens App",
+                facebook: "Facebook", whatsapp: "WhatsApp", telegram: "Telegram", instagram: "Instagram",
+                messages: "Messages", email: "Email", viber: "Viber", moreOptions: "More", copyLink: "Copy Link", cancel: "Cancel",
+                socialSupport: "Social Media and Support", telegramChannel: "Telegram Channel", telegramDesc: "Join our channel on Telegram",
+                youtubeChannel: "YouTube Channel", youtubeDesc: "Watch the latest videos and shows",
+                emailSupport: "Technical Support", emailSupportDesc: "Contact Star Screens Team",
+                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navSettings: "Settings",
+                now: "Now", minutesAgo: "", minute: "minute", hour: "hour", day: "day",
+                starScreens: "Star Screens", linkCopied: "Link copied successfully!",
                 shareText: "📺 Star Screens App\nBest Live Streaming Platform\n",
                 shareTextShort: "Star Screens App - Best Live Streaming Platform"
             }
         };
 
         function switchPane(index) {
+            if (document.getElementById('videoModal').classList.contains('active')) {
+                closeVideoPlayer();
+            }
+
             panesArr.forEach(pane => pane.classList.remove('active'));
             dockBtnsArr.forEach(btn => btn.classList.remove('active'));
 
@@ -1433,18 +1666,17 @@
 
             document.querySelector('.viewport-area').scrollTop = 0;
 
+            if (index === 1) {
+                if (currentCategory) closeCategory();
+            }
+
             if (index === 4) {
-                if (newsData.length === 0) {
-                    fetchNews();
-                } else {
-                    startNewsAutoScroll();
-                }
+                if (newsData.length === 0) fetchNews();
+                else startNewsAutoScroll();
             } else if (index === 2) {
                 fetchSchedule();
             } else {
-                if (newsInterval) {
-                    clearInterval(newsInterval);
-                }
+                if (newsInterval) clearInterval(newsInterval);
             }
         }
 
@@ -1453,14 +1685,9 @@
             try {
                 const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`);
                 const data = await response.json();
-                if (data.responseStatus === 200 && data.responseData.translatedText) {
-                    return data.responseData.translatedText;
-                }
+                if (data.responseStatus === 200 && data.responseData.translatedText) return data.responseData.translatedText;
                 return text;
-            } catch (error) {
-                console.error('Translation error:', error);
-                return text;
-            }
+            } catch (error) { return text; }
         }
 
         function getArabicTimeAgo(dateString) {
@@ -1470,110 +1697,38 @@
             const diffMins = Math.floor(diffMs / 60000);
             const diffHours = Math.floor(diffMins / 60);
             const diffDays = Math.floor(diffHours / 24);
-
-            if (diffMins < 1) {
-                return "الآن";
-            } else if (diffMins < 60) {
-                return `منذ ${diffMins} دقيقة`;
-            } else if (diffHours < 24) {
-                return `منذ ${diffHours} ساعة`;
-            } else if (diffDays < 7) {
-                return `منذ ${diffDays} يوم`;
-            } else {
-                return date.toLocaleDateString('ar-SA');
-            }
-        }
-
-        function getTimeAgo(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-
-            if (currentLanguage === 'ar') {
-                if (diffMins < 1) {
-                    return translations.ar.now;
-                } else if (diffMins < 60) {
-                    return `${translations.ar.minutesAgo} ${diffMins} ${translations.ar.minute}`;
-                } else if (diffHours < 24) {
-                    return `${translations.ar.minutesAgo} ${diffHours} ${translations.ar.hour}`;
-                } else if (diffDays < 7) {
-                    return `${translations.ar.minutesAgo} ${diffDays} ${translations.ar.day}`;
-                } else {
-                    return date.toLocaleDateString('ar-SA');
-                }
-            } else {
-                if (diffMins < 1) {
-                    return translations.en.now;
-                } else if (diffMins < 60) {
-                    return `${diffMins} ${translations.en.minute}${diffMins > 1 ? 's' : ''} ${translations.en.minutesAgo}`;
-                } else if (diffHours < 24) {
-                    return `${diffHours} ${translations.en.hour}${diffHours > 1 ? 's' : ''} ${translations.en.minutesAgo}`;
-                } else if (diffDays < 7) {
-                    return `${diffDays} ${translations.en.day}${diffDays > 1 ? 's' : ''} ${translations.en.minutesAgo}`;
-                } else {
-                    return date.toLocaleDateString('en-US');
-                }
-            }
+            if (diffMins < 1) return "الآن";
+            if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+            if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+            if (diffDays < 7) return `منذ ${diffDays} يوم`;
+            return date.toLocaleDateString('ar-SA');
         }
 
         async function fetchNews() {
             try {
                 const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=100');
                 const data = await response.json();
-                
-                const articlesToProcess = data.articles.slice(0, 15); 
-                
+                const articlesToProcess = data.articles.slice(0, 15);
                 const translatedArticles = await Promise.all(
                     articlesToProcess.map(async (article) => {
                         const titleAr = await translateText(article.headline);
-                        const descriptionAr = article.description 
-                            ? await translateText(article.description) 
-                            : titleAr;
-                        
+                        const descriptionAr = article.description ? await translateText(article.description) : titleAr;
                         return {
-                            title: titleAr,
-                            description: descriptionAr,
+                            title: titleAr, description: descriptionAr,
                             image: article.images ? article.images[0].url : '',
                             published: getArabicTimeAgo(article.published),
-                            source: "نجم الشاشات",
-                            publishedDate: new Date(article.published)
+                            source: "نجم الشاشات"
                         };
                     })
                 );
-
                 newsData = translatedArticles;
                 renderNewsSlides();
             } catch (error) {
-                console.error('Error fetching news:', error);
-                newsData = [
-                    {
-                        title: "تشيلسي يستعد لمواجهة هال سيتي في الدوري الإنجليزي",
-                        description: "يسعى تشيلسي للعودة للانتصارات بعد الخسارة أمام أرسنال",
-                        image: "",
-                        published: getArabicTimeAgo(new Date().toISOString()),
-                        source: "نجم الشاشات",
-                        publishedDate: new Date()
-                    },
-                    {
-                        title: "ليفربول يواجه فولهام في قمة الأسبوع",
-                        description: "مباراة قوية منتظرة بين ليفربول وفولهام",
-                        image: "",
-                        published: getArabicTimeAgo(new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()),
-                        source: "نجم الشاشات",
-                        publishedDate: new Date()
-                    },
-                    {
-                        title: "مانشستر سيتي يواصل صدارته للدوري",
-                        description: "السيتي يحقق فوزاً جديداً ويحافظ على الصدارة",
-                        image: "",
-                        published: getArabicTimeAgo(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()),
-                        source: "نجم الشاشات",
-                        publishedDate: new Date()
-                    }
-                ];
+                newsData = [{
+                    title: "أخبار رياضية عاجلة",
+                    description: "تابع أحدث المستجدات الرياضية على منصة نجم الشاشات",
+                    image: "", published: getArabicTimeAgo(new Date().toISOString()), source: "نجم الشاشات"
+                }];
                 renderNewsSlides();
             }
         }
@@ -1581,7 +1736,6 @@
         function renderNewsSlides() {
             const container = document.getElementById('newsSlidesContainer');
             const navContainer = document.getElementById('newsNavigation');
-            
             container.innerHTML = '';
             navContainer.innerHTML = '';
 
@@ -1589,9 +1743,7 @@
                 const slide = document.createElement('div');
                 slide.className = `news-slide ${index === 0 ? 'active' : ''}`;
                 slide.innerHTML = `
-                    <div class="news-background">
-                        ${news.image ? `<img src="${news.image}" onerror="this.style.display='none'">` : ''}
-                    </div>
+                    <div class="news-background">${news.image ? `<img src="${news.image}" onerror="this.style.display='none'">` : ''}</div>
                     <div class="news-content">
                         <div class="news-title">${news.title}</div>
                         <div class="news-description">${news.description}</div>
@@ -1599,42 +1751,32 @@
                             <span><i class="fa-regular fa-clock"></i> ${news.published}</span>
                             <span><i class="fa-solid fa-newspaper"></i> ${news.source}</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(slide);
-
                 const dot = document.createElement('div');
                 dot.className = `nav-dot ${index === 0 ? 'active' : ''}`;
                 dot.onclick = () => goToNewsSlide(index);
                 navContainer.appendChild(dot);
             });
-
             startNewsAutoScroll();
         }
 
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
-            
             newsInterval = setInterval(() => {
-                if (currentNewsIndex < newsData.length - 1) {
-                    goToNewsSlide(currentNewsIndex + 1);
-                } else {
-                    goToNewsSlide(0);
-                }
+                if (currentNewsIndex < newsData.length - 1) goToNewsSlide(currentNewsIndex + 1);
+                else goToNewsSlide(0);
             }, 12000);
         }
 
         function goToNewsSlide(index) {
             const slides = document.querySelectorAll('.news-slide');
             const dots = document.querySelectorAll('.nav-dot');
-            
-            slides[currentNewsIndex].classList.remove('active');
-            dots[currentNewsIndex].classList.remove('active');
-            
+            if (slides[currentNewsIndex]) slides[currentNewsIndex].classList.remove('active');
+            if (dots[currentNewsIndex]) dots[currentNewsIndex].classList.remove('active');
             currentNewsIndex = index;
-            
-            slides[currentNewsIndex].classList.add('active');
-            dots[currentNewsIndex].classList.add('active');
+            if (slides[currentNewsIndex]) slides[currentNewsIndex].classList.add('active');
+            if (dots[currentNewsIndex]) dots[currentNewsIndex].classList.add('active');
         }
 
         function openLanguageSheet() {
@@ -1651,40 +1793,23 @@
         function changeLanguage(lang) {
             currentLanguage = lang;
             const elements = document.querySelectorAll('[data-key]');
-            
             elements.forEach(element => {
                 const key = element.getAttribute('data-key');
-                if (translations[lang][key]) {
-                    element.textContent = translations[lang][key];
-                }
+                if (translations[lang][key]) element.textContent = translations[lang][key];
             });
-
             document.getElementById('currentLanguage').textContent = lang === 'ar' ? 'العربية' : 'English';
-
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-
             updateLanguageSelection();
-
-            setTimeout(() => {
-                closeLanguageSheet();
-            }, 300);
+            setTimeout(closeLanguageSheet, 300);
         }
 
         function updateLanguageSelection() {
-            document.querySelectorAll('.sheet-language-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            const selectedOption = document.getElementById(`sheet-lang-${currentLanguage}`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-            }
+            document.querySelectorAll('.sheet-language-option').forEach(o => o.classList.remove('selected'));
+            const s = document.getElementById(`sheet-lang-${currentLanguage}`);
+            if (s) s.classList.add('selected');
         }
 
-        // ============================================
-        // Share Functions
-        // ============================================
         function openShareSheet() {
             document.getElementById('shareOverlay').classList.add('active');
             document.getElementById('shareSheet').classList.add('active');
@@ -1699,39 +1824,25 @@
             const toast = document.getElementById('toastNotification');
             toast.textContent = message;
             toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
         function getShareText() {
-            return currentLanguage === 'ar' 
-                ? translations.ar.shareText + appUrl 
-                : translations.en.shareText + appUrl;
+            return currentLanguage === 'ar' ? translations.ar.shareText + appUrl : translations.en.shareText + appUrl;
         }
-
         function getShareTextShort() {
-            return currentLanguage === 'ar' 
-                ? translations.ar.shareTextShort 
-                : translations.en.shareTextShort;
+            return currentLanguage === 'ar' ? translations.ar.shareTextShort : translations.en.shareTextShort;
         }
 
-        // زر المزيد - يفتح قائمة المشاركة الكاملة للهاتف
         async function shareMore() {
             if (navigator.share) {
                 try {
                     await navigator.share({
                         title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
-                        text: getShareTextShort(),
-                        url: appUrl
+                        text: getShareTextShort(), url: appUrl
                     });
                     closeShareSheet();
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        console.log('Share failed:', err);
-                    }
-                }
+                } catch (err) { if (err.name !== 'AbortError') console.log('Share failed:', err); }
             } else {
                 copyLink();
                 showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط' : 'Link copied');
@@ -1739,65 +1850,40 @@
         }
 
         function shareToFacebook() {
-            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}"e=${encodeURIComponent(getShareTextShort())}`;
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}`;
             window.open(url, '_blank', 'width=600,height=400');
             setTimeout(closeShareSheet, 500);
         }
-
         function shareToWhatsApp() {
-            const url = `https://wa.me/?text=${encodeURIComponent(getShareText())}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`, '_blank');
             setTimeout(closeShareSheet, 500);
         }
-
         function shareToTelegram() {
-            const url = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(getShareTextShort())}`;
-            window.open(url, '_blank');
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(getShareTextShort())}`, '_blank');
             setTimeout(closeShareSheet, 500);
         }
 
-        // Instagram - إنشاء صورة ومشاركتها عبر قائمة النظام (مطابق للصورة)
         async function shareToInstagram() {
             const shareText = getShareTextShort();
-            
-            // إنشاء صورة عبر Canvas
             try {
                 const canvas = document.createElement('canvas');
-                canvas.width = 1080;
-                canvas.height = 1080;
+                canvas.width = 1080; canvas.height = 1080;
                 const ctx = canvas.getContext('2d');
-                
-                // الخلفية
-                ctx.fillStyle = '#030712';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // العنوان
+                ctx.fillStyle = '#030712'; ctx.fillRect(0, 0, 1080, 1080);
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 70px Alexandria, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('تطبيق نجم الشاشات', canvas.width / 2, canvas.height / 2 - 80);
-                
-                // الوصف
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('تطبيق نجم الشاشات', 540, 460);
                 ctx.fillStyle = '#38bdf8';
                 ctx.font = '45px Alexandria, sans-serif';
-                ctx.fillText('أفضل منصة للبث المباشر', canvas.width / 2, canvas.height / 2 + 20);
-                
-                // الرابط
+                ctx.fillText('أفضل منصة للبث المباشر', 540, 560);
                 ctx.fillStyle = '#6366f1';
                 ctx.font = '35px Alexandria, sans-serif';
-                ctx.fillText(appUrl, canvas.width / 2, canvas.height / 2 + 130);
+                ctx.fillText(appUrl, 540, 660);
 
-                // تحويل الصورة إلى ملف
                 canvas.toBlob(async (blob) => {
-                    if (!blob) {
-                        fallbackShare(shareText);
-                        return;
-                    }
-                    
+                    if (!blob) return fallbackShare(shareText);
                     const file = new File([blob], 'star-screens.jpg', { type: 'image/jpeg' });
-                    
-                    // التحقق من دعم مشاركة الملفات
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         try {
                             await navigator.share({
@@ -1806,62 +1892,43 @@
                                 text: shareText
                             });
                             closeShareSheet();
-                        } catch (err) {
-                            if (err.name !== 'AbortError') {
-                                fallbackShare(shareText);
-                            }
-                        }
-                    } else {
-                        fallbackShare(shareText);
-                    }
+                        } catch (err) { if (err.name !== 'AbortError') fallbackShare(shareText); }
+                    } else fallbackShare(shareText);
                 }, 'image/jpeg', 0.95);
-                
-            } catch (e) {
-                fallbackShare(shareText);
-            }
+            } catch (e) { fallbackShare(shareText); }
         }
 
-        // دالة احتياطية في حال عدم دعم مشاركة الملفات
         async function fallbackShare(shareText) {
             if (navigator.share) {
                 try {
                     await navigator.share({
                         title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
-                        text: shareText,
-                        url: appUrl
+                        text: shareText, url: appUrl
                     });
                     closeShareSheet();
                 } catch (err) {
                     if (err.name !== 'AbortError') {
                         copyLink();
-                        showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، افتح انستغرام والصقه' : 'Link copied, open Instagram and paste it');
+                        showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط' : 'Link copied');
                     }
                 }
             } else {
                 copyLink();
-                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط، افتح انستغرام والصقه' : 'Link copied, open Instagram and paste it');
+                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط' : 'Link copied');
             }
         }
 
-        // الرسائل SMS
         function shareToMessages() {
-            const body = getShareText();
-            window.location.href = `sms:?body=${encodeURIComponent(body)}`;
+            window.location.href = `sms:?body=${encodeURIComponent(getShareText())}`;
             setTimeout(closeShareSheet, 800);
         }
-
-        // البريد الإلكتروني
         function shareToEmail() {
             const subject = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
-            const body = getShareText();
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(getShareText())}`;
             setTimeout(closeShareSheet, 800);
         }
-
-        // فايبر
         function shareToViber() {
-            const text = getShareText();
-            window.location.href = `viber://forward?text=${encodeURIComponent(text)}`;
+            window.location.href = `viber://forward?text=${encodeURIComponent(getShareText())}`;
             setTimeout(closeShareSheet, 800);
         }
 
@@ -1871,69 +1938,47 @@
                 showToast(translations[currentLanguage].linkCopied);
                 setTimeout(closeShareSheet, 1500);
             } catch (err) {
-                const textArea = document.createElement('textarea');
-                textArea.value = appUrl;
-                document.body.appendChild(textArea);
-                textArea.select();
+                const t = document.createElement('textarea');
+                t.value = appUrl; document.body.appendChild(t); t.select();
                 document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
+                document.body.removeChild(t);
                 showToast(translations[currentLanguage].linkCopied);
                 setTimeout(closeShareSheet, 1500);
             }
         }
 
-        // ============================================
-        // Schedule - جدول المباريات
-        // ============================================
+        // =============================================================
+        // Schedule (kept as-is)
+        // =============================================================
         async function fetchSchedule() {
             const container = document.getElementById('scheduleList');
             if (!container) return;
-            
             if (container.children.length === 0 || container.querySelector('.schedule-loading')) {
-                container.innerHTML = `
-                    <div class="schedule-loading">
-                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i>
-                        <span>جاري تحميل أحدث المباريات...</span>
-                    </div>
-                `;
+                container.innerHTML = `<div class="schedule-loading"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i><span>جاري تحميل أحدث المباريات...</span></div>`;
             }
-            
             try {
                 const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/scoreboard');
                 const data = await response.json();
-                
                 container.innerHTML = '';
-                
                 if (!data.events || data.events.length === 0) {
                     container.innerHTML = '<div class="schedule-loading">لا توجد مباريات متاحة حالياً في الجدول</div>';
                     return;
                 }
-
                 data.events.forEach(event => {
                     const competition = event.competitions ? event.competitions[0] : null;
                     if (!competition) return;
-                    
                     const status = event.status || competition.status;
                     const isLive = status && status.type && status.type.state === 'in';
                     const isCompleted = status && status.type && status.type.completed;
-                    
                     const homeCompetitor = competition.competitors ? competition.competitors.find(c => c.homeAway === 'home') : null;
                     const awayCompetitor = competition.competitors ? competition.competitors.find(c => c.homeAway === 'away') : null;
-                    
                     const homeTeam = homeCompetitor && homeCompetitor.team ? homeCompetitor.team : { name: 'غير معروف', shortDisplayName: 'غير معروف', logo: '' };
                     const awayTeam = awayCompetitor && awayCompetitor.team ? awayCompetitor.team : { name: 'غير معروف', shortDisplayName: 'غير معروف', logo: '' };
-                    
                     const homeScore = homeCompetitor ? (homeCompetitor.score !== undefined ? homeCompetitor.score : '-') : '-';
                     const awayScore = awayCompetitor ? (awayCompetitor.score !== undefined ? awayCompetitor.score : '-') : '-';
-                    
-                    let statusText = '';
-                    let statusClass = '';
-                    let centerContent = '';
-                    
+                    let statusText = '', statusClass = '', centerContent = '';
                     if (isLive) {
-                        statusText = 'مباشر';
-                        statusClass = 'live';
+                        statusText = 'مباشر'; statusClass = 'live';
                         centerContent = `<div class="match-score live">${homeScore} - ${awayScore}</div>`;
                     } else if (isCompleted) {
                         statusText = 'انتهت';
@@ -1945,10 +1990,8 @@
                         statusText = `${dateStr}`;
                         centerContent = `<div class="match-time">${timeStr}</div>`;
                     }
-
                     const homeTeamNameAr = translateTeamName(homeTeam.shortDisplayName || homeTeam.name);
                     const awayTeamNameAr = translateTeamName(awayTeam.shortDisplayName || awayTeam.name);
-
                     const matchCard = document.createElement('div');
                     matchCard.className = 'match-card';
                     matchCard.innerHTML = `
@@ -1965,112 +2008,41 @@
                                 <img src="${awayTeam.logo}" alt="${awayTeam.name}" class="match-team-logo" onerror="this.src='https://via.placeholder.com/46?text=A'">
                                 <div class="match-team-name">${awayTeamNameAr}</div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     container.appendChild(matchCard);
                 });
-                
             } catch (error) {
-                console.error('Error fetching schedule:', error);
-                container.innerHTML = `
-                    <div class="schedule-loading" style="color: #ef4444;">
-                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem; margin-bottom: 10px;"></i>
-                        <span>فشل في تحميل الجدول. يرجى التحقق من الاتصال.</span>
-                    </div>
-                `;
+                container.innerHTML = `<div class="schedule-loading" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem; margin-bottom: 10px;"></i><span>فشل في تحميل الجدول. يرجى التحقق من الاتصال.</span></div>`;
             }
         }
 
         function translateTeamName(englishName) {
             const teamTranslations = {
-                'Brentford': 'برينتفورد',
-                'Bournemouth': 'بورنموث',
-                'Nottm Forest': 'نوتنغهام',
-                'Nottingham Forest': 'نوتنغهام',
-                'Aston Villa': 'أستون فيلا',
-                'Hull': 'هال',
-                'Hull City': 'هال سيتي',
-                'Chelsea': 'تشيلسي',
-                'Ipswich': 'إيبسويتش',
-                'Ipswich Town': 'إيبسويتش',
-                'C Palace': 'كريستال بالاس',
-                'Crystal Palace': 'كريستال بالاس',
-                'Fulham': 'فولهام',
-                'Liverpool': 'ليفربول',
-                'Man City': 'مانشستر سيتي',
-                'Manchester City': 'مانشستر سيتي',
-                'Man United': 'مانشستر يونايتد',
-                'Manchester United': 'مانشستر يونايتد',
-                'Arsenal': 'أرسنال',
-                'Tottenham': 'توتنهام',
-                'Tottenham Hotspur': 'توتنهام',
-                'Newcastle': 'نيوكاسل',
-                'Newcastle United': 'نيوكاسل',
-                'Brighton': 'برايتون',
-                'Brighton & Hove Albion': 'برايتون',
-                'West Ham': 'وست هام',
-                'West Ham United': 'وست هام',
-                'Everton': 'إيفرتون',
-                'Wolves': 'وولفرهامبتون',
-                'Wolverhampton': 'وولفرهامبتون',
-                'Wolverhampton Wanderers': 'وولفرهامبتون',
-                'Leicester': 'ليستر',
-                'Leicester City': 'ليستر',
-                'Southampton': 'ساوثهامبتون',
-                'Burnley': 'بيرنلي',
-                'Sheffield Utd': 'شيفيلد',
-                'Sheffield United': 'شيفيلد',
-                'Luton': 'لوتون',
-                'Luton Town': 'لوتون',
-                'Real Madrid': 'ريال مدريد',
-                'Barcelona': 'برشلونة',
-                'Atletico Madrid': 'أتلتيكو مدريد',
-                'Sevilla': 'إشبيلية',
-                'Valencia': 'فالنسيا',
-                'Villarreal': 'فياريال',
-                'Real Sociedad': 'ريال سوسيداد',
-                'Athletic Bilbao': 'أتلتيك بيلباو',
-                'Bayern Munich': 'بايرن ميونخ',
-                'Borussia Dortmund': 'بوروسيا دورتموند',
-                'RB Leipzig': 'لايبزيغ',
-                'Bayer Leverkusen': 'باير ليفركوزن',
-                'PSG': 'باريس سان جيرمان',
-                'Paris Saint-Germain': 'باريس سان جيرمان',
-                'Marseille': 'مارسيليا',
-                'Lyon': 'ليون',
-                'Monaco': 'موناكو',
-                'Juventus': 'يوفنتوس',
-                'AC Milan': 'ميلان',
-                'Inter Milan': 'إنتر ميلان',
-                'Inter': 'إنتر ميلان',
-                'Napoli': 'نابولي',
-                'Roma': 'روما',
-                'AS Roma': 'روما',
-                'Lazio': 'لاتسيو',
-                'Atalanta': 'أتالانتا',
-                'Ajax': 'أياكس',
-                'PSV': 'آيندهوفن',
-                'Feyenoord': 'فاينورد',
-                'Benfica': 'بنفيكا',
-                'Porto': 'بورتو',
-                'Sporting CP': 'سبورتينغ',
-                'Celtic': 'سيلتيك',
-                'Rangers': 'رينجرز',
-                'Galatasaray': 'غلطة سراي',
-                'Fenerbahce': 'فنربخشة',
-                'Besiktas': 'بيشكتاش'
+                'Brentford': 'برينتفورد', 'Bournemouth': 'بورنموث', 'Nottm Forest': 'نوتنغهام', 'Nottingham Forest': 'نوتنغهام',
+                'Aston Villa': 'أستون فيلا', 'Hull': 'هال', 'Hull City': 'هال سيتي', 'Chelsea': 'تشيلسي',
+                'Ipswich': 'إيبسويتش', 'Ipswich Town': 'إيبسويتش', 'C Palace': 'كريستال بالاس', 'Crystal Palace': 'كريستال بالاس',
+                'Fulham': 'فولهام', 'Liverpool': 'ليفربول', 'Man City': 'مانشستر سيتي', 'Manchester City': 'مانشستر سيتي',
+                'Man United': 'مانشستر يونايتد', 'Manchester United': 'مانشستر يونايتد', 'Arsenal': 'أرسنال',
+                'Tottenham': 'توتنهام', 'Tottenham Hotspur': 'توتنهام', 'Newcastle': 'نيوكاسل', 'Newcastle United': 'نيوكاسل',
+                'Brighton': 'برايتون', 'Brighton & Hove Albion': 'برايتون', 'West Ham': 'وست هام', 'West Ham United': 'وست هام',
+                'Everton': 'إيفرتون', 'Wolves': 'وولفرهامبتون', 'Wolverhampton': 'وولفرهامبتون', 'Leicester': 'ليستر',
+                'Leicester City': 'ليستر', 'Southampton': 'ساوثهامبتون', 'Burnley': 'بيرنلي', 'Sheffield Utd': 'شيفيلد',
+                'Sheffield United': 'شيفيلد', 'Luton': 'لوتون', 'Luton Town': 'لوتون', 'Real Madrid': 'ريال مدريد',
+                'Barcelona': 'برشلونة', 'Atletico Madrid': 'أتلتيكو مدريد', 'Sevilla': 'إشبيلية', 'Valencia': 'فالنسيا',
+                'Villarreal': 'فياريال', 'Real Sociedad': 'ريال سوسيداد', 'Athletic Bilbao': 'أتلتيك بيلباو',
+                'Bayern Munich': 'بايرن ميونخ', 'Borussia Dortmund': 'بوروسيا دورتموند', 'RB Leipzig': 'لايبزيغ',
+                'Bayer Leverkusen': 'باير ليفركوزن', 'PSG': 'باريس سان جيرمان', 'Paris Saint-Germain': 'باريس سان جيرمان',
+                'Marseille': 'مارسيليا', 'Lyon': 'ليون', 'Monaco': 'موناكو', 'Juventus': 'يوفنتوس', 'AC Milan': 'ميلان',
+                'Inter Milan': 'إنتر ميلان', 'Inter': 'إنتر ميلان', 'Napoli': 'نابولي', 'Roma': 'روما', 'AS Roma': 'روما',
+                'Lazio': 'لاتسيو', 'Atalanta': 'أتالانتا', 'Ajax': 'أياكس', 'PSV': 'آيندهوفن', 'Feyenoord': 'فاينورد',
+                'Benfica': 'بنفيكا', 'Porto': 'بورتو', 'Sporting CP': 'سبورتينغ', 'Celtic': 'سيلتيك', 'Rangers': 'رينجرز',
+                'Galatasaray': 'غلطة سراي', 'Fenerbahce': 'فنربخشة', 'Besiktas': 'بيشكتاش'
             };
-
             return teamTranslations[englishName] || englishName;
         }
 
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        document.addEventListener('touchstart', e => {
-            touchStartY = e.changedTouches[0].screenY;
-        }, {passive: true});
-
+        let touchStartY = 0, touchEndY = 0;
+        document.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, {passive: true});
         document.addEventListener('touchend', e => {
             touchEndY = e.changedTouches[0].screenY;
             handleNewsSwipe();
@@ -2079,27 +2051,14 @@
         function handleNewsSwipe() {
             const swipeThreshold = 50;
             const diff = touchStartY - touchEndY;
-            
             if (Math.abs(diff) > swipeThreshold && document.getElementById('pane-news').classList.contains('active')) {
-                if (diff > 0) {
-                    if (currentNewsIndex < newsData.length - 1) {
-                        goToNewsSlide(currentNewsIndex + 1);
-                        resetNewsTimer();
-                    }
-                } else {
-                    if (currentNewsIndex > 0) {
-                        goToNewsSlide(currentNewsIndex - 1);
-                        resetNewsTimer();
-                    }
-                }
+                if (diff > 0) { if (currentNewsIndex < newsData.length - 1) { goToNewsSlide(currentNewsIndex + 1); resetNewsTimer(); } }
+                else { if (currentNewsIndex > 0) { goToNewsSlide(currentNewsIndex - 1); resetNewsTimer(); } }
             }
         }
 
         function resetNewsTimer() {
-            if (newsInterval) {
-                clearInterval(newsInterval);
-                startNewsAutoScroll();
-            }
+            if (newsInterval) { clearInterval(newsInterval); startNewsAutoScroll(); }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
