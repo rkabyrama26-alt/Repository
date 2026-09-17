@@ -1213,6 +1213,27 @@
                                 <div class="category-card-title">قنوات ام بي سي</div>
                             </div>
                         </div>
+                        <div class="category-card" onclick="openCategory('kids')">
+                            <img class="category-card-image" src="https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp" alt="Kids">
+                            <div class="category-card-overlay"></div>
+                            <div class="category-card-content">
+                                <div class="category-card-title">قنوات الأطفال</div>
+                            </div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('religious')">
+                            <img class="category-card-image" src="https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp" alt="Religious">
+                            <div class="category-card-overlay"></div>
+                            <div class="category-card-content">
+                                <div class="category-card-title">قنوات دينية</div>
+                            </div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('quran')">
+                            <img class="category-card-image" src="https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp" alt="Quran">
+                            <div class="category-card-overlay"></div>
+                            <div class="category-card-content">
+                                <div class="category-card-title">قنوات القرآن الكريم</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1495,6 +1516,91 @@
                         name: 'باب الحارة',
                         logo: 'https://i.ibb.co/XfPPTgnS/Picsart-26-07-15-13-52-33-966.webp',
                         url: 'https://shd-amg-fast.edgenextcdn.net/tx010/playlist.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&'
+                    }
+                ]
+            },
+            kids: {
+                name: 'قنوات الأطفال',
+                channels: [
+                    {
+                        name: 'MBC 3',
+                        logo: 'https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8'
+                    },
+                    {
+                        name: 'سبيستون',
+                        logo: 'https://i.ibb.co/fd0wh493/Picsart-26-07-15-14-41-50-007.webp',
+                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-spacetoon/d8382fb9ab4b2307058f12c7ea90db54/index.m3u8'
+                    },
+                    {
+                        name: 'أطفال ومواهب',
+                        logo: 'https://i.ibb.co/MDP9dbJS/Picsart-26-07-15-14-44-05-366.webp',
+                        url: 'https://5aafcc5de91f1.streamlock.net/atfal1.com/atfal2/chunklist_w1586313661.m3u8'
+                    },
+                    {
+                        name: 'Roua Kids',
+                        logo: 'https://i.ibb.co/zWTgWXB5/Picsart-26-07-15-14-39-29-849.webp',
+                        url: 'https://fast.kwikmotion.com/roya/kids/playlist.m3u8'
+                    },
+                    {
+                        name: 'بهاء',
+                        logo: 'https://i.ibb.co/MDDKvxCN/Picsart-26-07-15-14-44-26-077.webp',
+                        url: 'http://platform.topuphost.com:8577/live/baha2/playlist.m3u8'
+                    },
+                    {
+                        name: 'عمو يزيد',
+                        logo: 'https://i.ibb.co/zWdY59Zm/Picsart-26-07-15-14-40-07-236.webp',
+                        url: 'http://mkstream.servehttp.com:1940/AmouYazid/ay1/chunklist.m3u8'
+                    }
+                ]
+            },
+            religious: {
+                name: 'قنوات دينية',
+                channels: [
+                    {
+                        name: 'كربلاء الوثائقية',
+                        logo: 'https://i.ibb.co/1YXXRSPK/Picsart-26-07-15-14-21-39-809.webp',
+                        url: 'https://ktvlive.online/stream/hls/ch3.m3u8'
+                    },
+                    {
+                        name: 'المعارف',
+                        logo: 'https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp',
+                        url: 'https://bucharest.zeuscdn724.com/lb0/CH-AL-MA/index.m3u8'
+                    },
+                    {
+                        name: 'دعاء',
+                        logo: 'https://i.ibb.co/fGBpcPSB/Picsart-26-07-15-14-21-23-183.webp',
+                        url: 'https://bucharest.zeuscdn724.com/lb0/H9/index.m3u8'
+                    },
+                    {
+                        name: 'كربلاء',
+                        logo: 'https://i.ibb.co/nNyf33ds/Picsart-26-07-15-14-22-03-289.webp',
+                        url: 'https://stream.wpbond.com/live/karbalatv.m3u8'
+                    }
+                ]
+            },
+            quran: {
+                name: 'قنوات القرآن الكريم',
+                channels: [
+                    {
+                        name: 'القرآن الكريم 1',
+                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
+                        url: 'https://win.holol.com/live/quran/playlist.m3u8'
+                    },
+                    {
+                        name: 'القرآن الكريم 2',
+                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
+                        url: 'https://win.holol.com/live/sunnah/playlist.m3u8'
+                    },
+                    {
+                        name: 'القرآن الكريم 3',
+                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
+                        url: 'https://media2.streambrothers.com:1936/8122/8122/playlist.m3u8'
+                    },
+                    {
+                        name: 'القرآن الكريم 4',
+                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
+                        url: 'https://live.kwikmotion.com/smcquranlive/quranradiolive/playlist.m3u8'
                     }
                 ]
             }
