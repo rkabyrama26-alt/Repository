@@ -257,9 +257,6 @@
             display: block;
         }
 
-        /* ==========================================
-           Categories & Channels Grid
-           ========================================== */
         .categories-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -321,7 +318,6 @@
             letter-spacing: -0.3px;
         }
 
-        /* Channels List Header */
         .channels-list-header {
             display: flex;
             align-items: center;
@@ -358,9 +354,6 @@
             letter-spacing: -0.3px;
         }
 
-        /* ==========================================
-           Channels Grid
-           ========================================== */
         .channels-grid {
             display: flex;
             flex-direction: column;
@@ -379,7 +372,7 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(20px);
-            border: none; /* تم حذف الحواف البيضاء */
+            border: none;
             position: relative;
             overflow: hidden;
         }
@@ -406,7 +399,7 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
-            border: none; /* تم حذف الحواف البيضاء */
+            border: none;
         }
 
         .channel-logo-wrap::before {
@@ -442,7 +435,7 @@
         }
 
         .channel-name {
-            font-size: 0.8rem; /* تم تصغير حجم الخط هنا */
+            font-size: 0.8rem;
             font-weight: 800;
             color: var(--text-main);
             line-height: 1.3;
@@ -454,7 +447,7 @@
         }
 
         .live-badge {
-            position: static; /* تم التعديل ليصبح ضمن السطر */
+            position: static;
             flex-shrink: 0;
             background: #ef4444;
             color: #ffffff;
@@ -485,103 +478,378 @@
         }
 
         /* ==========================================
-           Video Player Modal
+           PROFESSIONAL VIDEO PLAYER - FULL SCREEN
            ========================================== */
         .video-modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.96);
-            backdrop-filter: blur(10px);
+            background: #000000;
             z-index: 5000;
             align-items: center;
             justify-content: center;
-            padding: 18px;
         }
 
         .video-modal.active {
             display: flex;
         }
 
-        .video-modal-content {
-            width: 100%;
-            max-width: 900px;
-            position: relative;
-            animation: videoIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes videoIn {
-            from { opacity: 0; transform: scale(0.92); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .video-player-wrap {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 0 60px rgba(99, 102, 241, 0.25);
-            position: relative;
-        }
-
-        .video-player-wrap video {
+        .video-player-container {
             width: 100%;
             height: 100%;
-            display: block;
+            position: relative;
             background: #000;
         }
 
-        .video-close {
+        .video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .player-top-bar {
             position: absolute;
-            top: -52px;
+            top: 0;
             left: 0;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            width: 42px;
-            height: 42px;
+            right: 0;
+            padding: 15px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-modal.show-controls .player-top-bar {
+            opacity: 1;
+        }
+
+        .player-back-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
             cursor: pointer;
-            font-size: 1.05rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.25s ease;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
         }
 
-        .video-close:active {
-            transform: scale(0.9);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .video-title-bar {
+        .player-channel-info {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 16px;
-            color: #ffffff;
-            font-size: 1rem;
+        }
+
+        .player-live-badge {
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 700;
-            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
         }
 
-        .video-title-bar .live-badge {
-            position: static;
-            box-shadow: none;
+        .player-live-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: pulseDot 1.2s infinite;
         }
 
-        .video-loading {
+        .player-channel-name {
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .player-center-play {
             position: absolute;
-            inset: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--accent-secondary);
-            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            z-index: 5;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .player-center-play.show {
+            opacity: 1;
+        }
+
+        .player-center-play:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        .player-center-play i {
+            color: white;
+            font-size: 1.8rem;
+            margin-right: -4px;
+        }
+
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+            padding: 20px 20px 35px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-modal.show-controls .player-controls {
+            opacity: 1;
+        }
+
+        .player-progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .player-progress-bar {
+            height: 100%;
+            background: var(--accent-secondary);
+            border-radius: 3px;
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+
+        .player-progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .player-progress-container:hover .player-progress-bar::after {
+            opacity: 1;
+        }
+
+        .player-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .player-controls-left, .player-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .player-btn:active {
+            transform: scale(0.9);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .player-btn i {
+            font-size: 1.1rem;
+        }
+
+        .player-time {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .player-popup {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 16px;
+            min-width: 220px;
+            z-index: 20;
+            opacity: 0;
             pointer-events: none;
-            background: rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .player-popup.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .popup-header span {
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .popup-header button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-header button:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .popup-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .popup-options::-webkit-scrollbar {
+            width: 4px;
+        }
+        .popup-options::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+
+        .popup-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .popup-option:hover, .popup-option.active {
+            background: rgba(99, 102, 241, 0.25);
+            color: var(--accent-secondary);
+        }
+
+        .popup-option i {
+            font-size: 0.8rem;
+        }
+
+        .player-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 8;
+        }
+
+        .player-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-secondary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .volume-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-slider {
+            width: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-right: 0;
+            transition: width 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .volume-container:hover .volume-slider {
+            width: 70px;
+            margin-right: 8px;
+        }
+
+        .volume-level {
+            height: 100%;
+            background: white;
+            width: 70%;
+            border-radius: 2px;
         }
 
         .bottom-dock {
@@ -1158,6 +1426,22 @@
             align-items: center;
             gap: 12px;
         }
+
+        @media (max-width: 480px) {
+            .player-btn {
+                width: 38px;
+                height: 38px;
+            }
+            .player-btn i {
+                font-size: 1rem;
+            }
+            .player-controls {
+                padding: 15px 15px 30px;
+            }
+            .player-controls-row {
+                gap: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1198,12 +1482,8 @@
                 </div>
             </div>
 
-            <!-- ==========================================================
-                 CHANNELS PANE (Categories -> Channels List)
-                 ========================================================== -->
             <div id="pane-channels" class="section-pane">
 
-                <!-- Categories View -->
                 <div id="channelsCategoriesView">
                     <div class="categories-grid">
                         <div class="category-card" onclick="openCategory('mbc')">
@@ -1272,7 +1552,6 @@
                     </div>
                 </div>
 
-                <!-- Channels List View -->
                 <div id="channelsListView" style="display: none;">
                     <div class="channels-list-header">
                         <button class="back-btn" onclick="closeCategory()">
@@ -1412,21 +1691,90 @@
 
     </div>
 
-    <!-- Video Player Modal -->
+    <!-- ==========================================
+         Professional Video Player Modal
+         ========================================== -->
     <div class="video-modal" id="videoModal">
-        <div class="video-modal-content">
-            <button class="video-close" onclick="closeVideoPlayer()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="video-player-wrap">
-                <video id="videoPlayer" controls playsinline webkit-playsinline></video>
-                <div class="video-loading" id="videoLoading">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <div class="video-player-container">
+            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline></video>
+            
+            <div class="player-top-bar">
+                <button class="player-back-btn" onclick="closeVideoPlayer()">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div class="player-channel-info">
+                    <span class="player-live-badge" onclick="goToLiveEdge()">مباشر</span>
+                    <span class="player-channel-name" id="playerChannelName">اسم القناة</span>
                 </div>
+                <div style="width: 40px;"></div>
             </div>
-            <div class="video-title-bar">
-                <span class="live-badge">مباشر</span>
-                <span id="videoTitle">اسم القناة</span>
+
+            <div class="player-center-play" id="centerPlayBtn" onclick="togglePlay()">
+                <i class="fa-solid fa-play"></i>
+            </div>
+
+            <div class="player-loading" id="playerLoading" style="display: none;">
+                <div class="player-loading-spinner"></div>
+            </div>
+
+            <div class="player-popup" id="qualityPopup">
+                <div class="popup-header">
+                    <span>جودة البث</span>
+                    <button onclick="closePopups()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="popup-options" id="qualityOptions"></div>
+            </div>
+
+            <div class="player-popup" id="audioPopup">
+                <div class="popup-header">
+                    <span>التعليق الصوتي</span>
+                    <button onclick="closePopups()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="popup-options" id="audioOptions"></div>
+            </div>
+
+            <div class="player-controls">
+                <div class="player-progress-container" id="progressContainer">
+                    <div class="player-progress-bar" id="progressBar"></div>
+                </div>
+
+                <div class="player-controls-row">
+                    <div class="player-controls-left">
+                        <button class="player-btn" onclick="togglePlay()" id="playPauseBtn" title="تشغيل/إيقاف">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <button class="player-btn" onclick="skipBackward()" title="رجوع 10 ثواني">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                        <button class="player-btn" onclick="skipForward()" title="تقديم 10 ثواني">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                        <span class="player-time" id="currentTime">00:00</span>
+                    </div>
+
+                    <div class="player-controls-right">
+                        <div class="volume-container">
+                            <button class="player-btn" onclick="toggleMute()" title="كتم الصوت">
+                                <i class="fa-solid fa-volume-high" id="volumeIcon"></i>
+                            </button>
+                            <div class="volume-slider" id="volumeSlider" onclick="setVolume(event)">
+                                <div class="volume-level" id="volumeLevel"></div>
+                            </div>
+                        </div>
+                        <button class="player-btn" onclick="openQualityPopup()" title="الجودة">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </button>
+                        <button class="player-btn" onclick="openAudioPopup()" title="التعليق">
+                            <i class="fa-solid fa-microphone-alt"></i>
+                        </button>
+                        <button class="player-btn" onclick="toggleAspectRatio()" title="نسبة العرض">
+                            <i class="fa-solid fa-arrows-alt-h"></i>
+                        </button>
+                        <button class="player-btn" onclick="toggleFullscreen()" title="ملء الشاشة">
+                            <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1517,301 +1865,97 @@
             mbc: {
                 name: 'قنوات ام بي سي',
                 channels: [
-                    {
-                        name: 'MBC 1',
-                        logo: 'https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8'
-                    },
-                    {
-                        name: 'MBC العراق',
-                        logo: 'https://i.ibb.co/n8PMP8hM/Picsart-26-07-15-13-52-14-477.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-iraq/e38c44b1b43474e1c39cb5b90203691e/index.m3u8'
-                    },
-                    {
-                        name: 'MBC 4',
-                        logo: 'https://i.ibb.co/mrbTSLw2/Picsart-26-07-15-13-49-05-832.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8'
-                    },
-                    {
-                        name: 'MBC 5 المغربية',
-                        logo: 'https://i.ibb.co/vvxmrcN6/Picsart-26-07-15-13-49-23-266.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8'
-                    },
-                    {
-                        name: 'MBC مصر 2',
-                        logo: 'https://i.ibb.co/BK4fLC8X/Picsart-26-07-15-13-47-57-588.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8'
-                    },
-                    {
-                        name: 'MBC مصر',
-                        logo: 'https://i.ibb.co/rRgSzwt7/Picsart-26-07-15-13-48-42-409.webp',
-                        url: 'https://shd-gcp-live.lg.mncdn.com/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8'
-                    },
-                    {
-                        name: 'باب الحارة',
-                        logo: 'https://i.ibb.co/XfPPTgnS/Picsart-26-07-15-13-52-33-966.webp',
-                        url: 'https://shd-amg-fast.edgenextcdn.net/tx010/playlist.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&'
-                    }
+                    { name: 'MBC 1', logo: 'https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8' },
+                    { name: 'MBC العراق', logo: 'https://i.ibb.co/n8PMP8hM/Picsart-26-07-15-13-52-14-477.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-iraq/e38c44b1b43474e1c39cb5b90203691e/index.m3u8' },
+                    { name: 'MBC 4', logo: 'https://i.ibb.co/mrbTSLw2/Picsart-26-07-15-13-49-05-832.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8' },
+                    { name: 'MBC 5 المغربية', logo: 'https://i.ibb.co/vvxmrcN6/Picsart-26-07-15-13-49-23-266.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8' },
+                    { name: 'MBC مصر 2', logo: 'https://i.ibb.co/BK4fLC8X/Picsart-26-07-15-13-47-57-588.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8' },
+                    { name: 'MBC مصر', logo: 'https://i.ibb.co/rRgSzwt7/Picsart-26-07-15-13-48-42-409.webp', url: 'https://shd-gcp-live.lg.mncdn.com/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8' },
+                    { name: 'باب الحارة', logo: 'https://i.ibb.co/XfPPTgnS/Picsart-26-07-15-13-52-33-966.webp', url: 'https://shd-amg-fast.edgenextcdn.net/tx010/playlist.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&' }
                 ]
             },
             kids: {
                 name: 'قنوات الأطفال',
                 channels: [
-                    {
-                        name: 'MBC 3',
-                        logo: 'https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8'
-                    },
-                    {
-                        name: 'سبيستون',
-                        logo: 'https://i.ibb.co/fd0wh493/Picsart-26-07-15-14-41-50-007.webp',
-                        url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-spacetoon/d8382fb9ab4b2307058f12c7ea90db54/index.m3u8'
-                    },
-                    {
-                        name: 'أطفال ومواهب',
-                        logo: 'https://i.ibb.co/MDP9dbJS/Picsart-26-07-15-14-44-05-366.webp',
-                        url: 'https://5aafcc5de91f1.streamlock.net/atfal1.com/atfal2/chunklist_w1586313661.m3u8'
-                    },
-                    {
-                        name: 'Roua Kids',
-                        logo: 'https://i.ibb.co/zWTgWXB5/Picsart-26-07-15-14-39-29-849.webp',
-                        url: 'https://fast.kwikmotion.com/roya/kids/playlist.m3u8'
-                    },
-                    {
-                        name: 'بهاء',
-                        logo: 'https://i.ibb.co/MDDKvxCN/Picsart-26-07-15-14-44-26-077.webp',
-                        url: 'http://platform.topuphost.com:8577/live/baha2/playlist.m3u8'
-                    },
-                    {
-                        name: 'عمو يزيد',
-                        logo: 'https://i.ibb.co/zWdY59Zm/Picsart-26-07-15-14-40-07-236.webp',
-                        url: 'http://mkstream.servehttp.com:1940/AmouYazid/ay1/chunklist.m3u8'
-                    }
+                    { name: 'MBC 3', logo: 'https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8' },
+                    { name: 'سبيستون', logo: 'https://i.ibb.co/fd0wh493/Picsart-26-07-15-14-41-50-007.webp', url: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-spacetoon/d8382fb9ab4b2307058f12c7ea90db54/index.m3u8' },
+                    { name: 'أطفال ومواهب', logo: 'https://i.ibb.co/MDP9dbJS/Picsart-26-07-15-14-44-05-366.webp', url: 'https://5aafcc5de91f1.streamlock.net/atfal1.com/atfal2/chunklist_w1586313661.m3u8' },
+                    { name: 'Roua Kids', logo: 'https://i.ibb.co/zWTgWXB5/Picsart-26-07-15-14-39-29-849.webp', url: 'https://fast.kwikmotion.com/roya/kids/playlist.m3u8' },
+                    { name: 'بهاء', logo: 'https://i.ibb.co/MDDKvxCN/Picsart-26-07-15-14-44-26-077.webp', url: 'http://platform.topuphost.com:8577/live/baha2/playlist.m3u8' },
+                    { name: 'عمو يزيد', logo: 'https://i.ibb.co/zWdY59Zm/Picsart-26-07-15-14-40-07-236.webp', url: 'http://mkstream.servehttp.com:1940/AmouYazid/ay1/chunklist.m3u8' }
                 ]
             },
             religious: {
                 name: 'قنوات دينية',
                 channels: [
-                    {
-                        name: 'كربلاء الوثائقية',
-                        logo: 'https://i.ibb.co/1YXXRSPK/Picsart-26-07-15-14-21-39-809.webp',
-                        url: 'https://ktvlive.online/stream/hls/ch3.m3u8'
-                    },
-                    {
-                        name: 'المعارف',
-                        logo: 'https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp',
-                        url: 'https://bucharest.zeuscdn724.com/lb0/CH-AL-MA/index.m3u8'
-                    },
-                    {
-                        name: 'دعاء',
-                        logo: 'https://i.ibb.co/fGBpcPSB/Picsart-26-07-15-14-21-23-183.webp',
-                        url: 'https://bucharest.zeuscdn724.com/lb0/H9/index.m3u8'
-                    },
-                    {
-                        name: 'كربلاء',
-                        logo: 'https://i.ibb.co/nNyf33ds/Picsart-26-07-15-14-22-03-289.webp',
-                        url: 'https://stream.wpbond.com/live/karbalatv.m3u8'
-                    }
+                    { name: 'كربلاء الوثائقية', logo: 'https://i.ibb.co/1YXXRSPK/Picsart-26-07-15-14-21-39-809.webp', url: 'https://ktvlive.online/stream/hls/ch3.m3u8' },
+                    { name: 'المعارف', logo: 'https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp', url: 'https://bucharest.zeuscdn724.com/lb0/CH-AL-MA/index.m3u8' },
+                    { name: 'دعاء', logo: 'https://i.ibb.co/fGBpcPSB/Picsart-26-07-15-14-21-23-183.webp', url: 'https://bucharest.zeuscdn724.com/lb0/H9/index.m3u8' },
+                    { name: 'كربلاء', logo: 'https://i.ibb.co/nNyf33ds/Picsart-26-07-15-14-22-03-289.webp', url: 'https://stream.wpbond.com/live/karbalatv.m3u8' }
                 ]
             },
             quran: {
                 name: 'قنوات القرآن الكريم',
                 channels: [
-                    {
-                        name: 'القرآن الكريم 1',
-                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
-                        url: 'https://win.holol.com/live/quran/playlist.m3u8'
-                    },
-                    {
-                        name: 'القرآن الكريم 2',
-                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
-                        url: 'https://win.holol.com/live/sunnah/playlist.m3u8'
-                    },
-                    {
-                        name: 'القرآن الكريم 3',
-                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
-                        url: 'https://media2.streambrothers.com:1936/8122/8122/playlist.m3u8'
-                    },
-                    {
-                        name: 'القرآن الكريم 4',
-                        logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp',
-                        url: 'https://live.kwikmotion.com/smcquranlive/quranradiolive/playlist.m3u8'
-                    }
+                    { name: 'القرآن الكريم 1', logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp', url: 'https://win.holol.com/live/quran/playlist.m3u8' },
+                    { name: 'القرآن الكريم 2', logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp', url: 'https://win.holol.com/live/sunnah/playlist.m3u8' },
+                    { name: 'القرآن الكريم 3', logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp', url: 'https://media2.streambrothers.com:1936/8122/8122/playlist.m3u8' },
+                    { name: 'القرآن الكريم 4', logo: 'https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp', url: 'https://live.kwikmotion.com/smcquranlive/quranradiolive/playlist.m3u8' }
                 ]
             },
             news_channels: {
                 name: 'قنوات اخبار',
                 channels: [
-                    {
-                        name: 'العربية الاخبارية',
-                        logo: 'https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp',
-                        url: 'https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8'
-                    },
-                    {
-                        name: 'الحدث الاخبارية',
-                        logo: 'https://i.ibb.co/b5p0hB34/Picsart-26-07-19-18-51-40-629.webp',
-                        url: 'https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8'
-                    },
-                    {
-                        name: 'العربي الاخبارية',
-                        logo: 'https://i.ibb.co/M5Cf0z4B/Picsart-26-07-19-18-52-20-961.webp',
-                        url: 'https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70&position=50&align=center'
-                    },
-                    {
-                        name: 'سكاي نيوز الاخبارية',
-                        logo: 'https://i.ibb.co/jZvdpqXb/Picsart-26-07-19-18-52-06-112.webp',
-                        url: 'https://live-stream.skynewsarabia.com/c-vertical-channel/vertical-stream/index.m3u8'
-                    },
-                    {
-                        name: 'العالم الاخبارية',
-                        logo: 'https://i.ibb.co/jvx6QRLS/Picsart-26-07-19-18-51-51-806.webp',
-                        url: 'https://live2.alalam.ir/alalam.m3u8'
-                    }
+                    { name: 'العربية الاخبارية', logo: 'https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp', url: 'https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8' },
+                    { name: 'الحدث الاخبارية', logo: 'https://i.ibb.co/b5p0hB34/Picsart-26-07-19-18-51-40-629.webp', url: 'https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8' },
+                    { name: 'العربي الاخبارية', logo: 'https://i.ibb.co/M5Cf0z4B/Picsart-26-07-19-18-52-20-961.webp', url: 'https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70&position=50&align=center' },
+                    { name: 'سكاي نيوز الاخبارية', logo: 'https://i.ibb.co/jZvdpqXb/Picsart-26-07-19-18-52-06-112.webp', url: 'https://live-stream.skynewsarabia.com/c-vertical-channel/vertical-stream/index.m3u8' },
+                    { name: 'العالم الاخبارية', logo: 'https://i.ibb.co/jvx6QRLS/Picsart-26-07-19-18-51-51-806.webp', url: 'https://live2.alalam.ir/alalam.m3u8' }
                 ]
             },
             alwan_sports: {
                 name: 'قنوات الوان الرياضية',
                 channels: [
-                    {
-                        name: 'الوان الرياضية 1',
-                        logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp',
-                        url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181661.ts'
-                    },
-                    {
-                        name: 'الوان الرياضية 2',
-                        logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp',
-                        url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181662.ts'
-                    },
-                    {
-                        name: 'الوان الرياضية 3',
-                        logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp',
-                        url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181663.ts'
-                    },
-                    {
-                        name: 'الوان الرياضية 4',
-                        logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp',
-                        url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181664.ts'
-                    },
-                    {
-                        name: 'الوان الرياضية 5',
-                        logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp',
-                        url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181665.ts'
-                    },
-                    {
-                        name: 'الوان الرياضية 6',
-                        logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp',
-                        url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181666.ts'
-                    }
+                    { name: 'الوان الرياضية 1', logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp', url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181661.ts' },
+                    { name: 'الوان الرياضية 2', logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp', url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181662.ts' },
+                    { name: 'الوان الرياضية 3', logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp', url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181663.ts' },
+                    { name: 'الوان الرياضية 4', logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp', url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181664.ts' },
+                    { name: 'الوان الرياضية 5', logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp', url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181665.ts' },
+                    { name: 'الوان الرياضية 6', logo: 'https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp', url: 'http://pro.netmos.ovh:7355/live/MMTVO89S7DY7CNV7SD/P7HIDSPCN580WXH90/181666.ts' }
                 ]
             },
             bein_sports: {
                 name: 'قنوات بين سبورت',
                 channels: [
-                    {
-                        name: 'بين سبورت 1',
-                        logo: 'https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp',
-                        url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/1.m3u8'
-                    },
-                    {
-                        name: 'بين سبورت 2',
-                        logo: 'https://i.ibb.co/xt2Y3S7D/Picsart-26-07-15-13-15-19-901.webp',
-                        url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/2.m3u8'
-                    },
-                    {
-                        name: 'بين سبورت 3',
-                        logo: 'https://i.ibb.co/yc8tDt88/Picsart-26-07-15-13-15-25-585.webp',
-                        url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/3.m3u8'
-                    },
-                    {
-                        name: 'بين سبورت 4',
-                        logo: 'https://i.ibb.co/Rkt9q1p1/Picsart-26-07-15-13-15-31-227.webp',
-                        url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/4.m3u8'
-                    },
-                    {
-                        name: 'بين سبورت 5',
-                        logo: 'https://i.ibb.co/SwST6BGB/Picsart-26-07-15-13-15-37-276.webp',
-                        url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/5.m3u8'
-                    },
-                    {
-                        name: 'بين سبورت 6',
-                        logo: 'https://i.ibb.co/XfR68j7Z/Picsart-26-07-15-13-15-42-650.webp',
-                        url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/6.m3u8'
-                    }
+                    { name: 'بين سبورت 1', logo: 'https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/1.m3u8' },
+                    { name: 'بين سبورت 2', logo: 'https://i.ibb.co/xt2Y3S7D/Picsart-26-07-15-13-15-19-901.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/2.m3u8' },
+                    { name: 'بين سبورت 3', logo: 'https://i.ibb.co/yc8tDt88/Picsart-26-07-15-13-15-25-585.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/3.m3u8' },
+                    { name: 'بين سبورت 4', logo: 'https://i.ibb.co/Rkt9q1p1/Picsart-26-07-15-13-15-31-227.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/4.m3u8' },
+                    { name: 'بين سبورت 5', logo: 'https://i.ibb.co/SwST6BGB/Picsart-26-07-15-13-15-37-276.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/5.m3u8' },
+                    { name: 'بين سبورت 6', logo: 'https://i.ibb.co/XfR68j7Z/Picsart-26-07-15-13-15-42-650.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/6.m3u8' }
                 ]
             },
             iraqi_channels: {
                 name: 'قنوات عراقية',
                 channels: [
-                    {
-                        name: 'العراقية العامة',
-                        logo: 'https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp',
-                        url: 'https://imn-live.esite-lab.com/hls/iraqia-general.m3u8?sid=rdmcy5e6mok2j3ab'
-                    },
-                    {
-                        name: 'العراقية الاخبارية',
-                        logo: 'https://i.ibb.co/nqJKvC9Y/Picsart-26-07-15-14-02-30-113.webp',
-                        url: 'https://imn-live.esite-lab.com/hls/iraqia-news.m3u8?sid=rdmcy5e6mok2j3ab'
-                    },
-                    {
-                        name: 'العراقية الرياضية',
-                        logo: 'https://i.ibb.co/dJxRk92t/Picsart-26-07-15-14-02-44-407.webp',
-                        url: 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8?sid=rdmcy5e6mok2j3ab'
-                    },
-                    {
-                        name: 'الشرقية',
-                        logo: 'https://i.ibb.co/cSFRBvDc/Picsart-26-07-15-14-04-57-892.webp',
-                        url: 'https://indexforce.com/tvhighres/mystream/playlist.m3u8'
-                    },
-                    {
-                        name: 'السومرية',
-                        logo: 'https://i.ibb.co/LK4L10t/Picsart-26-07-15-14-03-37-617.webp',
-                        url: 'https://live.kwikmotion.com/alsumariatvlive/sumariamob.smil/sumariapublish/live_source/hdntl=exp=1789741683~acl=%2falsumariatvlive%2fsumariamob.smil%2f*~data=hdntl~hmac=eb62e046797d05c05610a0c955930f991be24c95314f37feabb8237db6e229b0/chunks.m3u8'
-                    },
-                    {
-                        name: 'الرشيد',
-                        logo: 'https://i.ibb.co/hxWyshTc/Picsart-26-07-15-14-05-18-303.webp',
-                        url: 'https://media1.livaat.com/static/AL-RASHEED-HD.m3u8?hls_ctx=m6o5957p'
-                    },
-                    {
-                        name: 'دجلة',
-                        logo: 'https://i.ibb.co/0p2Gy8Sq/Picsart-26-07-15-14-04-11-107.webp',
-                        url: 'https://ghaasiflu.online/Dijlah/index.m3u8'
-                    },
-                    {
-                        name: 'الفلوجة',
-                        logo: 'https://i.ibb.co/wFNMRsS0/Picsart-26-07-15-14-04-30-962.webp',
-                        url: 'https://live-ak.vimeocdn.com/exp=1789659194~acl=%2F98c512fd-adc9-4312-a1ec-ce8f0cb7dde1_fmp4%2F%2A~hmac=9ec3bfb9596f458f1815cc58e391014c7e58f6632583dffc118dbccc82d771e0/98c512fd-adc9-4312-a1ec-ce8f0cb7dde1_fmp4/avc/hls.m3u8'
-                    },
-                    {
-                        name: 'الأولى العراقية',
-                        logo: 'https://i.ibb.co/jkzkp26z/Picsart-26-07-15-14-04-47-528.webp',
-                        url: 'https://live.alawla.tv/hls/stream.m3u8'
-                    },
-                    {
-                        name: 'UTV العراقية',
-                        logo: 'https://i.ibb.co/fYm0BcGL/Picsart-26-07-15-14-03-55-671.webp',
-                        url: 'https://utviraqi-live.lg.mncdn.com/utviraqi2/64c80359/index.m3u8'
-                    }
+                    { name: 'العراقية العامة', logo: 'https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp', url: 'https://imn-live.esite-lab.com/hls/iraqia-general.m3u8?sid=rdmcy5e6mok2j3ab' },
+                    { name: 'العراقية الاخبارية', logo: 'https://i.ibb.co/nqJKvC9Y/Picsart-26-07-15-14-02-30-113.webp', url: 'https://imn-live.esite-lab.com/hls/iraqia-news.m3u8?sid=rdmcy5e6mok2j3ab' },
+                    { name: 'العراقية الرياضية', logo: 'https://i.ibb.co/dJxRk92t/Picsart-26-07-15-14-02-44-407.webp', url: 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8?sid=rdmcy5e6mok2j3ab' },
+                    { name: 'الشرقية', logo: 'https://i.ibb.co/cSFRBvDc/Picsart-26-07-15-14-04-57-892.webp', url: 'https://indexforce.com/tvhighres/mystream/playlist.m3u8' },
+                    { name: 'السومرية', logo: 'https://i.ibb.co/LK4L10t/Picsart-26-07-15-14-03-37-617.webp', url: 'https://live.kwikmotion.com/alsumariatvlive/sumariamob.smil/sumariapublish/live_source/hdntl=exp=1789741683~acl=%2falsumariatvlive%2fsumariamob.smil%2f*~data=hdntl~hmac=eb62e046797d05c05610a0c955930f991be24c95314f37feabb8237db6e229b0/chunks.m3u8' },
+                    { name: 'الرشيد', logo: 'https://i.ibb.co/hxWyshTc/Picsart-26-07-15-14-05-18-303.webp', url: 'https://media1.livaat.com/static/AL-RASHEED-HD.m3u8?hls_ctx=m6o5957p' },
+                    { name: 'دجلة', logo: 'https://i.ibb.co/0p2Gy8Sq/Picsart-26-07-15-14-04-11-107.webp', url: 'https://ghaasiflu.online/Dijlah/index.m3u8' },
+                    { name: 'الفلوجة', logo: 'https://i.ibb.co/wFNMRsS0/Picsart-26-07-15-14-04-30-962.webp', url: 'https://live-ak.vimeocdn.com/exp=1789659194~acl=%2F98c512fd-adc9-4312-a1ec-ce8f0cb7dde1_fmp4%2F%2A~hmac=9ec3bfb9596f458f1815cc58e391014c7e58f6632583dffc118dbccc82d771e0/98c512fd-adc9-4312-a1ec-ce8f0cb7dde1_fmp4/avc/hls.m3u8' },
+                    { name: 'الأولى العراقية', logo: 'https://i.ibb.co/jkzkp26z/Picsart-26-07-15-14-04-47-528.webp', url: 'https://live.alawla.tv/hls/stream.m3u8' },
+                    { name: 'UTV العراقية', logo: 'https://i.ibb.co/fYm0BcGL/Picsart-26-07-15-14-03-55-671.webp', url: 'https://utviraqi-live.lg.mncdn.com/utviraqi2/64c80359/index.m3u8' }
                 ]
             },
             thamania_sports: {
                 name: 'قنوات ثمانية الرياضية',
                 channels: [
-                    {
-                        name: 'ثمانية الرياضية 1',
-                        logo: 'https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp',
-                        url: 'http://main.light-ott.net/play/live.php?mac=A0:BB:3E:02:40:2B&stream=1264554&extension=m3u8'
-                    },
-                    {
-                        name: 'ثمانية الرياضية 2',
-                        logo: 'https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp',
-                        url: 'http://main.light-ott.net/play/live.php?mac=A0:BB:3E:02:40:2B&stream=1264555&extension=m3u8'
-                    },
-                    {
-                        name: 'ثمانية الرياضية 3',
-                        logo: 'https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp',
-                        url: 'http://main.light-ott.net/play/live.php?mac=A0:BB:3E:02:40:2B&stream=1303871&extension=m3u8'
-                    }
+                    { name: 'ثمانية الرياضية 1', logo: 'https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp', url: 'http://main.light-ott.net/play/live.php?mac=A0:BB:3E:02:40:2B&stream=1264554&extension=m3u8' },
+                    { name: 'ثمانية الرياضية 2', logo: 'https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp', url: 'http://main.light-ott.net/play/live.php?mac=A0:BB:3E:02:40:2B&stream=1264555&extension=m3u8' },
+                    { name: 'ثمانية الرياضية 3', logo: 'https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp', url: 'http://main.light-ott.net/play/live.php?mac=A0:BB:3E:02:40:2B&stream=1303871&extension=m3u8' }
                 ]
             }
         };
@@ -1855,64 +1999,419 @@
         }
 
         // =============================================================
-        // Video Player (HLS)
+        // PROFESSIONAL VIDEO PLAYER - TURBO
         // =============================================================
         let hlsPlayer = null;
+        let currentVideoUrl = '';
+        let retryCount = 0;
+        const MAX_RETRIES = 10;
+        let controlsTimeout;
+        let isPlaying = false;
 
         function playChannel(encodedUrl, name) {
             const url = decodeURIComponent(encodedUrl);
+            currentVideoUrl = url;
+            retryCount = 0;
+            
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
-            const loading = document.getElementById('videoLoading');
+            const loading = document.getElementById('playerLoading');
+            const centerPlay = document.getElementById('centerPlayBtn');
 
-            document.getElementById('videoTitle').textContent = name;
+            document.getElementById('playerChannelName').textContent = name;
             modal.classList.add('active');
-            loading.style.display = 'flex';
+            loading.style.display = 'block';
+            centerPlay.classList.remove('show');
+            
+            showControls();
+            initializePlayer(currentVideoUrl);
+        }
 
+        function destroyHls() {
             if (hlsPlayer) {
-                hlsPlayer.destroy();
+                try { hlsPlayer.destroy(); } catch(e) {}
                 hlsPlayer = null;
             }
+        }
 
-            const onPlaying = () => { loading.style.display = 'none'; };
-            video.addEventListener('playing', onPlaying, { once: true });
+        function initializePlayer(url) {
+            const video = document.getElementById('videoPlayer');
+            const loading = document.getElementById('playerLoading');
 
-            if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
-                video.play().catch(() => {});
-            } else if (window.Hls && Hls.isSupported()) {
-                hlsPlayer = new Hls({
+            destroyHls();
+            try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e) {}
+
+            const onPlaying = () => { 
+                loading.style.display = 'none';
+                isPlaying = true;
+                updatePlayPauseButton();
+            };
+
+            if (window.Hls && Hls.isSupported()) {
+                const hlsConfig = {
+                    enableWorker: true,
                     lowLatencyMode: true,
-                    enableWorker: true
-                });
+                    progressive: false,
+                    startFragPrefetch: true,
+                    testBandwidth: false,
+                    startLevel: -1,
+                    capLevelToPlayerSize: false,
+                    maxBufferLength: 12,
+                    maxMaxBufferLength: 90,
+                    maxBufferSize: 90 * 1000 * 1000,
+                    maxBufferHole: 0.3,
+                    liveSyncDuration: 1,
+                    liveMaxLatencyDuration: 15,
+                    liveDurationInfinity: true,
+                    liveBackBufferLength: 30,
+                    maxLiveSyncPlaybackRate: 2.0,
+                    abrEwmaDefaultEstimate: 800000,
+                    abrEwmaFastLive: 3.0,
+                    abrEwmaSlowLive: 9.0,
+                    abrBandWidthFactor: 0.95,
+                    abrBandWidthUpFactor: 0.9,
+                    fragLoadingMaxRetry: 15,
+                    fragLoadingMaxRetryTimeout: 32000,
+                    fragLoadingRetryDelay: 250,
+                    manifestLoadingMaxRetry: 12,
+                    manifestLoadingMaxRetryTimeout: 16000,
+                    manifestLoadingRetryDelay: 200,
+                    levelLoadingMaxRetry: 12,
+                    levelLoadingMaxRetryTimeout: 16000,
+                    levelLoadingRetryDelay: 200,
+                    appendErrorMaxRetry: 15,
+                    nudgeOffset: 0.1,
+                    nudgeMaxRetry: 15,
+                    highBufferWatchdogPeriod: 2,
+                    xhrSetup: function(xhr) {
+                        xhr.withCredentials = false;
+                        xhr.setRequestHeader('Accept', '*/*');
+                    }
+                };
+
+                hlsPlayer = new Hls(hlsConfig);
                 hlsPlayer.loadSource(url);
                 hlsPlayer.attachMedia(video);
+
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.play().catch(() => {});
+                    video.play().then(onPlaying).catch(() => silentRetry(url));
                 });
-                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        loading.style.display = 'none';
-                        console.warn('HLS fatal error:', data);
+
+                hlsPlayer.on(Hls.Events.FRAG_LOADED, () => {
+                    if (video.paused) {
+                        video.play().then(onPlaying).catch(() => {});
                     }
                 });
+
+                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                silentRetry(url);
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                hlsPlayer.recoverMediaError();
+                                break;
+                            default:
+                                silentRetry(url);
+                                break;
+                        }
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.preload = 'auto';
+                video.addEventListener('loadedmetadata', onPlaying, { once: true });
+                video.addEventListener('playing', onPlaying, { once: true });
+                video.addEventListener('error', () => silentRetry(url), { once: true });
+                video.play().catch(() => silentRetry(url));
             } else {
                 video.src = url;
-                video.play().catch(() => {});
+                video.preload = 'auto';
+                video.addEventListener('loadedmetadata', onPlaying, { once: true });
+                video.addEventListener('playing', onPlaying, { once: true });
+                video.addEventListener('error', () => silentRetry(url), { once: true });
+                video.play().catch(() => silentRetry(url));
             }
+
+            setupPlayerEvents();
+        }
+
+        function silentRetry(url) {
+            if (retryCount < MAX_RETRIES) {
+                retryCount++;
+                const loading = document.getElementById('playerLoading');
+                if (loading) loading.style.display = 'block';
+                setTimeout(() => {
+                    const video = document.getElementById('videoPlayer');
+                    if (hlsPlayer && !hlsPlayer.media) {
+                        try { hlsPlayer.attachMedia(video); } catch(e) {}
+                    }
+                    if (hlsPlayer) {
+                        try { hlsPlayer.startLoad(); } catch(e) {}
+                    } else {
+                        try { video.load(); video.play().catch(() => {}); } catch(e) {}
+                    }
+                }, 250);
+            } else {
+                retryCount = 0;
+                setTimeout(() => {
+                    initializePlayer(url);
+                }, 500);
+            }
+        }
+
+        function setupPlayerEvents() {
+            const video = document.getElementById('videoPlayer');
+            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.getElementById('progressContainer');
+            const currentTimeEl = document.getElementById('currentTime');
+
+            video.addEventListener('timeupdate', () => {
+                if (!isNaN(video.duration) && video.duration > 0 && isFinite(video.duration)) {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    currentTimeEl.textContent = formatTime(video.currentTime);
+                } else {
+                    currentTimeEl.textContent = formatTime(video.currentTime);
+                    progressBar.style.width = '100%';
+                }
+            });
+
+            progressContainer.addEventListener('click', (e) => {
+                if (isNaN(video.duration) || !isFinite(video.duration)) return;
+                const rect = progressContainer.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                video.currentTime = pos * video.duration;
+            });
+
+            const modal = document.getElementById('videoModal');
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target.classList.contains('video-player-container') || e.target.classList.contains('video-element')) {
+                    showControls();
+                }
+            });
+
+            modal.addEventListener('mousemove', () => {
+                showControls();
+            });
+
+            let lastTap = 0;
+            video.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    toggleFullscreen();
+                    e.preventDefault();
+                }
+                lastTap = currentTime;
+            });
+        }
+
+        function showControls() {
+            const modal = document.getElementById('videoModal');
+            modal.classList.add('show-controls');
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                if (isPlaying) {
+                    modal.classList.remove('show-controls');
+                    closePopups();
+                }
+            }, 3500);
+        }
+
+        function togglePlay() {
+            const video = document.getElementById('videoPlayer');
+            const centerPlay = document.getElementById('centerPlayBtn');
+            
+            if (video.paused) {
+                video.play();
+                isPlaying = true;
+                centerPlay.classList.remove('show');
+            } else {
+                video.pause();
+                isPlaying = false;
+                centerPlay.classList.add('show');
+            }
+            updatePlayPauseButton();
+            showControls();
+        }
+
+        function updatePlayPauseButton() {
+            const btn = document.getElementById('playPauseBtn');
+            if (!btn) return;
+            const icon = btn.querySelector('i');
+            if (isPlaying) {
+                icon.className = 'fa-solid fa-pause';
+            } else {
+                icon.className = 'fa-solid fa-play';
+            }
+        }
+
+        function skipForward() {
+            const video = document.getElementById('videoPlayer');
+            video.currentTime = Math.min(video.currentTime + 10, video.duration || video.currentTime + 10);
+            showControls();
+        }
+
+        function skipBackward() {
+            const video = document.getElementById('videoPlayer');
+            video.currentTime = Math.max(video.currentTime - 10, 0);
+            showControls();
+        }
+
+        function toggleMute() {
+            const video = document.getElementById('videoPlayer');
+            const icon = document.getElementById('volumeIcon');
+            video.muted = !video.muted;
+            icon.className = video.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+            showControls();
+        }
+
+        function setVolume(e) {
+            const video = document.getElementById('videoPlayer');
+            const slider = document.getElementById('volumeSlider');
+            const level = document.getElementById('volumeLevel');
+            const rect = slider.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            const volume = Math.max(0, Math.min(1, pos));
+            video.volume = volume;
+            level.style.width = `${volume * 100}%`;
+            showControls();
+        }
+
+        function toggleFullscreen() {
+            const container = document.querySelector('.video-player-container');
+            const icon = document.getElementById('fullscreenIcon');
+            
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => console.log(err));
+                icon.className = 'fa-solid fa-compress';
+            } else {
+                document.exitFullscreen();
+                icon.className = 'fa-solid fa-expand';
+            }
+            showControls();
+        }
+
+        function toggleAspectRatio() {
+            const video = document.getElementById('videoPlayer');
+            if (video.style.objectFit === 'contain') {
+                video.style.objectFit = 'cover';
+                showToast('ملء الشاشة');
+            } else {
+                video.style.objectFit = 'contain';
+                showToast('نسبة الأصلية');
+            }
+            showControls();
+        }
+
+        function goToLiveEdge() {
+            const video = document.getElementById('videoPlayer');
+            if (hlsPlayer && hlsPlayer.liveSyncPosition) {
+                video.currentTime = hlsPlayer.liveSyncPosition;
+            } else {
+                video.currentTime = video.duration || video.currentTime;
+            }
+            showControls();
+        }
+
+        function openQualityPopup() {
+            closePopups();
+            const popup = document.getElementById('qualityPopup');
+            const optionsContainer = document.getElementById('qualityOptions');
+            optionsContainer.innerHTML = '';
+
+            if (hlsPlayer && hlsPlayer.levels && hlsPlayer.levels.length > 1) {
+                const autoDiv = document.createElement('div');
+                autoDiv.className = `popup-option ${hlsPlayer.currentLevel === -1 ? 'active' : ''}`;
+                autoDiv.innerHTML = '<span>تلقائي (موصى به)</span><i class="fa-solid fa-check"></i>';
+                autoDiv.onclick = () => {
+                    hlsPlayer.currentLevel = -1;
+                    closePopups();
+                    showToast('تم تعيين الجودة على التلقائي');
+                };
+                optionsContainer.appendChild(autoDiv);
+
+                hlsPlayer.levels.forEach((level, index) => {
+                    const height = level.height || '?';
+                    const div = document.createElement('div');
+                    div.className = `popup-option ${hlsPlayer.currentLevel === index ? 'active' : ''}`;
+                    div.innerHTML = `<span>${height}p</span>`;
+                    div.onclick = () => {
+                        hlsPlayer.currentLevel = index;
+                        closePopups();
+                        showToast(`الجودة: ${height}p`);
+                    };
+                    optionsContainer.appendChild(div);
+                });
+            } else {
+                optionsContainer.innerHTML = '<div class="popup-option active"><span>جودة واحدة متاحة</span><i class="fa-solid fa-check"></i></div>';
+            }
+            
+            popup.classList.add('active');
+            showControls();
+        }
+
+        function openAudioPopup() {
+            closePopups();
+            const popup = document.getElementById('audioPopup');
+            const optionsContainer = document.getElementById('audioOptions');
+            optionsContainer.innerHTML = '';
+
+            const video = document.getElementById('videoPlayer');
+            if (video.audioTracks && video.audioTracks.length > 1) {
+                Array.from(video.audioTracks).forEach((track, index) => {
+                    const div = document.createElement('div');
+                    div.className = `popup-option ${track.enabled ? 'active' : ''}`;
+                    div.innerHTML = `<span>${track.label || 'تعليق ' + (index + 1)}</span>`;
+                    if (track.enabled) div.innerHTML += '<i class="fa-solid fa-check"></i>';
+                    
+                    div.onclick = () => {
+                        Array.from(video.audioTracks).forEach(t => t.enabled = false);
+                        track.enabled = true;
+                        closePopups();
+                        showToast(`${track.label || 'تعليق ' + (index + 1)}`);
+                    };
+                    optionsContainer.appendChild(div);
+                });
+            } else {
+                optionsContainer.innerHTML = '<div class="popup-option active"><span>تعليق افتراضي</span><i class="fa-solid fa-check"></i></div>';
+            }
+            
+            popup.classList.add('active');
+            showControls();
+        }
+
+        function closePopups() {
+            document.getElementById('qualityPopup').classList.remove('active');
+            document.getElementById('audioPopup').classList.remove('active');
         }
 
         function closeVideoPlayer() {
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
-            try { video.pause(); } catch(e) {}
-            video.removeAttribute('src');
-            try { video.load(); } catch(e) {}
-            if (hlsPlayer) {
-                hlsPlayer.destroy();
-                hlsPlayer = null;
-            }
-            modal.classList.remove('active');
+            
+            try { 
+                video.pause(); 
+                video.removeAttribute('src');
+                video.load();
+            } catch(e) {}
+            
+            destroyHls();
+            
+            modal.classList.remove('active', 'show-controls');
+            closePopups();
+            isPlaying = false;
+            retryCount = 0;
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '00:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
         // =============================================================
@@ -2263,9 +2762,6 @@
             }
         }
 
-        // =============================================================
-        // Schedule (kept as-is)
-        // =============================================================
         async function fetchSchedule() {
             const container = document.getElementById('scheduleList');
             if (!container) return;
