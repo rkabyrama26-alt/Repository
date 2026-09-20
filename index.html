@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
+    <!-- ==========================================
+         إضافة Google Cast SDK
+         ========================================== -->
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
     <style>
         :root {
             --bg-base: #030712;
@@ -498,14 +503,14 @@
             width: 100%;
             height: 100%;
             position: relative;
-            background: #000; /* خلفية سوداء صريحة */
+            background: #000;
         }
 
         .video-element {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            background-color: #000000; /* ضمان خلفية سوداء */
+            background-color: #000000;
         }
 
         .player-top-bar {
@@ -697,6 +702,16 @@
 
         .player-btn i {
             font-size: 1.1rem;
+        }
+
+        /* ==========================================
+           تنسيق زر Cast عند الاتصال النشط
+           ========================================== */
+        .player-btn.casting {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
         }
 
         .player-time {
@@ -1697,7 +1712,6 @@
          ========================================== -->
     <div class="video-modal" id="videoModal">
         <div class="video-player-container">
-            <!-- إضافة poster شفاف لمنع ظهور صورة المشغل الافتراضية -->
             <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
@@ -1772,6 +1786,14 @@
                         <button class="player-btn" onclick="toggleAspectRatio()" title="نسبة العرض">
                             <i class="fa-solid fa-arrows-alt-h"></i>
                         </button>
+                        
+                        <!-- ==========================================
+                             زر Cast الجديد للعرض على التلفزيون
+                             ========================================== -->
+                        <button class="player-btn" id="castBtn" onclick="launchCast()" title="عرض على التلفزيون (Cast)">
+                            <i class="fa-solid fa-tv"></i>
+                        </button>
+
                         <button class="player-btn" onclick="toggleFullscreen()" title="ملء الشاشة">
                             <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
                         </button>
@@ -2006,7 +2028,7 @@
         let hlsPlayer = null;
         let currentVideoUrl = '';
         let retryCount = 0;
-        const MAX_RETRIES = 15; // Increased for weak networks
+        const MAX_RETRIES = 15;
         let controlsTimeout;
         let isPlaying = false;
 
@@ -2025,9 +2047,6 @@
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
 
-            // ==========================================
-            // NEW FEATURE: Auto Fullscreen & Landscape Mode
-            // ==========================================
             const container = document.querySelector('.video-player-container');
             if (container.requestFullscreen) {
                 container.requestFullscreen().then(() => {
@@ -2036,7 +2055,6 @@
                     }
                 }).catch(err => console.log('Fullscreen request failed:', err));
             }
-            // ==========================================
             
             showControls();
             initializePlayer(currentVideoUrl);
@@ -2063,30 +2081,29 @@
             };
 
             if (window.Hls && Hls.isSupported()) {
-                // TURBO CONFIGURATION FOR WEAK INTERNET & INSTANT START
                 const hlsConfig = {
                     enableWorker: true,
-                    lowLatencyMode: false, // Disabled to prioritize stability over strict low latency on weak nets
+                    lowLatencyMode: false,
                     progressive: true,
                     startFragPrefetch: true,
                     testBandwidth: true,
-                    startLevel: 0, // FORCE start at lowest quality for INSTANT playback, then adapt up
-                    capLevelToPlayerSize: true, // Don't download 1080p for a small mobile screen (saves massive bandwidth)
-                    maxBufferLength: 30, // Keep a good buffer once playing
+                    startLevel: 0,
+                    capLevelToPlayerSize: true,
+                    maxBufferLength: 30,
                     maxMaxBufferLength: 60,
                     maxBufferSize: 60 * 1000 * 1000,
                     maxBufferHole: 0.5,
-                    liveSyncDuration: 3, // 3 seconds behind live edge is much more stable on weak net than 1s
+                    liveSyncDuration: 3,
                     liveMaxLatencyDuration: 10,
                     liveDurationInfinity: true,
                     liveBackBufferLength: 10,
                     maxLiveSyncPlaybackRate: 1.5,
-                    abrEwmaDefaultEstimate: 500000, // Assume 500kbps initially (safe for weak net)
-                    abrBandWidthFactor: 0.8, // Be conservative in upgrading quality
+                    abrEwmaDefaultEstimate: 500000,
+                    abrBandWidthFactor: 0.8,
                     abrBandWidthUpFactor: 0.7,
                     fragLoadingMaxRetry: 6,
                     fragLoadingMaxRetryTimeout: 64000,
-                    fragLoadingRetryDelay: 1000, // Longer delay prevents server ban on weak net
+                    fragLoadingRetryDelay: 1000,
                     manifestLoadingMaxRetry: 6,
                     manifestLoadingMaxRetryTimeout: 64000,
                     manifestLoadingRetryDelay: 1000,
@@ -2099,7 +2116,7 @@
                     highBufferWatchdogPeriod: 3,
                     xhrSetup: function(xhr, xhrUrl) {
                         xhr.withCredentials = false;
-                        xhr.timeout = 10000; // 10 second timeout to prevent hanging
+                        xhr.timeout = 10000;
                     }
                 };
 
@@ -2108,7 +2125,6 @@
                 hlsPlayer.attachMedia(video);
 
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    // Attempt to play. If blocked by browser (autoplay policy), try muted.
                     video.play().then(onPlaying).catch(() => {
                         video.muted = true;
                         video.play().then(onPlaying).catch(() => silentRetry(url));
@@ -2167,7 +2183,6 @@
                 const loading = document.getElementById('playerLoading');
                 if (loading) loading.style.display = 'block';
                 
-                // Exponential backoff for weak networks
                 const delay = Math.min(1000 * Math.pow(1.5, retryCount), 8000);
                 
                 setTimeout(() => {
@@ -2429,9 +2444,6 @@
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
 
-            // ==========================================
-            // NEW FEATURE: Exit Fullscreen & Unlock Orientation
-            // ==========================================
             if (document.fullscreenElement) {
                 document.exitFullscreen().then(() => {
                     if (screen.orientation && screen.orientation.unlock) {
@@ -2439,7 +2451,6 @@
                     }
                 }).catch(err => console.log('Exit fullscreen failed:', err));
             }
-            // ==========================================
             
             try { 
                 video.pause(); 
@@ -2924,9 +2935,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
 
-            // ==========================================
-            // NEW FEATURE: Sync Fullscreen Icon & Orientation
-            // ==========================================
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
                 if (icon) {
@@ -2943,6 +2951,91 @@
                 }
             });
         });
+
+        // =============================================================
+        // GOOGLE CAST INTEGRATION (العرض على التلفزيون)
+        // =============================================================
+        let castContext;
+
+        window.__onGCastApiAvailable = function(isAvailable) {
+            if (isAvailable) {
+                initializeCastApi();
+            }
+        };
+
+        function initializeCastApi() {
+            cast.framework.CastContext.getInstance().setOptions({
+                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+            });
+            
+            castContext = cast.framework.CastContext.getInstance();
+            castContext.addEventListener(
+                cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+                function(event) {
+                    const castBtn = document.getElementById('castBtn');
+                    if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
+                        if (castBtn) castBtn.classList.add('casting');
+                    } else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+                        if (castBtn) castBtn.classList.remove('casting');
+                    }
+                }
+            );
+        }
+
+        function launchCast() {
+            if (!castContext) {
+                showToast('جاري تحميل ميزة العرض...');
+                return;
+            }
+            
+            if (!currentVideoUrl) {
+                showToast('يرجى تشغيل قناة أولاً');
+                return;
+            }
+
+            const currentSession = castContext.getCurrentSession();
+            if (currentSession) {
+                castContext.endCurrentSession(true);
+                return;
+            }
+
+            castContext.requestSession().then(() => {
+                const session = castContext.getCurrentSession();
+                if (session) {
+                    loadMediaOnCast(session);
+                }
+            }).catch((error) => {
+                if (error.code !== chrome.cast.ErrorCode.CANCEL) {
+                    showToast('فشل في الاتصال بالتلفزيون');
+                }
+            });
+        }
+
+        function loadMediaOnCast(session) {
+            if (!currentVideoUrl) return;
+            
+            const mediaInfo = new chrome.cast.media.MediaInfo(currentVideoUrl, 'application/x-mpegURL');
+            const channelName = document.getElementById('playerChannelName').textContent || 'بث مباشر';
+            
+            mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+            mediaInfo.metadata.title = channelName;
+            mediaInfo.metadata.subtitle = 'بث مباشر';
+
+            const request = new chrome.cast.media.LoadRequest(mediaInfo);
+            request.autoplay = true;
+            request.currentTime = 0;
+
+            session.loadMedia(request).then(
+                () => {
+                    showToast('جاري العرض على التلفزيون');
+                },
+                (error) => {
+                    console.error("Load media failed", error);
+                    showToast('فشل في تشغيل الفيديو على التلفزيون');
+                }
+            );
+        }
     </script>
 </body>
 </html>
