@@ -10,10 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <!-- ==========================================
-         إضافة Google Cast SDK
+         Google Cast Sender API (للربط مع التلفاز / Chromecast)
          ========================================== -->
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-
+    
     <style>
         :root {
             --bg-base: #030712;
@@ -705,13 +705,22 @@
         }
 
         /* ==========================================
-           تنسيق زر Cast عند الاتصال النشط
+           CAST BUTTON - حالة الاتصال بالتلفاز
            ========================================== */
-        .player-btn.casting {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+        .player-btn.cast-btn.cast-connected {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+        }
+
+        .player-btn.cast-btn.cast-connecting {
+            animation: castPulse 1.2s infinite;
+        }
+
+        @keyframes castPulse {
+            0%, 100% { background: rgba(99, 102, 241, 0.15); }
+            50% { background: rgba(99, 102, 241, 0.45); }
         }
 
         .player-time {
@@ -1786,14 +1795,12 @@
                         <button class="player-btn" onclick="toggleAspectRatio()" title="نسبة العرض">
                             <i class="fa-solid fa-arrows-alt-h"></i>
                         </button>
-                        
                         <!-- ==========================================
-                             زر Cast الجديد للعرض على التلفزيون
+                             NEW: زر CAST للبث على التلفاز / Chromecast
                              ========================================== -->
-                        <button class="player-btn" id="castBtn" onclick="launchCast()" title="عرض على التلفزيون (Cast)">
-                            <i class="fa-solid fa-tv"></i>
+                        <button class="player-btn cast-btn" onclick="toggleCast()" id="castBtn" title="بث إلى التلفاز">
+                            <i class="fa-solid fa-tv" id="castIcon"></i>
                         </button>
-
                         <button class="player-btn" onclick="toggleFullscreen()" title="ملء الشاشة">
                             <i class="fa-solid fa-expand" id="fullscreenIcon"></i>
                         </button>
@@ -2444,6 +2451,9 @@
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
 
+            // إيقاف أي جلسة Cast نشطة قبل الإغلاق
+            stopCastSession();
+
             if (document.fullscreenElement) {
                 document.exitFullscreen().then(() => {
                     if (screen.orientation && screen.orientation.unlock) {
@@ -2471,6 +2481,147 @@
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // =============================================================
+        // GOOGLE CAST - البث على التلفاز / Chromecast
+        // =============================================================
+        let castSession = null;
+        let castContext = null;
+        let castRemotePlayer = null;
+        let castRemotePlayerController = null;
+        let castInitialized = false;
+
+        // تهيئة Cast Framework عند تحميل الصفحة
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+            if (isAvailable) {
+                initCastFramework();
+            }
+        };
+
+        function initCastFramework() {
+            if (castInitialized) return;
+            try {
+                const castFramework = cast.framework;
+                const context = castFramework.CastContext.getInstance();
+                
+                context.setOptions({
+                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+                    resumeSavedSession: true
+                });
+
+                castContext = context;
+                castRemotePlayer = new castFramework.RemotePlayer();
+                castRemotePlayerController = new castFramework.RemotePlayerController(castRemotePlayer);
+
+                //监听 حالة الاتصال
+                context.addEventListener(
+                    castFramework.CastContextEventType.SESSION_STATE_CHANGED,
+                    onCastSessionStateChanged
+                );
+
+                castInitialized = true;
+                console.log('Cast Framework initialized successfully');
+            } catch (err) {
+                console.error('Cast init error:', err);
+            }
+        }
+
+        function onCastSessionStateChanged(event) {
+            const state = event.sessionState;
+            const castBtn = document.getElementById('castBtn');
+            const castIcon = document.getElementById('castIcon');
+
+            if (state === cast.framework.SessionState.SESSION_STARTED || 
+                state === cast.framework.SessionState.SESSION_RESUMED) {
+                castSession = castContext.getCurrentSession();
+                castBtn.classList.add('cast-connected');
+                castBtn.classList.remove('cast-connecting');
+                castIcon.className = 'fa-solid fa-tv';
+                showToast('تم الاتصال بالتلفاز بنجاح 📺');
+                
+                // بدء البث على التلفاز تلقائياً إذا كان فيديو قيد التشغيل
+                if (currentVideoUrl) {
+                    loadMediaOnCast(currentVideoUrl);
+                }
+            } else if (state === cast.framework.SessionState.SESSION_STARTING || 
+                       state === cast.framework.SessionState.SESSION_ENDING) {
+                castBtn.classList.add('cast-connecting');
+                castBtn.classList.remove('cast-connected');
+            } else if (state === cast.framework.SessionState.SESSION_ENDED || 
+                       state === cast.framework.SessionState.NO_SESSION) {
+                castSession = null;
+                castBtn.classList.remove('cast-connected', 'cast-connecting');
+                castIcon.className = 'fa-solid fa-tv';
+            }
+        }
+
+        function toggleCast() {
+            if (!castInitialized) {
+                showToast('خدمة Cast غير متاحة في هذا المتصفح');
+                return;
+            }
+
+            try {
+                if (castSession) {
+                    // إيقاف الجلسة الحالية
+                    castContext.endCurrentSession(true);
+                    showToast('تم فصل البث عن التلفاز');
+                } else {
+                    // بدء جلسة جديدة (يظهر قائمة أجهزة التلفاز)
+                    castContext.requestSession().then(() => {
+                        console.log('Cast session requested');
+                    }).catch((err) => {
+                        if (err === 'cancel') {
+                            console.log('Cast cancelled by user');
+                        } else {
+                            showToast('تعذر الاتصال بجهاز Cast');
+                            console.error('Cast request error:', err);
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Toggle Cast error:', err);
+                showToast('خطأ في خدمة البث');
+            }
+        }
+
+        function loadMediaOnCast(url) {
+            if (!castSession) return;
+
+            try {
+                const cast = window.chrome.cast;
+                const mediaInfo = new cast.media.MediaInfo(url, 'application/x-mpegURL');
+                mediaInfo.streamType = cast.media.StreamType.LIVE;
+                mediaInfo.metadata = new cast.media.GenericMediaMetadata();
+                mediaInfo.metadata.title = document.getElementById('playerChannelName').textContent || 'بث مباشر';
+                mediaInfo.metadata.subtitle = 'نجم الشاشات';
+
+                const request = new cast.media.LoadRequest(mediaInfo);
+                request.autoplay = true;
+                request.currentTime = 0;
+
+                castSession.loadMedia(request).then(() => {
+                    console.log('Media loaded on TV successfully');
+                    showToast('جاري البث على التلفاز...');
+                }).catch((err) => {
+                    console.error('Load media error:', err);
+                    showToast('فشل تحميل البث على التلفاز');
+                });
+            } catch (err) {
+                console.error('Cast load error:', err);
+            }
+        }
+
+        function stopCastSession() {
+            if (castContext && castSession) {
+                try {
+                    castContext.endCurrentSession(true);
+                } catch (err) {
+                    console.error('Stop cast error:', err);
+                }
+            }
         }
 
         // =============================================================
@@ -2951,91 +3102,6 @@
                 }
             });
         });
-
-        // =============================================================
-        // GOOGLE CAST INTEGRATION (العرض على التلفزيون)
-        // =============================================================
-        let castContext;
-
-        window.__onGCastApiAvailable = function(isAvailable) {
-            if (isAvailable) {
-                initializeCastApi();
-            }
-        };
-
-        function initializeCastApi() {
-            cast.framework.CastContext.getInstance().setOptions({
-                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-            });
-            
-            castContext = cast.framework.CastContext.getInstance();
-            castContext.addEventListener(
-                cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
-                function(event) {
-                    const castBtn = document.getElementById('castBtn');
-                    if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                        if (castBtn) castBtn.classList.add('casting');
-                    } else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
-                        if (castBtn) castBtn.classList.remove('casting');
-                    }
-                }
-            );
-        }
-
-        function launchCast() {
-            if (!castContext) {
-                showToast('جاري تحميل ميزة العرض...');
-                return;
-            }
-            
-            if (!currentVideoUrl) {
-                showToast('يرجى تشغيل قناة أولاً');
-                return;
-            }
-
-            const currentSession = castContext.getCurrentSession();
-            if (currentSession) {
-                castContext.endCurrentSession(true);
-                return;
-            }
-
-            castContext.requestSession().then(() => {
-                const session = castContext.getCurrentSession();
-                if (session) {
-                    loadMediaOnCast(session);
-                }
-            }).catch((error) => {
-                if (error.code !== chrome.cast.ErrorCode.CANCEL) {
-                    showToast('فشل في الاتصال بالتلفزيون');
-                }
-            });
-        }
-
-        function loadMediaOnCast(session) {
-            if (!currentVideoUrl) return;
-            
-            const mediaInfo = new chrome.cast.media.MediaInfo(currentVideoUrl, 'application/x-mpegURL');
-            const channelName = document.getElementById('playerChannelName').textContent || 'بث مباشر';
-            
-            mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
-            mediaInfo.metadata.title = channelName;
-            mediaInfo.metadata.subtitle = 'بث مباشر';
-
-            const request = new chrome.cast.media.LoadRequest(mediaInfo);
-            request.autoplay = true;
-            request.currentTime = 0;
-
-            session.loadMedia(request).then(
-                () => {
-                    showToast('جاري العرض على التلفزيون');
-                },
-                (error) => {
-                    console.error("Load media failed", error);
-                    showToast('فشل في تشغيل الفيديو على التلفزيون');
-                }
-            );
-        }
     </script>
 </body>
 </html>
