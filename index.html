@@ -4,12 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تطبيق احترافي بملء الشاشة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- تحسين تحميل الخطوط لمنع الوميض -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- تغيير display=swap إلى display=block لمنع ظهور الخط العادي نهائياً -->
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=block" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <style>
+        /* منع ظهور أي محتوى حتى يتم تحميل الخطوط الرسمية */
+        html {
+            visibility: hidden;
+        }
+        html.fonts-loaded {
+            visibility: visible;
+        }
+
         :root {
             --bg-base: #030712;
             --surface-glass: rgba(255, 255, 255, 0.035);
@@ -59,7 +72,7 @@
         .viewport-area {
             flex: 1;
             overflow-y: auto;
-            padding: 50px 20px calc(var(--nav-height) + 50px);
+            padding: 50px 20px calc(var(--nav-height) + 30px);
             scroll-behavior: smooth;
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -85,6 +98,58 @@
         @keyframes paneEnter {
             from { opacity: 0; transform: translateY(15px) scale(0.97); }
             to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .hero-banner {
+            width: 100%;
+            height: 185px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.1)), var(--surface-glass);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 120px; height: 120px;
+            background: var(--accent-primary);
+            filter: blur(50px);
+            opacity: 0.3;
+        }
+
+        .hero-badge {
+            position: absolute;
+            top: 16px; right: 18px;
+            background: rgba(99, 102, 241, 0.25);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
+        }
+
+        .hero-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .pane-header-title {
@@ -801,16 +866,13 @@
             border-radius: 2px;
         }
 
-        /* ==========================================
-           NEW FLOATING BOTTOM DOCK & BUBBLE INDICATOR
-           ========================================== */
         .bottom-dock {
             position: absolute;
-            bottom: 20px;
-            left: 15px;
-            right: 15px;
-            height: 68px;
-            background: rgba(3, 7, 18, 0.95);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background: rgba(3, 7, 18, 0.92);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             display: flex;
@@ -818,28 +880,6 @@
             align-items: center;
             padding: 0 6px;
             z-index: 100;
-            border-radius: 34px;
-            border: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            overflow: visible; 
-        }
-
-        .nav-bubble {
-            position: absolute;
-            width: 48px;
-            height: 48px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            top: -14px;
-            left: 0;
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.6), inset 0 2px 4px rgba(255,255,255,0.2);
-            z-index: 1;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
         }
 
         .dock-tab-btn {
@@ -853,36 +893,38 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
-            height: 62px;
+            height: 64px;
             border-radius: 16px;
             position: relative;
             margin: 0 2px;
-            z-index: 2;
         }
 
         .dock-tab-btn i {
             font-size: 1.2rem;
             margin-bottom: 4px;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            color: var(--text-muted);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
         }
 
         .dock-tab-btn span {
             font-size: 0.62rem;
             font-weight: 700;
-            transition: all 0.4s ease;
+            transition: opacity 0.3s ease;
             color: var(--text-muted);
         }
 
+        .dock-tab-btn.active {
+            color: var(--accent-secondary);
+            background: rgba(99, 102, 241, 0.12);
+        }
+
         .dock-tab-btn.active i {
-            color: #ffffff;
-            transform: translateY(-20px) scale(1.1);
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transform: translateY(-2px) scale(1.15);
+            color: var(--accent-secondary);
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
         }
 
         .dock-tab-btn.active span {
-            opacity: 0;
-            transform: translateY(15px);
+            color: var(--accent-secondary);
         }
 
         .language-overlay {
@@ -1415,12 +1457,25 @@
             }
         }
     </style>
+    
+    <!-- سكريبت لمنع ظهور أي محتوى حتى يتم تحميل الخطوط الرسمية -->
+    <script>
+        if (document.fonts) {
+            document.fonts.ready.then(function () {
+                document.documentElement.classList.add('fonts-loaded');
+            });
+        } else {
+            document.documentElement.classList.add('fonts-loaded');
+        }
+    </script>
 </head>
 <body>
 
     <div class="app-container">
 
         <div class="viewport-area">
+
+            <!-- تم حذف قسم الرئيسية (pane-home) بالكامل -->
 
             <div id="pane-channels" class="section-pane active">
 
@@ -1602,13 +1657,8 @@
 
         </div>
 
-        <!-- ==========================================
-             NEW FLOATING BOTTOM DOCK & BUBBLE INDICATOR
-             ========================================== -->
+        <!-- تم تحديث الأزرار وإزالة زر الرئيسية، وتعديل المؤشرات (0 إلى 4) -->
         <nav class="bottom-dock">
-            <!-- الفقاعة المتحركة -->
-            <div class="nav-bubble" id="navBubble"></div>
-
             <button class="dock-tab-btn active" onclick="switchPane(0)">
                 <i class="fa-solid fa-tv"></i>
                 <span data-key="navChannels">قنوات</span>
@@ -2392,7 +2442,7 @@
         }
 
         // =============================================================
-        // Panes / Docks & Bubble Indicator Logic
+        // Panes / Docks
         // =============================================================
         const panesArr = document.querySelectorAll('.section-pane');
         const dockBtnsArr = document.querySelectorAll('.dock-tab-btn');
@@ -2401,28 +2451,6 @@
         let newsData = [];
         let newsInterval;
         const appUrl = window.location.href;
-
-        // دالة تحديث موقع الفقاعة المتحركة
-        function updateBubblePosition(index) {
-            const dock = document.querySelector('.bottom-dock');
-            const buttons = document.querySelectorAll('.dock-tab-btn');
-            const bubble = document.getElementById('navBubble');
-            if (!buttons[index] || !bubble || !dock) return;
-
-            requestAnimationFrame(() => {
-                const button = buttons[index];
-                const dockRect = dock.getBoundingClientRect();
-                const btnRect = button.getBoundingClientRect();
-
-                const btnCenterX = btnRect.left + (btnRect.width / 2);
-                const dockLeft = dockRect.left;
-
-                // الفقاعة 48 بكسل، لذا الإزاحة هي 24 بكسل
-                const targetX = btnCenterX - dockLeft - 24;
-
-                bubble.style.transform = `translateX(${targetX}px)`;
-            });
-        }
 
         const translations = {
             ar: {
@@ -2478,21 +2506,18 @@
             panesArr[index].classList.add('active');
             dockBtnsArr[index].classList.add('active');
 
-            // تحديث موقع الفقاعة عند التبديل
-            updateBubblePosition(index);
-
             document.querySelector('.viewport-area').scrollTop = 0;
 
-            if (index === 0) { // Channels Pane
+            // تم تحديث المؤشرات لتتوافق مع حذف الرئيسية (0: قنوات، 1: جدول، 2: مسلسلات، 3: أخبار، 4: إعدادات)
+            if (index === 0) { // Channels
                 if (currentCategory) closeCategory();
-            }
-
-            if (index === 3) { // News Pane
+            } else if (index === 1) { // Schedule
+                fetchSchedule();
+            } else if (index === 3) { // News
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
-            } else if (index === 1) { // Schedule Pane
-                fetchSchedule();
             } else {
+                // Series (2) or Settings (4)
                 if (newsInterval) clearInterval(newsInterval);
             }
         }
@@ -2878,12 +2903,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
 
-            // تهيئة موقع الفقاعة عند فتح التطبيق
-            const activeIndex = Array.from(dockBtnsArr).findIndex(btn => btn.classList.contains('active'));
-            if (activeIndex !== -1) {
-                setTimeout(() => updateBubblePosition(activeIndex), 100);
-            }
-
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
                 if (icon) {
@@ -2898,12 +2917,6 @@
                         screen.orientation.unlock();
                     }
                 }
-            });
-
-            // تحديث موقع الفقاعة عند تغيير حجم الشاشة أو اتجاه الجهاز
-            window.addEventListener('resize', () => {
-                const activeIndex = Array.from(dockBtnsArr).findIndex(btn => btn.classList.contains('active'));
-                if (activeIndex !== -1) updateBubblePosition(activeIndex);
             });
         });
     </script>
