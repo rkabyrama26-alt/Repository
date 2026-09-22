@@ -498,14 +498,14 @@
             width: 100%;
             height: 100%;
             position: relative;
-            background: #000;
+            background: #000; /* خلفية سوداء صريحة */
         }
 
         .video-element {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            background-color: #000000;
+            background-color: #000000; /* ضمان خلفية سوداء */
         }
 
         .player-top-bar {
@@ -1451,8 +1451,6 @@
 
         <div class="viewport-area">
 
-            <!-- تم حذف قسم الرئيسية (pane-home) من هنا -->
-
             <div id="pane-channels" class="section-pane active">
 
                 <div id="channelsCategoriesView">
@@ -1633,7 +1631,6 @@
 
         </div>
 
-        <!-- تم تحديث أزرار التنقل لتبدأ من 0 وتتوافق مع الأقسام الجديدة -->
         <nav class="bottom-dock">
             <button class="dock-tab-btn active" onclick="switchPane(0)">
                 <i class="fa-solid fa-tv"></i>
@@ -1664,6 +1661,7 @@
          ========================================== -->
     <div class="video-modal" id="videoModal">
         <div class="video-player-container">
+            <!-- إضافة poster شفاف لمنع ظهور صورة المشغل الافتراضية -->
             <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
@@ -1972,7 +1970,7 @@
         let hlsPlayer = null;
         let currentVideoUrl = '';
         let retryCount = 0;
-        const MAX_RETRIES = 15;
+        const MAX_RETRIES = 15; // Increased for weak networks
         let controlsTimeout;
         let isPlaying = false;
 
@@ -1991,6 +1989,9 @@
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
 
+            // ==========================================
+            // NEW FEATURE: Auto Fullscreen & Landscape Mode
+            // ==========================================
             const container = document.querySelector('.video-player-container');
             if (container.requestFullscreen) {
                 container.requestFullscreen().then(() => {
@@ -1999,6 +2000,7 @@
                     }
                 }).catch(err => console.log('Fullscreen request failed:', err));
             }
+            // ==========================================
             
             showControls();
             initializePlayer(currentVideoUrl);
@@ -2025,29 +2027,30 @@
             };
 
             if (window.Hls && Hls.isSupported()) {
+                // TURBO CONFIGURATION FOR WEAK INTERNET & INSTANT START
                 const hlsConfig = {
                     enableWorker: true,
-                    lowLatencyMode: false,
+                    lowLatencyMode: false, // Disabled to prioritize stability over strict low latency on weak nets
                     progressive: true,
                     startFragPrefetch: true,
                     testBandwidth: true,
-                    startLevel: 0,
-                    capLevelToPlayerSize: true,
-                    maxBufferLength: 30,
+                    startLevel: 0, // FORCE start at lowest quality for INSTANT playback, then adapt up
+                    capLevelToPlayerSize: true, // Don't download 1080p for a small mobile screen (saves massive bandwidth)
+                    maxBufferLength: 30, // Keep a good buffer once playing
                     maxMaxBufferLength: 60,
                     maxBufferSize: 60 * 1000 * 1000,
                     maxBufferHole: 0.5,
-                    liveSyncDuration: 3,
+                    liveSyncDuration: 3, // 3 seconds behind live edge is much more stable on weak net than 1s
                     liveMaxLatencyDuration: 10,
                     liveDurationInfinity: true,
                     liveBackBufferLength: 10,
                     maxLiveSyncPlaybackRate: 1.5,
-                    abrEwmaDefaultEstimate: 500000,
-                    abrBandWidthFactor: 0.8,
+                    abrEwmaDefaultEstimate: 500000, // Assume 500kbps initially (safe for weak net)
+                    abrBandWidthFactor: 0.8, // Be conservative in upgrading quality
                     abrBandWidthUpFactor: 0.7,
                     fragLoadingMaxRetry: 6,
                     fragLoadingMaxRetryTimeout: 64000,
-                    fragLoadingRetryDelay: 1000,
+                    fragLoadingRetryDelay: 1000, // Longer delay prevents server ban on weak net
                     manifestLoadingMaxRetry: 6,
                     manifestLoadingMaxRetryTimeout: 64000,
                     manifestLoadingRetryDelay: 1000,
@@ -2060,7 +2063,7 @@
                     highBufferWatchdogPeriod: 3,
                     xhrSetup: function(xhr, xhrUrl) {
                         xhr.withCredentials = false;
-                        xhr.timeout = 10000;
+                        xhr.timeout = 10000; // 10 second timeout to prevent hanging
                     }
                 };
 
@@ -2069,6 +2072,7 @@
                 hlsPlayer.attachMedia(video);
 
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                    // Attempt to play. If blocked by browser (autoplay policy), try muted.
                     video.play().then(onPlaying).catch(() => {
                         video.muted = true;
                         video.play().then(onPlaying).catch(() => silentRetry(url));
@@ -2127,6 +2131,7 @@
                 const loading = document.getElementById('playerLoading');
                 if (loading) loading.style.display = 'block';
                 
+                // Exponential backoff for weak networks
                 const delay = Math.min(1000 * Math.pow(1.5, retryCount), 8000);
                 
                 setTimeout(() => {
@@ -2388,6 +2393,9 @@
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
 
+            // ==========================================
+            // NEW FEATURE: Exit Fullscreen & Unlock Orientation
+            // ==========================================
             if (document.fullscreenElement) {
                 document.exitFullscreen().then(() => {
                     if (screen.orientation && screen.orientation.unlock) {
@@ -2395,6 +2403,7 @@
                     }
                 }).catch(err => console.log('Exit fullscreen failed:', err));
             }
+            // ==========================================
             
             try { 
                 video.pause(); 
@@ -2484,14 +2493,15 @@
 
             document.querySelector('.viewport-area').scrollTop = 0;
 
-            // تم تحديث المؤشرات لتتوافق مع حذف قسم الرئيسية
-            if (index === 0) { // القنوات (كانت 1)
+            if (index === 0) {
                 if (currentCategory) closeCategory();
-            } else if (index === 1) { // الجدول (كان 2)
-                fetchSchedule();
-            } else if (index === 3) { // الأخبار (كانت 4)
+            }
+
+            if (index === 3) {
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
+            } else if (index === 1) {
+                fetchSchedule();
             } else {
                 if (newsInterval) clearInterval(newsInterval);
             }
@@ -2878,6 +2888,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
 
+            // ==========================================
+            // NEW FEATURE: Sync Fullscreen Icon & Orientation
+            // ==========================================
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
                 if (icon) {
