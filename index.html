@@ -512,6 +512,8 @@
             height: 100%;
             position: relative;
             background: #000;
+            display: flex;
+            flex-direction: column;
         }
 
         .video-element {
@@ -519,6 +521,7 @@
             height: 100%;
             object-fit: contain;
             background-color: #000000;
+            flex: 1;
         }
 
         .player-top-bar {
@@ -531,13 +534,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            z-index: 10;
+            z-index: 100;
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
         .video-modal.show-controls .player-top-bar {
             opacity: 1;
+            pointer-events: all;
         }
 
         .player-back-btn {
@@ -552,12 +557,14 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(10px);
+            pointer-events: all;
         }
 
         .player-channel-info {
             display: flex;
             align-items: center;
             gap: 10px;
+            pointer-events: all;
         }
 
         .player-live-badge {
@@ -603,8 +610,9 @@
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.2s ease;
-            z-index: 5;
+            z-index: 50;
             border: 2px solid rgba(255,255,255,0.2);
+            pointer-events: all;
         }
 
         .player-center-play.show {
@@ -628,13 +636,15 @@
             right: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             padding: 20px 20px 35px;
-            z-index: 10;
+            z-index: 100;
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
         .video-modal.show-controls .player-controls {
             opacity: 1;
+            pointer-events: all;
         }
 
         .player-progress-container {
@@ -701,6 +711,7 @@
             justify-content: center;
             backdrop-filter: blur(10px);
             transition: all 0.2s ease;
+            pointer-events: all;
         }
 
         .player-btn:active {
@@ -733,7 +744,7 @@
             border-radius: 16px;
             padding: 16px;
             min-width: 220px;
-            z-index: 20;
+            z-index: 200;
             opacity: 0;
             pointer-events: none;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1694,7 +1705,7 @@
          Professional Video Player Modal
          ========================================== -->
     <div class="video-modal" id="videoModal">
-        <div class="video-player-container">
+        <div class="video-player-container" id="videoPlayerContainer">
             <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
@@ -2022,7 +2033,8 @@
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
 
-            const container = document.querySelector('.video-player-container');
+            // طلب ملء الشاشة للعنصر الصحيح
+            const container = document.getElementById('videoPlayerContainer');
             if (container.requestFullscreen) {
                 container.requestFullscreen().then(() => {
                     if (screen.orientation && screen.orientation.lock) {
@@ -2300,7 +2312,7 @@
         }
 
         function toggleFullscreen() {
-            const container = document.querySelector('.video-player-container');
+            const container = document.getElementById('videoPlayerContainer');
             const icon = document.getElementById('fullscreenIcon');
             
             if (!document.fullscreenElement) {
