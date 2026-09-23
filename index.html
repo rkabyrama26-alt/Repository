@@ -8,7 +8,6 @@
     <!-- تحسين تحميل الخطوط لمنع الوميض -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- تغيير display=swap إلى display=block لمنع ظهور الخط العادي نهائياً -->
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=block" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,7 +33,7 @@
             --gradient-main: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
             --text-main: #ffffff;
             --text-muted: #94a3b8;
-            --nav-height: 100px; /* تم زيادة الارتفاع ليتناسب مع الشريط العائم */
+            --nav-height: 100px; 
         }
 
         html, body {
@@ -270,66 +269,64 @@
             display: block;
         }
 
+        /* ==========================================
+           NEW CATEGORIES DESIGN (MATCHING IMAGE)
+           ========================================== */
         .categories-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px 12px;
+            margin-bottom: 24px;
         }
 
         .category-card {
-            position: relative;
-            height: 110px;
-            border-radius: 22px;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(56, 189, 248, 0.15));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        }
-
-        .category-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 14px 32px rgba(99, 102, 241, 0.25);
+            transition: transform 0.2s ease;
+            background: transparent;
+            border: none;
         }
 
         .category-card:active {
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
 
-        .category-card-image {
-            position: absolute;
-            inset: 0;
+        .category-icon-wrap {
+            width: 100%;
+            max-width: 80px; /* تم التعديل: تصغير الحجم */
+            aspect-ratio: 1 / 1;
+            background: transparent; 
+            border-radius: 20px; /* تعديل بسيط للحواف مع الحجم الجديد */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0; 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto; /* تم التعديل: لتوسيط المربع */
+        }
+
+        .category-icon-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.4;
-        }
-
-        .category-card-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to left, rgba(3,7,18,0.15), rgba(3,7,18,0.92));
-        }
-
-        .category-card-content {
-            position: relative;
-            z-index: 2;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: flex-start;
-            padding: 12px 18px 14px;
+            object-fit: cover; 
+            border-radius: inherit; 
         }
 
         .category-card-title {
-            font-size: 1rem;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.3px;
+            font-size: 0.72rem; /* تم التعديل: تصغير الخط قليلاً ليتناسب مع الحجم */
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: center;
+            line-height: 1.4;
+            padding: 0 2px;
         }
+        /* ========================================== */
 
         .channels-list-header {
             display: flex;
@@ -490,9 +487,6 @@
             50% { opacity: 0.35; transform: scale(0.85); }
         }
 
-        /* ==========================================
-           PROFESSIONAL VIDEO PLAYER - FULL SCREEN
-           ========================================== */
         .video-modal {
             display: none;
             position: fixed;
@@ -512,8 +506,6 @@
             height: 100%;
             position: relative;
             background: #000;
-            display: flex;
-            flex-direction: column;
         }
 
         .video-element {
@@ -521,7 +513,6 @@
             height: 100%;
             object-fit: contain;
             background-color: #000000;
-            flex: 1;
         }
 
         .player-top-bar {
@@ -534,15 +525,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            z-index: 100;
+            z-index: 10;
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
         }
 
         .video-modal.show-controls .player-top-bar {
             opacity: 1;
-            pointer-events: all;
         }
 
         .player-back-btn {
@@ -557,14 +546,12 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(10px);
-            pointer-events: all;
         }
 
         .player-channel-info {
             display: flex;
             align-items: center;
             gap: 10px;
-            pointer-events: all;
         }
 
         .player-live-badge {
@@ -610,9 +597,8 @@
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.2s ease;
-            z-index: 50;
+            z-index: 5;
             border: 2px solid rgba(255,255,255,0.2);
-            pointer-events: all;
         }
 
         .player-center-play.show {
@@ -636,15 +622,13 @@
             right: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             padding: 20px 20px 35px;
-            z-index: 100;
+            z-index: 10;
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
         }
 
         .video-modal.show-controls .player-controls {
             opacity: 1;
-            pointer-events: all;
         }
 
         .player-progress-container {
@@ -711,7 +695,6 @@
             justify-content: center;
             backdrop-filter: blur(10px);
             transition: all 0.2s ease;
-            pointer-events: all;
         }
 
         .player-btn:active {
@@ -744,7 +727,7 @@
             border-radius: 16px;
             padding: 16px;
             min-width: 220px;
-            z-index: 200;
+            z-index: 20;
             opacity: 0;
             pointer-events: none;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -877,16 +860,13 @@
             border-radius: 2px;
         }
 
-        /* ==========================================
-           BOTTOM DOCK - FLOATING PILL DESIGN
-           ========================================== */
         .bottom-dock {
             position: absolute;
             bottom: 15px;
             left: 15px;
             right: 15px;
             height: 68px;
-            background: rgba(15, 20, 30, 0.85); /* خلفية زجاجية داكنة */
+            background: rgba(15, 20, 30, 0.85); 
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             display: flex;
@@ -894,9 +874,9 @@
             align-items: center;
             padding: 0 8px;
             z-index: 100;
-            border-radius: 34px; /* حواف دائرية كاملة */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* ظل عائم */
-            border: 1px solid rgba(255, 255, 255, 0.06); /* حدود زجاجية خفيفة */
+            border-radius: 34px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
         }
 
         .dock-tab-btn {
@@ -911,7 +891,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
             height: 56px;
-            border-radius: 28px; /* حواف دائرية داخلية */
+            border-radius: 28px; 
             position: relative;
             margin: 0 2px;
         }
@@ -929,10 +909,9 @@
             color: var(--text-muted);
         }
 
-        /* الزر النشط: خلفية داكنة دائرية مثل الصورة */
         .dock-tab-btn.active {
             color: var(--accent-secondary);
-            background: rgba(0, 0, 0, 0.45); /* الخلفية الداكنة للزر النشط */
+            background: rgba(0, 0, 0, 0.45); 
         }
 
         .dock-tab-btn.active i {
@@ -1476,7 +1455,6 @@
         }
     </style>
     
-    <!-- سكريبت لمنع ظهور أي محتوى حتى يتم تحميل الخطوط الرسمية -->
     <script>
         if (document.fonts) {
             document.fonts.ready.then(function () {
@@ -1493,74 +1471,72 @@
 
         <div class="viewport-area">
 
-            <!-- تم حذف قسم الرئيسية (pane-home) بالكامل -->
-
             <div id="pane-channels" class="section-pane active">
 
                 <div id="channelsCategoriesView">
                     <div class="categories-grid">
+                        <!-- تم تحديث تصميم الأقسام ليتطابق مع الشكل الشبكي المطلوب -->
                         <div class="category-card" onclick="openCategory('mbc')">
-                            <img class="category-card-image" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات ام بي سي</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
                             </div>
+                            <div class="category-card-title">قنوات ام بي سي</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('kids')">
-                            <img class="category-card-image" src="https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp" alt="Kids">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات الأطفال</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp" alt="Kids">
                             </div>
+                            <div class="category-card-title">قنوات الأطفال</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('religious')">
-                            <img class="category-card-image" src="https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp" alt="Religious">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات دينية</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp" alt="Religious">
                             </div>
+                            <div class="category-card-title">قنوات دينية</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('quran')">
-                            <img class="category-card-image" src="https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp" alt="Quran">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات القرآن الكريم</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp" alt="Quran">
                             </div>
+                            <div class="category-card-title">قنوات القرآن</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('news_channels')">
-                            <img class="category-card-image" src="https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp" alt="News">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات اخبار</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp" alt="News">
                             </div>
+                            <div class="category-card-title">قنوات اخبار</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('alwan_sports')">
-                            <img class="category-card-image" src="https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp" alt="Alwan Sports">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات الوان الرياضية</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp" alt="Alwan Sports">
                             </div>
+                            <div class="category-card-title">الوان الرياضية</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('bein_sports')">
-                            <img class="category-card-image" src="https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp" alt="BeIN Sports">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات بين سبورت</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp" alt="BeIN Sports">
                             </div>
+                            <div class="category-card-title">بين سبورت</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('iraqi_channels')">
-                            <img class="category-card-image" src="https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp" alt="Iraqi Channels">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات عراقية</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp" alt="Iraqi Channels">
                             </div>
+                            <div class="category-card-title">قنوات عراقية</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('thamania_sports')">
-                            <img class="category-card-image" src="https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp" alt="Thamania Sports">
-                            <div class="category-card-overlay"></div>
-                            <div class="category-card-content">
-                                <div class="category-card-title">قنوات ثمانية الرياضية</div>
+                            <div class="category-icon-wrap">
+                                <img class="category-icon-img" src="https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp" alt="Thamania Sports">
                             </div>
+                            <div class="category-card-title">ثمانية الرياضية</div>
                         </div>
                     </div>
                 </div>
@@ -1675,7 +1651,6 @@
 
         </div>
 
-        <!-- تم تحديث الأزرار وإزالة زر الرئيسية، وتعديل المؤشرات (0 إلى 4) -->
         <nav class="bottom-dock">
             <button class="dock-tab-btn active" onclick="switchPane(0)">
                 <i class="fa-solid fa-tv"></i>
@@ -1701,11 +1676,8 @@
 
     </div>
 
-    <!-- ==========================================
-         Professional Video Player Modal
-         ========================================== -->
     <div class="video-modal" id="videoModal">
-        <div class="video-player-container" id="videoPlayerContainer">
+        <div class="video-player-container">
             <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
@@ -1789,7 +1761,6 @@
         </div>
     </div>
 
-    <!-- Language Bottom Sheet -->
     <div class="language-overlay" id="languageOverlay" onclick="closeLanguageSheet()"></div>
     <div class="language-sheet" id="languageSheet">
         <div class="sheet-handle"></div>
@@ -1810,7 +1781,6 @@
         </div>
     </div>
 
-    <!-- Share Bottom Sheet -->
     <div class="share-overlay" id="shareOverlay" onclick="closeShareSheet()"></div>
     <div class="share-sheet" id="shareSheet">
         <button class="share-close-btn" onclick="closeShareSheet()">
@@ -1868,9 +1838,6 @@
     <div class="toast-notification" id="toastNotification"></div>
 
     <script>
-        // =============================================================
-        // Data: Categories & Channels
-        // =============================================================
         const categoriesData = {
             mbc: {
                 name: 'قنوات ام بي سي',
@@ -1970,9 +1937,6 @@
             }
         };
 
-        // =============================================================
-        // Categories / Channels Navigation
-        // =============================================================
         let currentCategory = null;
 
         function openCategory(catKey) {
@@ -2008,9 +1972,6 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        // =============================================================
-        // PROFESSIONAL VIDEO PLAYER - TURBO OPTIMIZED FOR WEAK NET
-        // =============================================================
         let hlsPlayer = null;
         let currentVideoUrl = '';
         let retryCount = 0;
@@ -2033,8 +1994,7 @@
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
 
-            // طلب ملء الشاشة للعنصر الصحيح
-            const container = document.getElementById('videoPlayerContainer');
+            const container = document.querySelector('.video-player-container');
             if (container.requestFullscreen) {
                 container.requestFullscreen().then(() => {
                     if (screen.orientation && screen.orientation.lock) {
@@ -2312,7 +2272,7 @@
         }
 
         function toggleFullscreen() {
-            const container = document.getElementById('videoPlayerContainer');
+            const container = document.querySelector('.video-player-container');
             const icon = document.getElementById('fullscreenIcon');
             
             if (!document.fullscreenElement) {
@@ -2460,9 +2420,6 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // =============================================================
-        // Panes / Docks
-        // =============================================================
         const panesArr = document.querySelectorAll('.section-pane');
         const dockBtnsArr = document.querySelectorAll('.dock-tab-btn');
         let currentLanguage = 'ar';
@@ -2527,16 +2484,14 @@
 
             document.querySelector('.viewport-area').scrollTop = 0;
 
-            // تم تحديث المؤشرات لتتوافق مع حذف الرئيسية (0: قنوات، 1: جدول، 2: مسلسلات، 3: أخبار، 4: إعدادات)
-            if (index === 0) { // Channels
+            if (index === 0) { 
                 if (currentCategory) closeCategory();
-            } else if (index === 1) { // Schedule
+            } else if (index === 1) { 
                 fetchSchedule();
-            } else if (index === 3) { // News
+            } else if (index === 3) { 
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
             } else {
-                // Series (2) or Settings (4)
                 if (newsInterval) clearInterval(newsInterval);
             }
         }
