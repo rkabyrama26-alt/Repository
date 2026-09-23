@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تطبيق احترافي بملء الشاشة</title>
     
-    <!-- تحسين تحميل الخطوط لمنع الوميض -->
+    <!-- تحسين تحميل الخطوط والصور لمنع الوميض والتأخير -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://i.ibb.co"> <!-- تمت الإضافة: تسريع الاتصال بخادم الصور -->
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=block" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -299,7 +300,7 @@
             max-width: 80px; /* تم التعديل: تصغير الحجم */
             aspect-ratio: 1 / 1;
             background: transparent; 
-            border-radius: 20px; /* تعديل بسيط للحواف مع الحجم الجديد */
+            border-radius: 20px; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -319,7 +320,7 @@
         }
 
         .category-card-title {
-            font-size: 0.72rem; /* تم التعديل: تصغير الخط قليلاً ليتناسب مع الحجم */
+            font-size: 0.72rem; 
             font-weight: 700;
             color: var(--text-main);
             text-align: center;
@@ -1478,63 +1479,63 @@
                         <!-- تم تحديث تصميم الأقسام ليتطابق مع الشكل الشبكي المطلوب -->
                         <div class="category-card" onclick="openCategory('mbc')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
+                                <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">قنوات ام بي سي</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('kids')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp" alt="Kids">
+                                <img class="category-icon-img" src="https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp" alt="Kids" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">قنوات الأطفال</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('religious')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp" alt="Religious">
+                                <img class="category-icon-img" src="https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp" alt="Religious" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">قنوات دينية</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('quran')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp" alt="Quran">
+                                <img class="category-icon-img" src="https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp" alt="Quran" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">قنوات القرآن</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('news_channels')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp" alt="News">
+                                <img class="category-icon-img" src="https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp" alt="News" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">قنوات اخبار</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('alwan_sports')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp" alt="Alwan Sports">
+                                <img class="category-icon-img" src="https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp" alt="Alwan Sports" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">الوان الرياضية</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('bein_sports')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp" alt="BeIN Sports">
+                                <img class="category-icon-img" src="https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp" alt="BeIN Sports" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">بين سبورت</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('iraqi_channels')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp" alt="Iraqi Channels">
+                                <img class="category-icon-img" src="https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp" alt="Iraqi Channels" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">قنوات عراقية</div>
                         </div>
                         
                         <div class="category-card" onclick="openCategory('thamania_sports')">
                             <div class="category-icon-wrap">
-                                <img class="category-icon-img" src="https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp" alt="Thamania Sports">
+                                <img class="category-icon-img" src="https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp" alt="Thamania Sports" loading="eager" decoding="async">
                             </div>
                             <div class="category-card-title">ثمانية الرياضية</div>
                         </div>
