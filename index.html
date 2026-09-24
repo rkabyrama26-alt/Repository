@@ -1432,6 +1432,40 @@
             gap: 12px;
         }
 
+        /* ===== قسم المسلسلات - عرض الموقع داخل القسم بملء الشاشة ===== */
+        #pane-series.active {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 40; /* يجعله خلف شريط التنقل السفلي ولكن يغطي باقي الشاشة */
+            background: var(--bg-base);
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden;
+        }
+
+        #pane-series .series-iframe-wrapper {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            border: none;
+            background: #000;
+            box-shadow: none;
+        }
+
+        #pane-series iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: #000;
+        }
+        /* ================================================ */
+
         @media (max-width: 480px) {
             .player-btn {
                 width: 38px;
@@ -1446,32 +1480,6 @@
             .player-controls-row {
                 gap: 8px;
             }
-        }
-
-        /* ============================================ */
-        /* نمط إطار عرض المسلسلات والأفلام - ملء الشاشة */
-        /* ============================================ */
-        #pane-series {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            padding: 60px 0 130px 0; /* زيادة المساحة السفلية إلى 130 بكسل لكي لا يختفي المحتوى تحت الشريط */
-            margin: 0;
-            z-index: 50;
-            background: var(--bg-base);
-        }
-        #pane-series.active {
-            display: block;
-        }
-        .series-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #000;
         }
     </style>
     
@@ -1591,11 +1599,20 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات: تم استبدال المحتوى بعرض السيرفر ===== -->
+            <!-- ===== قسم المسلسلات: تم استبدال المحتوى بعرض الموقع داخل القسم ===== -->
             <div id="pane-series" class="section-pane">
-                <iframe src="https://m-weld-three.vercel.app/" class="series-iframe" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
+                <div class="series-iframe-wrapper">
+                    <iframe 
+                        src="https://m-weld-three.vercel.app/" 
+                        title="مسلسلات وأفلام"
+                        allowfullscreen
+                        allow="autoplay; encrypted-media; picture-in-picture"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
             </div>
-            <!-- ========================================================= -->
+            <!-- ================================================================= -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
