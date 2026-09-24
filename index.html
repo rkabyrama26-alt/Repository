@@ -1432,17 +1432,17 @@
             gap: 12px;
         }
 
-        /* ===== قسم المسلسلات - عرض الموقع داخل القسم بملء الشاشة ===== */
+        /* ===== قسم المسلسلات - عرض الموقع داخل القسم بملء الشاشة مع ضبط الأعلى ===== */
         #pane-series.active {
             position: fixed !important;
-            top: 0 !important;
+            top: 45px !important; /* تم ضبط النزول من الأعلى بمقدار 45 بكسل ليتناسب مع الشاشة */
             left: 0 !important;
             right: 0 !important;
             bottom: 0 !important;
             width: 100vw !important;
-            height: 100vh !important;
-            height: 100dvh !important;
-            z-index: 40; /* يجعله خلف شريط التنقل السفلي ولكن يغطي باقي الشاشة */
+            height: calc(100vh - 45px) !important; /* تعديل الارتفاع ليتناسب مع الإزاحة */
+            height: calc(100dvh - 45px) !important;
+            z-index: 40;
             background: var(--bg-base);
             padding: 0 !important;
             margin: 0 !important;
