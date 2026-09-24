@@ -1432,32 +1432,6 @@
             gap: 12px;
         }
 
-        /* ===== تعديل قسم المسلسلات ===== */
-        #pane-series.active {
-            padding: 0 !important;
-            margin: 0 !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 40 !important;
-            background: var(--bg-base) !important;
-            padding-top: 50px !important; /* مسافة علوية لتفادي شريط الحالة */
-            padding-bottom: 95px !important; /* مسافة سفلية لتفادي شريط التنقل */
-            box-sizing: border-box !important;
-        }
-
-        #pane-series.active iframe {
-            width: 100% !important;
-            height: 100% !important;
-            border: none !important;
-            display: block !important;
-            border-radius: 24px 24px 0 0 !important; /* حواف دائرية لتبدو كقسم داخلي */
-            background: #030712 !important;
-        }
-        /* ================================ */
-
         @media (max-width: 480px) {
             .player-btn {
                 width: 38px;
@@ -1472,6 +1446,32 @@
             .player-controls-row {
                 gap: 8px;
             }
+        }
+
+        /* ============================================ */
+        /* نمط إطار عرض المسلسلات والأفلام - ملء الشاشة */
+        /* ============================================ */
+        #pane-series {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 60px 0 100px 0; /* تم إضافة مسافة 60 بكسل من الأعلى لكي لا يختفي المحتوى تحت شريط الحالة */
+            margin: 0;
+            z-index: 50;
+            background: var(--bg-base);
+        }
+        #pane-series.active {
+            display: block;
+        }
+        .series-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
         }
     </style>
     
@@ -1591,11 +1591,11 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات (تم استبدال المحتوى بـ iframe) ===== -->
+            <!-- ===== قسم المسلسلات: تم استبدال المحتوى بعرض السيرفر ===== -->
             <div id="pane-series" class="section-pane">
-                <iframe src="https://m-weld-three.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
+                <iframe src="https://m-weld-three.vercel.app/" class="series-iframe" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe>
             </div>
-            <!-- ======================================================== -->
+            <!-- ========================================================= -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -2525,17 +2525,35 @@
             }
         }
 
+        // ==========================================
+        // 🛠️ تم إصلاح دوال الأخبار والترجمة هنا 🛠️
+        // ==========================================
+
         async function translateText(text) {
             if (!text) return "";
+            // إضافة مهلة زمنية (Timeout) لمنع تعليق التطبيق إذا تأخر سيرفر الترجمة
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 ثواني كحد أقصى
+
             try {
-                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`);
+                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error("Translation server error");
+                
                 const data = await response.json();
-                if (data.responseStatus === 200 && data.responseData.translatedText) return data.responseData.translatedText;
-                return text;
-            } catch (error) { return text; }
+                if (data.responseStatus === 200 && data.responseData.translatedText) {
+                    return data.responseData.translatedText;
+                }
+                return text; // إذا فشلت الترجمة، يرجع النص الأصلي
+            } catch (error) {
+                console.warn("Translation failed, using original text.");
+                return text; // في حالة الخطأ أو انتهاء المهلة، يرجع النص الأصلي
+            }
         }
 
         function getArabicTimeAgo(dateString) {
+            if (!dateString) return "الآن";
             const date = new Date(dateString);
             const now = new Date();
             const diffMs = now - date;
@@ -2550,30 +2568,80 @@
         }
 
         async function fetchNews() {
+            const container = document.getElementById('newsSlidesContainer');
+            // عرض مؤشر التحميل أثناء جلب الأخبار
+            container.innerHTML = `
+                <div class="news-slide active" style="display: flex; align-items: center; justify-content: center; background: var(--bg-base);">
+                    <div class="schedule-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--accent-primary);"></i>
+                        <span style="font-size: 1.1rem; margin-top: 10px;">جاري تحميل الأخبار...</span>
+                    </div>
+                </div>`;
+
             try {
-                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=100');
+                // إضافة مهلة زمنية لسيرفر ESPN
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 ثواني كحد أقصى
+
+                const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=15', { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error("ESPN API failed");
+                
                 const data = await response.json();
-                const articlesToProcess = data.articles.slice(0, 15);
+                
+                if (!data.articles || data.articles.length === 0) {
+                    throw new Error("No articles found");
+                }
+
+                const articlesToProcess = data.articles.slice(0, 10);
+                
+                // استخدام Promise.allSettled لضمان عدم توقف التطبيق إذا فشلت ترجمة خبر واحد
                 const translatedArticles = await Promise.all(
                     articlesToProcess.map(async (article) => {
-                        const titleAr = await translateText(article.headline);
-                        const descriptionAr = article.description ? await translateText(article.description) : titleAr;
-                        return {
-                            title: titleAr, description: descriptionAr,
-                            image: article.images ? article.images[0].url : '',
-                            published: getArabicTimeAgo(article.published),
-                            source: "نجم الشاشات"
-                        };
+                        try {
+                            const titleAr = await translateText(article.headline);
+                            const descriptionAr = article.description ? await translateText(article.description) : titleAr;
+                            return {
+                                title: titleAr, 
+                                description: descriptionAr,
+                                image: article.images && article.images.length > 0 ? article.images[0].url : '',
+                                published: getArabicTimeAgo(article.published),
+                                source: "نجم الشاشات"
+                            };
+                        } catch (e) {
+                            // إذا فشل خبر واحد، يتم تجاوزه بدلاً من إفشال كل الأخبار
+                            return null;
+                        }
                     })
                 );
-                newsData = translatedArticles;
+                
+                // تصفية الأخبار التي فشلت ترجمتها
+                newsData = translatedArticles.filter(article => article !== null);
+                
+                if (newsData.length === 0) throw new Error("Translation failed for all articles");
+                
                 renderNewsSlides();
             } catch (error) {
-                newsData = [{
-                    title: "أخبار رياضية عاجلة",
-                    description: "تابع أحدث المستجدات الرياضية على منصة نجم الشاشات",
-                    image: "", published: getArabicTimeAgo(new Date().toISOString()), source: "نجم الشاشات"
-                }];
+                console.error("Fetch news error:", error);
+                // 🛡️ أخبار احتياطية (Fallback) في حال انقطاع الإنترنت أو تعطل السيرفر 🛡️
+                newsData = [
+                    {
+                        title: "أخبار رياضية عاجلة",
+                        description: "تابع أحدث المستجدات الرياضية على منصة نجم الشاشات. يرجى التأكد من اتصالك بالإنترنت.",
+                        image: "", published: "الآن", source: "نجم الشاشات"
+                    },
+                    {
+                        title: "تحديثات مباشرة",
+                        description: "يتم تحديث الأخبار الرياضية بشكل مستمر. اضغط على القنوات لمتابعة البث المباشر.",
+                        image: "", published: "منذ قليل", source: "نجم الشاشات"
+                    },
+                    {
+                        title: "منصة نجم الشاشات",
+                        description: "أفضل تجربة لمشاهدة القنوات الرياضية والمسلسلات بجودة عالية وبدون تقطيع.",
+                        image: "", published: "منذ 5 دقائق", source: "نجم الشاشات"
+                    }
+                ];
                 renderNewsSlides();
             }
         }
@@ -2583,6 +2651,9 @@
             const navContainer = document.getElementById('newsNavigation');
             container.innerHTML = '';
             navContainer.innerHTML = '';
+            currentNewsIndex = 0; // إعادة تعيين الفهرس
+
+            if (newsData.length === 0) return;
 
             newsData.forEach((news, index) => {
                 const slide = document.createElement('div');
@@ -2598,16 +2669,23 @@
                         </div>
                     </div>`;
                 container.appendChild(slide);
-                const dot = document.createElement('div');
-                dot.className = `nav-dot ${index === 0 ? 'active' : ''}`;
-                dot.onclick = () => goToNewsSlide(index);
-                navContainer.appendChild(dot);
+                
+                // إضافة نقاط التنقل فقط إذا كان هناك أكثر من خبر
+                if (newsData.length > 1) {
+                    const dot = document.createElement('div');
+                    dot.className = `nav-dot ${index === 0 ? 'active' : ''}`;
+                    dot.onclick = () => goToNewsSlide(index);
+                    navContainer.appendChild(dot);
+                }
             });
             startNewsAutoScroll();
         }
 
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
+            // 🛠️ منع التمرير التلقائي إذا كان هناك خبر واحد أو لا يوجد أخبار
+            if (newsData.length <= 1) return; 
+
             newsInterval = setInterval(() => {
                 if (currentNewsIndex < newsData.length - 1) goToNewsSlide(currentNewsIndex + 1);
                 else goToNewsSlide(0);
@@ -2623,6 +2701,10 @@
             if (slides[currentNewsIndex]) slides[currentNewsIndex].classList.add('active');
             if (dots[currentNewsIndex]) dots[currentNewsIndex].classList.add('active');
         }
+
+        // ==========================================
+        // نهاية قسم إصلاح الأخبار
+        // ==========================================
 
         function openLanguageSheet() {
             document.getElementById('languageOverlay').classList.add('active');
