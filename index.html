@@ -1443,6 +1443,9 @@
             height: 100vh !important;
             z-index: 40 !important;
             background: var(--bg-base) !important;
+            padding-top: 50px !important; /* مسافة علوية لتفادي شريط الحالة */
+            padding-bottom: 95px !important; /* مسافة سفلية لتفادي شريط التنقل */
+            box-sizing: border-box !important;
         }
 
         #pane-series.active iframe {
@@ -1450,6 +1453,8 @@
             height: 100% !important;
             border: none !important;
             display: block !important;
+            border-radius: 24px 24px 0 0 !important; /* حواف دائرية لتبدو كقسم داخلي */
+            background: #030712 !important;
         }
         /* ================================ */
 
