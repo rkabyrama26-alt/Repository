@@ -1432,35 +1432,46 @@
             gap: 12px;
         }
 
-        /* ===== قسم المسلسلات - نفس أبعاد وطريقة قسم الأخبار تماماً ===== */
-        #pane-series {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            z-index: 50;
+        /* ===== قسم المسلسلات - عرض الموقع داخل القسم بملء الشاشة ===== */
+        #pane-series.active {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            z-index: 40; /* يجعله خلف شريط التنقل السفلي ولكن يغطي باقي الشاشة */
             background: var(--bg-base);
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden;
+            animation: none !important;
+            transform: none !important;
+            opacity: 1 !important;
+            display: block !important;
         }
 
-        #pane-series.active { display: block; }
-
         #pane-series .series-iframe-wrapper {
-            width: 100%;
-            height: 100%;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
             border-radius: 0;
             border: none;
             background: #000;
             box-shadow: none;
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         #pane-series iframe {
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             border: none;
             display: block;
             background: #000;
@@ -1600,7 +1611,7 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات: عرض الموقع داخل القسم ===== -->
+            <!-- ===== قسم المسلسلات: تم استبدال المحتوى بعرض الموقع داخل القسم ===== -->
             <div id="pane-series" class="section-pane">
                 <div class="series-iframe-wrapper">
                     <iframe 
@@ -2543,10 +2554,15 @@
             }
         }
 
+        // ==========================================
+        // 🛠️ تم إصلاح دوال الأخبار والترجمة هنا 🛠️
+        // ==========================================
+
         async function translateText(text) {
             if (!text) return "";
+            // إضافة مهلة زمنية (Timeout) لمنع تعليق التطبيق إذا تأخر سيرفر الترجمة
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 ثواني كحد أقصى
 
             try {
                 const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`, { signal: controller.signal });
@@ -2558,10 +2574,10 @@
                 if (data.responseStatus === 200 && data.responseData.translatedText) {
                     return data.responseData.translatedText;
                 }
-                return text;
+                return text; // إذا فشلت الترجمة، يرجع النص الأصلي
             } catch (error) {
                 console.warn("Translation failed, using original text.");
-                return text;
+                return text; // في حالة الخطأ أو انتهاء المهلة، يرجع النص الأصلي
             }
         }
 
@@ -2582,6 +2598,7 @@
 
         async function fetchNews() {
             const container = document.getElementById('newsSlidesContainer');
+            // عرض مؤشر التحميل أثناء جلب الأخبار
             container.innerHTML = `
                 <div class="news-slide active" style="display: flex; align-items: center; justify-content: center; background: var(--bg-base);">
                     <div class="schedule-loading">
@@ -2591,8 +2608,9 @@
                 </div>`;
 
             try {
+                // إضافة مهلة زمنية لسيرفر ESPN
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 ثواني كحد أقصى
 
                 const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=15', { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -2607,6 +2625,7 @@
 
                 const articlesToProcess = data.articles.slice(0, 10);
                 
+                // استخدام Promise.allSettled لضمان عدم توقف التطبيق إذا فشلت ترجمة خبر واحد
                 const translatedArticles = await Promise.all(
                     articlesToProcess.map(async (article) => {
                         try {
@@ -2620,11 +2639,13 @@
                                 source: "نجم الشاشات"
                             };
                         } catch (e) {
+                            // إذا فشل خبر واحد، يتم تجاوزه بدلاً من إفشال كل الأخبار
                             return null;
                         }
                     })
                 );
                 
+                // تصفية الأخبار التي فشلت ترجمتها
                 newsData = translatedArticles.filter(article => article !== null);
                 
                 if (newsData.length === 0) throw new Error("Translation failed for all articles");
@@ -2632,6 +2653,7 @@
                 renderNewsSlides();
             } catch (error) {
                 console.error("Fetch news error:", error);
+                // 🛡️ أخبار احتياطية (Fallback) في حال انقطاع الإنترنت أو تعطل السيرفر 🛡️
                 newsData = [
                     {
                         title: "أخبار رياضية عاجلة",
@@ -2658,7 +2680,7 @@
             const navContainer = document.getElementById('newsNavigation');
             container.innerHTML = '';
             navContainer.innerHTML = '';
-            currentNewsIndex = 0;
+            currentNewsIndex = 0; // إعادة تعيين الفهرس
 
             if (newsData.length === 0) return;
 
@@ -2677,6 +2699,7 @@
                     </div>`;
                 container.appendChild(slide);
                 
+                // إضافة نقاط التنقل فقط إذا كان هناك أكثر من خبر
                 if (newsData.length > 1) {
                     const dot = document.createElement('div');
                     dot.className = `nav-dot ${index === 0 ? 'active' : ''}`;
@@ -2689,6 +2712,7 @@
 
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
+            // 🛠️ منع التمرير التلقائي إذا كان هناك خبر واحد أو لا يوجد أخبار
             if (newsData.length <= 1) return; 
 
             newsInterval = setInterval(() => {
@@ -2706,6 +2730,10 @@
             if (slides[currentNewsIndex]) slides[currentNewsIndex].classList.add('active');
             if (dots[currentNewsIndex]) dots[currentNewsIndex].classList.add('active');
         }
+
+        // ==========================================
+        // نهاية قسم إصلاح الأخبار
+        // ==========================================
 
         function openLanguageSheet() {
             document.getElementById('languageOverlay').classList.add('active');
