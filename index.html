@@ -313,7 +313,6 @@
             border-radius: inherit; 
         }
 
-        /* شارة عدد قنوات Xtream */
         .category-count-badge {
             position: absolute;
             top: 5px;
@@ -1238,7 +1237,6 @@
 
         #pane-news.active { display: block; }
 
-        /* ===== قسم المسلسلات بملء الشاشة ===== */
         #pane-series {
             position: fixed;
             top: 0;
@@ -1262,7 +1260,6 @@
             display: block;
             background: #030712;
         }
-        /* ===================================== */
 
         .news-feed-container {
             width: 100%;
@@ -1476,7 +1473,6 @@
             gap: 12px;
         }
 
-        /* شريط تحميل قنوات Xtream */
         .xtream-loading-card {
             display: flex;
             flex-direction: column;
@@ -1493,7 +1489,6 @@
             color: var(--accent-primary);
         }
 
-        /* ================= Telegram Popup Styles ================= */
         .tg-popup-overlay {
             position: fixed;
             inset: 0;
@@ -1620,7 +1615,168 @@
             background: rgba(255, 255, 255, 0.1);
             transform: scale(0.97);
         }
-        /* ========================================================= */
+
+        /* ============================================== */
+        /* ===== شاشة الحماية الأمنية (Reqable/VPN) ===== */
+        /* ============================================== */
+        .security-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(239, 68, 68, 0.08) 0%, rgba(3, 7, 18, 0.98) 55%);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            direction: rtl;
+        }
+        .security-overlay.active,
+        html.security-threat .security-overlay {
+            display: flex !important;
+        }
+        html.security-threat .app-container,
+        html.security-threat .bottom-dock,
+        html.security-threat .video-modal,
+        html.security-threat .tg-popup-overlay,
+        html.security-threat .language-overlay,
+        html.security-threat .language-sheet,
+        html.security-threat .share-overlay,
+        html.security-threat .share-sheet {
+            display: none !important;
+        }
+        .security-card {
+            background: linear-gradient(150deg, #0f172a 0%, #0b1121 100%);
+            border: 1px solid rgba(239, 68, 68, 0.28);
+            border-radius: 30px;
+            padding: 36px 24px 26px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 
+                0 25px 70px -10px rgba(0, 0, 0, 0.85), 
+                0 0 45px rgba(239, 68, 68, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            animation: secCardIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .security-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 160px; height: 160px;
+            background: #ef4444;
+            filter: blur(70px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        @keyframes secCardIn {
+            from { opacity: 0; transform: translateY(25px) scale(0.94); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .sec-shield {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(220, 38, 38, 0.08));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 22px;
+            border: 2px solid rgba(239, 68, 68, 0.35);
+            animation: secPulse 2s infinite ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes secPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45), inset 0 0 20px rgba(239, 68, 68, 0.1); }
+            50%      { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0), inset 0 0 30px rgba(239, 68, 68, 0.25); }
+        }
+        .sec-shield i {
+            font-size: 2.6rem;
+            color: #ef4444;
+            filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.7));
+            animation: secShake 1.8s infinite;
+        }
+        @keyframes secShake {
+            0%, 100%, 90% { transform: rotate(0deg); }
+            92% { transform: rotate(-6deg); }
+            94% { transform: rotate(6deg); }
+            96% { transform: rotate(-4deg); }
+            98% { transform: rotate(4deg); }
+        }
+        .sec-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff, #fca5a5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .sec-msg {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.95;
+            margin-bottom: 26px;
+            font-weight: 500;
+            padding: 0 6px;
+            text-align: center;
+        }
+        .sec-msg .line { display: block; }
+        .sec-msg .gap { display: block; height: 10px; }
+        .sec-msg .highlight { color: #fca5a5; font-weight: 700; }
+        .sec-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+            color: #ffffff;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Alexandria', sans-serif;
+            box-shadow: 0 10px 28px rgba(99, 102, 241, 0.4);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+        .sec-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.5);
+        }
+        .sec-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .sec-btn i {
+            font-size: 1.05rem;
+        }
+        .sec-note {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+        .sec-note i {
+            color: #38bdf8;
+            font-size: 0.75rem;
+        }
+        /* ============================================== */
 
         @media (max-width: 480px) {
             .player-btn {
@@ -1647,9 +1803,97 @@
         } else {
             document.documentElement.classList.add('fonts-loaded');
         }
+
+        // ============================================================
+        // ===== كشف Reqable / VPN — دقيق جداً (بدون إنذارات كاذبة) =====
+        // ============================================================
+        (function () {
+            // دالة الكشف الدقيقة — تتحقق فقط من البصمات المؤكدة لـ Reqable
+            function checkNow() {
+                // 1) الكائنات العامة التي يحقنها Reqable تحديداً في صفحة الويب
+                try {
+                    if (window.Reqable === true || window.__REQABLE__ === true || window.__reqable__ === true) return true;
+                    if (window.ReqableProxy || window.ReqableAndroid || window.ReqableClient) return true;
+                    if (window.__REQABLE_PROXY__ || window.__REQABLE_INJECT__) return true;
+                } catch (e) {}
+
+                // 2) بصمة User-Agent (خاصة بـ Reqable فقط)
+                try {
+                    var ua = (navigator.userAgent || '').toLowerCase();
+                    if (ua.indexOf('reqable') > -1) return true;
+                } catch (e) {}
+
+                // 3) عناصر DOM يحقنها Reqable في الصفحة
+                try {
+                    if (document.querySelector) {
+                        if (document.querySelector('[data-reqable]')) return true;
+                        if (document.querySelector('meta[name="reqable" i]')) return true;
+                        if (document.getElementById('reqable-inject')) return true;
+                    }
+                } catch (e) {}
+
+                // 4) كائنات خاصة على document
+                try {
+                    if (document.__reqableInjected || document.reqableInjected) return true;
+                } catch (e) {}
+
+                return false;
+            }
+
+            // الفحص المتزامن الأول (فوري 0ms)
+            if (checkNow()) {
+                document.documentElement.classList.add('security-threat');
+                window.__instantThreatDetected = true;
+            } else {
+                // فحص سريع جداً خلال أول ثانية (Reqable يحقن JS بعد التحميل بقليل)
+                var fastTicks = 0;
+                var fastInterval = setInterval(function () {
+                    fastTicks++;
+                    if (checkNow()) {
+                        clearInterval(fastInterval);
+                        document.documentElement.classList.add('security-threat');
+                        window.__instantThreatDetected = true;
+                    } else if (fastTicks >= 20) {
+                        clearInterval(fastInterval);
+                    }
+                }, 100);
+
+                // فحص دوري بطيء لالتقاط تشغيل Reqable لاحقاً
+                setInterval(function () {
+                    if (checkNow()) {
+                        document.documentElement.classList.add('security-threat');
+                        window.__instantThreatDetected = true;
+                    }
+                }, 2000);
+            }
+
+            window.__checkThreatNow = checkNow;
+        })();
+        // ============================================================
     </script>
 </head>
 <body>
+
+    <!-- ================= شاشة الحماية الأمنية (Reqable/VPN) ================= -->
+    <div class="security-overlay" id="securityOverlay">
+        <div class="security-card">
+            <div class="sec-shield"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2 class="sec-title">⚠️ تنبيه أمني</h2>
+            <p class="sec-msg">
+                <span class="line">تم اكتشاف اتصال <span class="highlight">VPN</span> أو تطبيق <span class="highlight">Reqable</span> يعمل على جهازك</span>
+                <span class="gap"></span>
+                <span class="line">لحماية البث وضمان استمرار التشغيل بشكل طبيعي</span>
+                <span class="line">يرجى إغلاق تطبيق <span class="highlight">Reqable</span> أو إيقاف اتصال <span class="highlight">VPN</span></span>
+                <span class="line">ثم إعادة المحاولة</span>
+            </p>
+            <button class="sec-btn" id="secRecheckBtn" onclick="recheckSecurity()">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>إعادة الفحص</span>
+            </button>
+            <div class="sec-note"><i class="fa-solid fa-lock"></i> <span>نجم الشاشات محمي</span></div>
+        </div>
+    </div>
+    <!-- ====================================================================== -->
 
     <div class="app-container">
 
@@ -1659,7 +1903,6 @@
 
                 <div id="channelsCategoriesView">
                     <div class="categories-grid" id="mainCategoriesGrid">
-                        <!-- قنوات ام بي سي -->
                         <div class="category-card" onclick="openCategory('mbc')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
@@ -1667,14 +1910,12 @@
                             <div class="category-card-title">قنوات ام بي سي</div>
                         </div>
                         
-                        <!-- ===== قسم الكاس الجديد ===== -->
                         <div class="category-card" onclick="openCategory('kas')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/nMRCsHh6/Picsart-26-07-15-13-24-44-209.webp" alt="Al Kass">
                             </div>
                             <div class="category-card-title">قنوات الكاس</div>
                         </div>
-                        <!-- ============================ -->
                         
                         <div class="category-card" onclick="openCategory('kids')">
                             <div class="category-icon-wrap">
@@ -1755,11 +1996,9 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات: تم حذف المحتوى وإضافة iframe بملء الشاشة ===== -->
             <div id="pane-series" class="section-pane">
                 <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
-            <!-- ================================================================ -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -2020,7 +2259,6 @@
 
     <div class="toast-notification" id="toastNotification"></div>
 
-    <!-- ================= Telegram Popup HTML ================= -->
     <div class="tg-popup-overlay" id="tgPopupOverlay">
         <div class="tg-popup-card">
             <div class="tg-icon-container">
@@ -2039,9 +2277,98 @@
             </div>
         </div>
     </div>
-    <!-- ======================================================= -->
 
     <script>
+        // ============================================================
+        // ============  شاشة الحماية الأمنية (Reqable/VPN)  ==========
+        // ============================================================
+        let securityBlocked = !!window.__instantThreatDetected;
+
+        // فحص شامل (لا يعتمد على الشبكة إطلاقاً — لمنع الإنذارات الكاذبة)
+        function deepSecurityCheck() {
+            try {
+                if (typeof window.__checkThreatNow === 'function') {
+                    return window.__checkThreatNow();
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        function activateSecurityOverlay() {
+            securityBlocked = true;
+            document.documentElement.classList.add('security-threat');
+            const overlay = document.getElementById('securityOverlay');
+            if (overlay) overlay.classList.add('active');
+            const tg = document.getElementById('tgPopupOverlay');
+            if (tg) tg.classList.remove('active');
+            try {
+                const v = document.getElementById('videoPlayer');
+                if (v) v.pause();
+            } catch (e) {}
+        }
+
+        function deactivateSecurityOverlay() {
+            securityBlocked = false;
+            document.documentElement.classList.remove('security-threat');
+            const overlay = document.getElementById('securityOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        function runSecurityCheck() {
+            const isThreat = deepSecurityCheck();
+            if (isThreat) {
+                activateSecurityOverlay();
+            } else {
+                deactivateSecurityOverlay();
+            }
+            return !isThreat;
+        }
+
+        function recheckSecurity() {
+            const btn = document.getElementById('secRecheckBtn');
+            if (btn) {
+                btn.disabled = true;
+                const span = btn.querySelector('span');
+                if (span) span.textContent = 'جاري إعادة الفحص...';
+            }
+
+            // مهلة صغيرة ليغلق المستخدم Reqable
+            setTimeout(function () {
+                const ok = runSecurityCheck();
+
+                if (btn) {
+                    btn.disabled = false;
+                    const span = btn.querySelector('span');
+                    if (span) span.textContent = 'إعادة الفحص';
+                }
+
+                if (ok) {
+                    deactivateSecurityOverlay();
+                    // إظهار نافذة التلغرام لاحقاً
+                    setTimeout(function () {
+                        const tg = document.getElementById('tgPopupOverlay');
+                        if (tg && !securityBlocked) {
+                            tg.classList.add('active');
+                        }
+                    }, 400);
+                }
+            }, 700);
+        }
+
+        // ============================================================
+        // ================== فحص دوري في الخلفية =====================
+        // ============================================================
+        setInterval(function () {
+            try {
+                if (typeof window.__checkThreatNow === 'function' && window.__checkThreatNow()) {
+                    if (!securityBlocked) {
+                        activateSecurityOverlay();
+                    }
+                }
+            } catch (e) {}
+        }, 2000);
+        // ============================================================
+
         const categoriesData = {
             mbc: {
                 name: 'قنوات ام بي سي',
@@ -2151,9 +2478,6 @@
             }
         };
 
-        // ============================================================
-        // ============  إعدادات قنوات Xtream (المشترك)  ==============
-        // ============================================================
         const XTREAM_CONFIG = {
             host: 'http://sts.mydroon.com',
             username: '9127491274',
@@ -2161,14 +2485,12 @@
             maxChannels: 700
         };
         
-        let xtreamCategories = {};     // { category_id: { name, channels: [...] } }
+        let xtreamCategories = {};
         let xtreamLoaded = false;
         let xtreamLoading = false;
-        // ============================================================
 
         let currentCategory = null;
 
-        // =========== تحميل قنوات Xtream من السيرفر ===========
         async function loadXtreamChannels() {
             if (xtreamLoading || xtreamLoaded) return;
             xtreamLoading = true;
@@ -2176,7 +2498,6 @@
             try {
                 const base = `${XTREAM_CONFIG.host}/player_api.php?username=${encodeURIComponent(XTREAM_CONFIG.username)}&password=${encodeURIComponent(XTREAM_CONFIG.password)}`;
                 
-                // جلب الأقسام والقنوات بالتوازي للسرعة
                 const [catRes, streamRes] = await Promise.all([
                     fetch(`${base}&action=get_live_categories`).then(r => r.json()),
                     fetch(`${base}&action=get_live_streams`).then(r => r.json())
@@ -2186,7 +2507,6 @@
                     throw new Error('بيانات Xtream غير صالحة');
                 }
                 
-                // خريطة أسماء الأقسام
                 const catNameMap = {};
                 catRes.forEach(c => {
                     if (c && c.category_id != null) {
@@ -2194,7 +2514,6 @@
                     }
                 });
                 
-                // تجميع القنوات حسب القسم مع حد 700 قناة
                 const grouped = {};
                 let totalCount = 0;
                 
@@ -2224,7 +2543,6 @@
                 xtreamLoaded = true;
                 xtreamLoading = false;
                 
-                // عرض الأقسام
                 renderXtreamCategories();
                 
             } catch (err) {
@@ -2234,7 +2552,6 @@
             }
         }
 
-        // =========== عرض أقسام Xtream في الشبكة ===========
         function renderXtreamCategories() {
             const grid = document.getElementById('mainCategoriesGrid');
             const catKeys = Object.keys(xtreamCategories);
@@ -2279,7 +2596,6 @@
         }
 
         function openCategory(catKey) {
-            // =========== دعم أقسام Xtream ===========
             if (catKey && catKey.startsWith('xtream_')) {
                 const catId = catKey.replace('xtream_', '');
                 const cat = xtreamCategories[catId];
@@ -2295,11 +2611,10 @@
                 const grid = document.getElementById('channelsGrid');
                 const defaultImgUrl = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
                 
-                // بناء سريع باستخدام مصفوفة واحدة
                 const htmlParts = new Array(cat.channels.length);
                 for (let i = 0; i < cat.channels.length; i++) {
                     const ch = cat.channels[i];
-                    const safeName = String(ch.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeName = String(ch.name || '').replace(/'/g, "\\'").replace(/"/g, '"');
                     const logo = ch.logo || defaultImgUrl;
                     
                     htmlParts[i] = `
@@ -2319,7 +2634,6 @@
                 document.querySelector('.viewport-area').scrollTop = 0;
                 return;
             }
-            // ========================================
             
             const cat = categoriesData[catKey];
             if (!cat) return;
@@ -2853,6 +3167,7 @@
         };
 
         function switchPane(index) {
+            if (securityBlocked) return;
             if (document.getElementById('videoModal').classList.contains('active')) {
                 closeVideoPlayer();
             }
@@ -3042,6 +3357,7 @@
         }
 
         function openLanguageSheet() {
+            if (securityBlocked) return;
             document.getElementById('languageOverlay').classList.add('active');
             document.getElementById('languageSheet').classList.add('active');
             updateLanguageSelection();
@@ -3073,6 +3389,7 @@
         }
 
         function openShareSheet() {
+            if (securityBlocked) return;
             document.getElementById('shareOverlay').classList.add('active');
             document.getElementById('shareSheet').classList.add('active');
         }
@@ -3320,11 +3637,10 @@
             if (newsInterval) { clearInterval(newsInterval); startNewsAutoScroll(); }
         }
 
-        // ================= Telegram Popup Functions =================
         function initTelegramPopup() {
             setTimeout(() => {
                 const overlay = document.getElementById('tgPopupOverlay');
-                if (overlay) overlay.classList.add('active');
+                if (overlay && !securityBlocked) overlay.classList.add('active');
             }, 50);
         }
 
@@ -3337,15 +3653,20 @@
             window.open('https://t.me/azcajfaj', '_blank');
             closeTelegramPopup();
         }
-        // ============================================================
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function () {
             updateLanguageSelection();
-            initTelegramPopup();
+
+            // إذا كان التهديد مكتشفاً مسبقاً، فعّل الشاشة فوراً
+            if (window.__instantThreatDetected) {
+                activateSecurityOverlay();
+            }
+
+            if (!securityBlocked) {
+                initTelegramPopup();
+            }
             
-            // ======== تحميل قنوات Xtream تلقائياً في الخلفية ========
             loadXtreamChannels();
-            // ============================================
 
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
