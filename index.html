@@ -53,6 +53,263 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* ==================== شاشة الحماية الجديدة ==================== */
+        .security-shield {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: radial-gradient(circle at 50% 40%, rgba(15, 23, 42, 0.98) 0%, rgba(3, 7, 18, 0.99) 70%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .security-shield.active {
+            display: flex;
+            animation: shieldFadeIn 0.4s ease forwards;
+        }
+
+        @keyframes shieldFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .security-shield::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 60%);
+            animation: shieldGlow 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shieldGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        }
+
+        .shield-card {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(160deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 28px;
+            padding: 36px 24px 28px;
+            text-align: center;
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardSlideUp {
+            from { transform: translateY(30px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .shield-radar {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            animation: radarPulse 2.2s ease-out infinite;
+        }
+
+        .radar-ring:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+
+        .radar-ring:nth-child(3) {
+            animation-delay: 1.4s;
+        }
+
+        @keyframes radarPulse {
+            0% { transform: scale(0.5); opacity: 1; border-color: rgba(239, 68, 68, 0.6); }
+            100% { transform: scale(1.4); opacity: 0; border-color: rgba(239, 68, 68, 0); }
+        }
+
+        .shield-icon-core {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 0 30px rgba(239, 68, 68, 0.6),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            z-index: 2;
+            animation: iconPulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(239, 68, 68, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.3); }
+        }
+
+        .shield-icon-core i {
+            font-size: 2rem;
+            color: #ffffff;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .shield-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .shield-desc {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.7;
+            margin-bottom: 22px;
+            font-weight: 500;
+            padding: 0 6px;
+        }
+
+        .shield-desc strong {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        .shield-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .shield-btn {
+            flex: 1;
+            height: 50px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Alexandria', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: -0.2px;
+        }
+
+        .shield-btn.primary {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+        }
+
+        .shield-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+        }
+
+        .shield-btn.primary:active {
+            transform: scale(0.97) translateY(0);
+        }
+
+        .shield-btn i {
+            font-size: 1rem;
+        }
+
+        .shield-btn.loading i {
+            animation: spin 0.7s linear infinite;
+        }
+
+        .shield-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .shield-scan-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #64748b;
+            padding: 10px 0 4px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .shield-scan-status .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+            animation: statusPulse 1.6s ease-in-out infinite;
+        }
+
+        .shield-scan-status.scanning .status-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        }
+
+        .shield-scan-status.threat .status-dot {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .shield-footer {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .shield-footer i {
+            color: #10b981;
+            font-size: 0.75rem;
+        }
+
+        .shield-brand {
+            background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        /* =========================================================== */
+
         .app-container {
             width: 100%;
             height: 100%;
@@ -1220,7 +1477,6 @@
 
         #pane-news.active { display: block; }
 
-        /* ===== قسم المسلسلات بملء الشاشة ===== */
         #pane-series {
             position: fixed;
             top: 0;
@@ -1244,7 +1500,6 @@
             display: block;
             background: #030712;
         }
-        /* ===================================== */
 
         .news-feed-container {
             width: 100%;
@@ -1472,6 +1727,15 @@
             .player-controls-row {
                 gap: 8px;
             }
+            .shield-card {
+                padding: 30px 20px 24px;
+            }
+            .shield-title {
+                font-size: 1.2rem;
+            }
+            .shield-desc {
+                font-size: 0.8rem;
+            }
         }
     </style>
     
@@ -1487,6 +1751,40 @@
 </head>
 <body>
 
+    <!-- ==================== شاشة الحماية الأمنية الجديدة ==================== -->
+    <div class="security-shield" id="securityShield">
+        <div class="shield-card">
+            <div class="shield-radar">
+                <div class="radar-ring"></div>
+                <div class="radar-ring"></div>
+                <div class="radar-ring"></div>
+                <div class="shield-icon-core">
+                    <i class="fa-solid fa-shield-halved" id="shieldIcon"></i>
+                </div>
+            </div>
+            <h2 class="shield-title" id="shieldTitle">تنبيه أمني</h2>
+            <p class="shield-desc" id="shieldDesc">
+                تم اكتشاف <strong>تطبيق Reqable</strong> أو اتصال <strong>VPN مشبوه</strong> على جهازك.<br>
+                لحماية روابط البث، يرجى إغلاق التطبيق أو إيقاف الـVPN ثم إعادة الفحص للمتابعة.
+            </p>
+            <div class="shield-actions">
+                <button class="shield-btn primary" id="shieldRecheckBtn" onclick="recheckSecurity()">
+                    <i class="fa-solid fa-rotate-right" id="shieldBtnIcon"></i>
+                    <span id="shieldBtnText">إعادة الفحص</span>
+                </button>
+            </div>
+            <div class="shield-scan-status scanning" id="shieldStatus">
+                <div class="status-dot"></div>
+                <span id="shieldStatusText">جاري فحص الاتصال...</span>
+            </div>
+            <div class="shield-footer">
+                <i class="fa-solid fa-lock"></i>
+                <span><span class="shield-brand">نجم الشاشات</span> محمي</span>
+            </div>
+        </div>
+    </div>
+    <!-- ==================================================================== -->
+
     <div class="app-container">
 
         <div class="viewport-area">
@@ -1495,7 +1793,6 @@
 
                 <div id="channelsCategoriesView">
                     <div class="categories-grid">
-                        <!-- قنوات ام بي سي -->
                         <div class="category-card" onclick="openCategory('mbc')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
@@ -1503,14 +1800,12 @@
                             <div class="category-card-title">قنوات ام بي سي</div>
                         </div>
                         
-                        <!-- ===== قسم الكاس الجديد ===== -->
                         <div class="category-card" onclick="openCategory('kas')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/nMRCsHh6/Picsart-26-07-15-13-24-44-209.webp" alt="Al Kass">
                             </div>
                             <div class="category-card-title">قنوات الكاس</div>
                         </div>
-                        <!-- ============================ -->
                         
                         <div class="category-card" onclick="openCategory('kids')">
                             <div class="category-icon-wrap">
@@ -1591,11 +1886,9 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات: تم حذف المحتوى وإضافة iframe بملء الشاشة ===== -->
             <div id="pane-series" class="section-pane">
                 <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
-            <!-- ================================================================ -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -2968,6 +3261,290 @@
             if (newsInterval) { clearInterval(newsInterval); startNewsAutoScroll(); }
         }
 
+        /* ==================== نظام الحماية الأمني الجديد ==================== */
+        
+        let securityCheckRunning = false;
+        let securityThreatDetected = false;
+
+        // كشف VPN عبر WebRTC - يكتشف واجهات الشبكة الوهمية
+        function detectWebRTCVPN() {
+            return new Promise((resolve) => {
+                let resolved = false;
+                const finish = (val) => {
+                    if (!resolved) { resolved = true; resolve(val); }
+                };
+
+                const timer = setTimeout(() => finish(false), 3500);
+
+                try {
+                    if (!window.RTCPeerConnection) {
+                        clearTimeout(timer);
+                        return finish(false);
+                    }
+
+                    const pc = new RTCPeerConnection({
+                        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                    });
+
+                    const localIPs = new Set();
+                    const publicIPs = new Set();
+                    let mdnsCount = 0;
+
+                    pc.onicecandidate = (e) => {
+                        if (!e.candidate) {
+                            clearTimeout(timer);
+                            try { pc.close(); } catch(err) {}
+                            
+                            // كشف VPN: إذا كان هناك أكثر من IP محلي
+                            // أو شبكة بمعدل غير طبيعي
+                            const suspicious = localIPs.size > 1 || publicIPs.size > 0;
+                            finish(suspicious);
+                            return;
+                        }
+
+                        const cand = e.candidate.candidate;
+                        
+                        // كشف mDNS (خصوصية عالية - طبيعي)
+                        if (cand.includes('.local')) {
+                            mdnsCount++;
+                            return;
+                        }
+
+                        const ipMatch = cand.match(/\b([0-9]{1,3}(\.[0-9]{1,3}){3})\b/);
+                        if (ipMatch) {
+                            const ip = ipMatch[1];
+                            const isPrivate = 
+                                ip.startsWith('10.') ||
+                                ip.startsWith('192.168.') ||
+                                ip.startsWith('169.254.') ||
+                                (ip.startsWith('172.') && (() => {
+                                    const second = parseInt(ip.split('.')[1]);
+                                    return second >= 16 && second <= 31;
+                                })());
+                            
+                            if (isPrivate) {
+                                localIPs.add(ip);
+                            } else if (!ip.startsWith('0.') && ip !== '0.0.0.0') {
+                                publicIPs.add(ip);
+                            }
+                        }
+                    };
+
+                    pc.createDataChannel('sectest');
+                    pc.createOffer()
+                        .then(o => pc.setLocalDescription(o))
+                        .catch(() => finish(false));
+                } catch (e) {
+                    clearTimeout(timer);
+                    finish(false);
+                }
+            });
+        }
+
+        // كشف Proxy عبر زمن الاستجابة
+        async function detectProxyLatency() {
+            try {
+                const samples = [];
+                
+                for (let i = 0; i < 3; i++) {
+                    const start = performance.now();
+                    try {
+                        await fetch('https://www.cloudflare.com/cdn-cgi/trace?nocache=' + Date.now(), {
+                            cache: 'no-store',
+                            mode: 'no-cors',
+                            signal: AbortSignal.timeout ? AbortSignal.timeout(2000) : undefined
+                        });
+                    } catch(e) {}
+                    samples.push(performance.now() - start);
+                }
+
+                const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
+                // إذا كان المعدل مرتفع جداً فهناك وسيط
+                return avg > 1800;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        // كشف نوع الاتصال المشبوه
+        function detectConnectionAnomaly() {
+            try {
+                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (!conn) return false;
+
+                // أنواع غير معتادة تشير إلى VPN
+                if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') {
+                    if (conn.downlink && conn.downlink > 5) return true;
+                }
+
+                // سرعة منخفضة بشكل مشبوه مع نوع شبكة عالي
+                if (conn.effectiveType === '4g' && conn.downlink && conn.downlink < 0.5) {
+                    return true;
+                }
+
+                return false;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        // كشف HTTPS Interception (Reqable)
+        async function detectSSLInterception() {
+            try {
+                // محاولة طلب مورد من دومين معروف
+                // إذا كان هناك اعتراض، عادة ما يفشل أو يتغير سلوكه
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 2500);
+                
+                try {
+                    const resp = await fetch('https://httpbin.org/get', {
+                        method: 'GET',
+                        cache: 'no-store',
+                        signal: controller.signal
+                    });
+                    clearTimeout(timer);
+                    
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        // httpbin يعيد معلومات عن الاتصال
+                        // إذا كان هناك وسيط، قد تظهر معلومات غريبة
+                        if (data && data.headers) {
+                            const headers = data.headers;
+                            // ترويسات مشبوهة يضيفها الوسطاء
+                            if (headers['Via'] || headers['X-Forwarded-For'] || 
+                                headers['X-Proxy'] || headers['X-Cache']) {
+                                return true;
+                            }
+                        }
+                    }
+                } catch(e) {
+                    clearTimeout(timer);
+                }
+                
+                return false;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        // الفحص الشامل
+        async function performSecurityScan() {
+            const results = await Promise.allSettled([
+                detectWebRTCVPN(),
+                detectProxyLatency(),
+                Promise.resolve(detectConnectionAnomaly()),
+                detectSSLInterception()
+            ]);
+
+            const threats = results.filter(r => 
+                r.status === 'fulfilled' && r.value === true
+            ).length;
+
+            // إذا تم اكتشاف تهديد واحد على الأقل
+            return threats >= 1;
+        }
+
+        // عرض شاشة الحماية
+        function showSecurityOverlay() {
+            const overlay = document.getElementById('securityShield');
+            const status = document.getElementById('shieldStatus');
+            const statusText = document.getElementById('shieldStatusText');
+            
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            status.classList.remove('scanning');
+            status.classList.add('threat');
+            statusText.textContent = 'تم اكتشاف تهديد أمني!';
+            securityThreatDetected = true;
+        }
+
+        // إخفاء شاشة الحماية
+        function hideSecurityOverlay() {
+            const overlay = document.getElementById('securityShield');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+            securityThreatDetected = false;
+        }
+
+        // إعادة الفحص عند الضغط على الزر
+        async function recheckSecurity() {
+            if (securityCheckRunning) return;
+            
+            const btn = document.getElementById('shieldRecheckBtn');
+            const btnIcon = document.getElementById('shieldBtnIcon');
+            const btnText = document.getElementById('shieldBtnText');
+            const status = document.getElementById('shieldStatus');
+            const statusText = document.getElementById('shieldStatusText');
+            
+            securityCheckRunning = true;
+            btn.disabled = true;
+            btnIcon.className = 'fa-solid fa-circle-notch';
+            btn.classList.add('loading');
+            btnText.textContent = 'جاري الفحص...';
+            
+            status.classList.remove('threat');
+            status.classList.add('scanning');
+            statusText.textContent = 'جاري فحص الاتصال من جديد...';
+
+            // انتظار قليل لعرض التحميل
+            await new Promise(r => setTimeout(r, 800));
+
+            const threat = await performSecurityScan();
+            
+            if (threat) {
+                status.classList.remove('scanning');
+                status.classList.add('threat');
+                statusText.textContent = 'لا يزال التهديد موجوداً!';
+            } else {
+                status.classList.remove('scanning', 'threat');
+                statusText.textContent = 'الاتصال آمن ✓';
+                
+                // إخفاء بعد لحظة
+                setTimeout(() => {
+                    hideSecurityOverlay();
+                }, 600);
+            }
+
+            btn.disabled = false;
+            btnIcon.className = 'fa-solid fa-rotate-right';
+            btn.classList.remove('loading');
+            btnText.textContent = 'إعادة الفحص';
+            securityCheckRunning = false;
+        }
+
+        // الفحص الأولي عند بدء التطبيق
+        async function initialSecurityCheck() {
+            const status = document.getElementById('shieldStatus');
+            const statusText = document.getElementById('shieldStatusText');
+            
+            status.classList.add('scanning');
+            statusText.textContent = 'جاري فحص الاتصال...';
+            
+            const threat = await performSecurityScan();
+            
+            if (threat) {
+                showSecurityOverlay();
+            } else {
+                hideSecurityOverlay();
+            }
+        }
+
+        // فحص دوري كل 8 ثواني للكشف الفوري عند تفعيل Reqable
+        setInterval(async () => {
+            if (securityCheckRunning) return;
+            
+            // فحص فقط إذا كانت الشاشة مخفية
+            if (!securityThreatDetected) {
+                const threat = await performSecurityScan();
+                if (threat) {
+                    showSecurityOverlay();
+                }
+            }
+        }, 8000);
+
+        /* ================================================================ */
+
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
 
@@ -2986,6 +3563,11 @@
                     }
                 }
             });
+
+            // تشغيل الفحص الأمني عند فتح التطبيق
+            setTimeout(() => {
+                initialSecurityCheck();
+            }, 1200);
         });
     </script>
 </body>
