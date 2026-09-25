@@ -1220,6 +1220,42 @@
 
         #pane-news.active { display: block; }
 
+        /* ========================================= */
+        /* قسم المسلسلات - تم استبداله بسيرفر ملء الشاشة */
+        /* ========================================= */
+        #pane-series {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            z-index: 50;
+            background: var(--bg-base);
+        }
+
+        #pane-series.active { display: block; }
+
+        .series-iframe-wrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .series-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: var(--bg-base);
+        }
+
         .news-feed-container {
             width: 100%;
             height: 100%;
@@ -1432,30 +1468,6 @@
             gap: 12px;
         }
 
-        /* ====== كود قسم المسلسلات الجديد (ملء الشاشة بدون إطار) ====== */
-        #pane-series.active {
-            margin: -50px -20px calc(var(--nav-height) * -1) -20px;
-            height: 100vh;
-            padding-bottom: var(--nav-height);
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-        #pane-series .iframe-container {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 0;
-            overflow: hidden;
-            background: var(--bg-base);
-        }
-        #pane-series .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-        /* ============================================================ */
-
         @media (max-width: 480px) {
             .player-btn {
                 width: 38px;
@@ -1589,13 +1601,21 @@
                 </div>
             </div>
 
-            <!-- ====== تم تعديل قسم المسلسلات لعرض الرابط بملء الشاشة ====== -->
+            <!-- ============================================= -->
+            <!-- قسم المسلسلات - تم استبداله بسيرفر ملء الشاشة -->
+            <!-- ============================================= -->
             <div id="pane-series" class="section-pane">
-                <div class="iframe-container">
-                    <iframe src="https://cccc-jade.vercel.app/" allowfullscreen></iframe>
+                <div class="series-iframe-wrap">
+                    <iframe 
+                        class="series-iframe" 
+                        src="https://xj-zeta.vercel.app/" 
+                        allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade"
+                        loading="eager">
+                    </iframe>
                 </div>
             </div>
-            <!-- ========================================================= -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
