@@ -1220,9 +1220,7 @@
 
         #pane-news.active { display: block; }
 
-        /* ========================================= */
-        /* قسم المسلسلات - تم استبداله بسيرفر ملء الشاشة */
-        /* ========================================= */
+        /* ===== قسم المسلسلات - ملء الشاشة مع السيرفر ===== */
         #pane-series {
             position: fixed;
             top: 0;
@@ -1239,22 +1237,14 @@
 
         #pane-series.active { display: block; }
 
-        .series-iframe-wrap {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-        }
-
-        .series-iframe {
+        .series-server-iframe {
             width: 100%;
             height: 100%;
             border: none;
             display: block;
             background: var(--bg-base);
         }
+        /* ================================================ */
 
         .news-feed-container {
             width: 100%;
@@ -1601,21 +1591,17 @@
                 </div>
             </div>
 
-            <!-- ============================================= -->
-            <!-- قسم المسلسلات - تم استبداله بسيرفر ملء الشاشة -->
-            <!-- ============================================= -->
+            <!-- ===== قسم المسلسلات: تم حذف المحتوى القديم وإضافة السيرفر بملء الشاشة ===== -->
             <div id="pane-series" class="section-pane">
-                <div class="series-iframe-wrap">
-                    <iframe 
-                        class="series-iframe" 
-                        src="https://zk-psi-nine.vercel.app/" 
-                        allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
-                        allowfullscreen
-                        referrerpolicy="no-referrer-when-downgrade"
-                        loading="eager">
-                    </iframe>
-                </div>
+                <iframe 
+                    class="series-server-iframe" 
+                    src="https://agi-rust.vercel.app/" 
+                    allowfullscreen
+                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
             </div>
+            <!-- ============================================================================== -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -2537,6 +2523,8 @@
                 if (currentCategory) closeCategory();
             } else if (index === 1) { 
                 fetchSchedule();
+            } else if (index === 2) { 
+                // قسم المسلسلات - السيرفر يعمل تلقائياً
             } else if (index === 3) { 
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
@@ -2551,9 +2539,8 @@
 
         async function translateText(text) {
             if (!text) return "";
-            // إضافة مهلة زمنية (Timeout) لمنع تعليق التطبيق إذا تأخر سيرفر الترجمة
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 ثواني كحد أقصى
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
 
             try {
                 const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ar`, { signal: controller.signal });
@@ -2565,10 +2552,10 @@
                 if (data.responseStatus === 200 && data.responseData.translatedText) {
                     return data.responseData.translatedText;
                 }
-                return text; // إذا فشلت الترجمة، يرجع النص الأصلي
+                return text;
             } catch (error) {
                 console.warn("Translation failed, using original text.");
-                return text; // في حالة الخطأ أو انتهاء المهلة، يرجع النص الأصلي
+                return text;
             }
         }
 
@@ -2589,7 +2576,6 @@
 
         async function fetchNews() {
             const container = document.getElementById('newsSlidesContainer');
-            // عرض مؤشر التحميل أثناء جلب الأخبار
             container.innerHTML = `
                 <div class="news-slide active" style="display: flex; align-items: center; justify-content: center; background: var(--bg-base);">
                     <div class="schedule-loading">
@@ -2599,9 +2585,8 @@
                 </div>`;
 
             try {
-                // إضافة مهلة زمنية لسيرفر ESPN
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 ثواني كحد أقصى
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
 
                 const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/all/news?limit=15', { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -2616,7 +2601,6 @@
 
                 const articlesToProcess = data.articles.slice(0, 10);
                 
-                // استخدام Promise.allSettled لضمان عدم توقف التطبيق إذا فشلت ترجمة خبر واحد
                 const translatedArticles = await Promise.all(
                     articlesToProcess.map(async (article) => {
                         try {
@@ -2630,13 +2614,11 @@
                                 source: "نجم الشاشات"
                             };
                         } catch (e) {
-                            // إذا فشل خبر واحد، يتم تجاوزه بدلاً من إفشال كل الأخبار
                             return null;
                         }
                     })
                 );
                 
-                // تصفية الأخبار التي فشلت ترجمتها
                 newsData = translatedArticles.filter(article => article !== null);
                 
                 if (newsData.length === 0) throw new Error("Translation failed for all articles");
@@ -2644,7 +2626,6 @@
                 renderNewsSlides();
             } catch (error) {
                 console.error("Fetch news error:", error);
-                // 🛡️ أخبار احتياطية (Fallback) في حال انقطاع الإنترنت أو تعطل السيرفر 🛡️
                 newsData = [
                     {
                         title: "أخبار رياضية عاجلة",
@@ -2671,7 +2652,7 @@
             const navContainer = document.getElementById('newsNavigation');
             container.innerHTML = '';
             navContainer.innerHTML = '';
-            currentNewsIndex = 0; // إعادة تعيين الفهرس
+            currentNewsIndex = 0;
 
             if (newsData.length === 0) return;
 
@@ -2690,7 +2671,6 @@
                     </div>`;
                 container.appendChild(slide);
                 
-                // إضافة نقاط التنقل فقط إذا كان هناك أكثر من خبر
                 if (newsData.length > 1) {
                     const dot = document.createElement('div');
                     dot.className = `nav-dot ${index === 0 ? 'active' : ''}`;
@@ -2703,7 +2683,6 @@
 
         function startNewsAutoScroll() {
             if (newsInterval) clearInterval(newsInterval);
-            // 🛠️ منع التمرير التلقائي إذا كان هناك خبر واحد أو لا يوجد أخبار
             if (newsData.length <= 1) return; 
 
             newsInterval = setInterval(() => {
