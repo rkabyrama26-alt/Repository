@@ -313,6 +313,24 @@
             border-radius: inherit; 
         }
 
+        /* شارة عدد قنوات Xtream */
+        .category-count-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            color: #ffffff;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 10px;
+            z-index: 3;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.5);
+            min-width: 22px;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+
         .category-card-title {
             font-size: 0.72rem;
             font-weight: 700;
@@ -1458,6 +1476,23 @@
             gap: 12px;
         }
 
+        /* شريط تحميل قنوات Xtream */
+        .xtream-loading-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0.7;
+        }
+        .xtream-loading-card .category-icon-wrap {
+            background: rgba(99, 102, 241, 0.08);
+        }
+        .xtream-loading-card i {
+            font-size: 1.4rem;
+            color: var(--accent-primary);
+        }
+
         /* ================= Telegram Popup Styles ================= */
         .tg-popup-overlay {
             position: fixed;
@@ -1481,8 +1516,8 @@
             background: linear-gradient(145deg, #0f172a, #0b1121);
             border: 1px solid rgba(34, 158, 217, 0.2);
             border-radius: 28px;
-            padding: 30px 15px 25px; /* تعديل الحواشي ليتسع النص */
-            width: 92%; /* تكبير العرض قليلاً */
+            padding: 30px 15px 25px;
+            width: 92%;
             max-width: 380px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(34, 158, 217, 0.1);
@@ -1525,22 +1560,22 @@
             100% { transform: scale(1.05); opacity: 1; }
         }
         .tg-title {
-            font-size: 1.1rem; /* تصغير الخط ليتسع في صف واحد */
+            font-size: 1.1rem;
             font-weight: 800;
             color: #ffffff;
             margin-bottom: 12px;
             line-height: 1.4;
             letter-spacing: -0.5px;
-            white-space: nowrap; /* منع النص من الانكسار */
+            white-space: nowrap;
         }
         .tg-desc {
-            font-size: 0.75rem; /* تصغير الخط قليلاً */
+            font-size: 0.75rem;
             color: #94a3b8;
-            line-height: 1.8; /* تحسين تباعد الأسطر */
+            line-height: 1.8;
             margin-bottom: 28px;
             font-weight: 500;
             padding: 0 5px;
-            white-space: nowrap; /* منع الكلمات من التكسر العشوائي */
+            white-space: nowrap;
         }
         .tg-actions {
             display: flex;
@@ -1623,7 +1658,7 @@
             <div id="pane-channels" class="section-pane active">
 
                 <div id="channelsCategoriesView">
-                    <div class="categories-grid">
+                    <div class="categories-grid" id="mainCategoriesGrid">
                         <!-- قنوات ام بي سي -->
                         <div class="category-card" onclick="openCategory('mbc')">
                             <div class="category-icon-wrap">
@@ -2116,9 +2151,176 @@
             }
         };
 
+        // ============================================================
+        // ============  إعدادات قنوات Xtream (المشترك)  ==============
+        // ============================================================
+        const XTREAM_CONFIG = {
+            host: 'http://sts.mydroon.com',
+            username: '9127491274',
+            password: 'QDXDbuLzFDYaYbD',
+            maxChannels: 700
+        };
+        
+        let xtreamCategories = {};     // { category_id: { name, channels: [...] } }
+        let xtreamLoaded = false;
+        let xtreamLoading = false;
+        // ============================================================
+
         let currentCategory = null;
 
+        // =========== تحميل قنوات Xtream من السيرفر ===========
+        async function loadXtreamChannels() {
+            if (xtreamLoading || xtreamLoaded) return;
+            xtreamLoading = true;
+            
+            try {
+                const base = `${XTREAM_CONFIG.host}/player_api.php?username=${encodeURIComponent(XTREAM_CONFIG.username)}&password=${encodeURIComponent(XTREAM_CONFIG.password)}`;
+                
+                // جلب الأقسام والقنوات بالتوازي للسرعة
+                const [catRes, streamRes] = await Promise.all([
+                    fetch(`${base}&action=get_live_categories`).then(r => r.json()),
+                    fetch(`${base}&action=get_live_streams`).then(r => r.json())
+                ]);
+                
+                if (!Array.isArray(catRes) || !Array.isArray(streamRes)) {
+                    throw new Error('بيانات Xtream غير صالحة');
+                }
+                
+                // خريطة أسماء الأقسام
+                const catNameMap = {};
+                catRes.forEach(c => {
+                    if (c && c.category_id != null) {
+                        catNameMap[String(c.category_id)] = c.category_name || 'قنوات';
+                    }
+                });
+                
+                // تجميع القنوات حسب القسم مع حد 700 قناة
+                const grouped = {};
+                let totalCount = 0;
+                
+                for (let i = 0; i < streamRes.length; i++) {
+                    if (totalCount >= XTREAM_CONFIG.maxChannels) break;
+                    
+                    const s = streamRes[i];
+                    if (!s || s.stream_id == null) continue;
+                    
+                    const cid = String(s.category_id || '0');
+                    const catName = catNameMap[cid] || 'قنوات أخرى';
+                    
+                    if (!grouped[cid]) {
+                        grouped[cid] = { name: catName, channels: [] };
+                    }
+                    
+                    grouped[cid].channels.push({
+                        name: s.name || ('قناة ' + s.stream_id),
+                        logo: s.stream_icon || '',
+                        url: `${XTREAM_CONFIG.host}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${s.stream_id}.m3u8`
+                    });
+                    
+                    totalCount++;
+                }
+                
+                xtreamCategories = grouped;
+                xtreamLoaded = true;
+                xtreamLoading = false;
+                
+                // عرض الأقسام
+                renderXtreamCategories();
+                
+            } catch (err) {
+                console.error('Xtream load error:', err);
+                xtreamLoading = false;
+                showToast('فشل تحميل قنوات الاشتراك');
+            }
+        }
+
+        // =========== عرض أقسام Xtream في الشبكة ===========
+        function renderXtreamCategories() {
+            const grid = document.getElementById('mainCategoriesGrid');
+            const catKeys = Object.keys(xtreamCategories);
+            
+            if (catKeys.length === 0) return;
+            
+            let catNumber = 1;
+            const defaultImgUrl = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
+            
+            catKeys.forEach(catId => {
+                const cat = xtreamCategories[catId];
+                if (!cat.channels || cat.channels.length === 0) return;
+                
+                const count = cat.channels.length;
+                const firstLogo = (cat.channels.find(c => c.logo) || {}).logo || '';
+                
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                const key = 'xtream_' + catId;
+                card.onclick = () => openCategory(key);
+                
+                const imgHTML = `
+                    <img class="category-icon-img" 
+                         src="${firstLogo || defaultImgUrl}" 
+                         alt="Channel" 
+                         onerror="this.src='${defaultImgUrl}'; this.style.opacity='1';">
+                `;
+                
+                card.innerHTML = `
+                    <div class="category-icon-wrap">
+                        ${imgHTML}
+                        <div class="category-count-badge">${count}</div>
+                    </div>
+                    <div class="category-card-title">${catNumber}</div>
+                `;
+                
+                cat.displayIndex = catNumber;
+                catNumber++;
+                
+                grid.appendChild(card);
+            });
+        }
+
         function openCategory(catKey) {
+            // =========== دعم أقسام Xtream ===========
+            if (catKey && catKey.startsWith('xtream_')) {
+                const catId = catKey.replace('xtream_', '');
+                const cat = xtreamCategories[catId];
+                if (!cat) return;
+                currentCategory = catKey;
+                
+                document.getElementById('channelsCategoriesView').style.display = 'none';
+                document.getElementById('channelsListView').style.display = 'block';
+                
+                const displayName = cat.displayIndex ? `قنوات ${cat.displayIndex}` : cat.name;
+                document.getElementById('categoryTitle').textContent = `${displayName} (${cat.channels.length})`;
+                
+                const grid = document.getElementById('channelsGrid');
+                const defaultImgUrl = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
+                
+                // بناء سريع باستخدام مصفوفة واحدة
+                const htmlParts = new Array(cat.channels.length);
+                for (let i = 0; i < cat.channels.length; i++) {
+                    const ch = cat.channels[i];
+                    const safeName = String(ch.name || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const logo = ch.logo || defaultImgUrl;
+                    
+                    htmlParts[i] = `
+                        <div class="channel-card" onclick="playChannel('${encodeURIComponent(ch.url)}', '${safeName}')">
+                            <div class="channel-logo-wrap">
+                                <img src="${logo}" alt="" loading="lazy" onerror="this.src='${defaultImgUrl}'">
+                            </div>
+                            <div class="channel-info">
+                                <div class="channel-name">${ch.name || ''}</div>
+                            </div>
+                            <span class="live-badge">مباشر</span>
+                        </div>
+                    `;
+                }
+                grid.innerHTML = htmlParts.join('');
+                
+                document.querySelector('.viewport-area').scrollTop = 0;
+                return;
+            }
+            // ========================================
+            
             const cat = categoriesData[catKey];
             if (!cat) return;
             currentCategory = catKey;
@@ -3120,7 +3322,6 @@
 
         // ================= Telegram Popup Functions =================
         function initTelegramPopup() {
-            // يظهر فوراً بعد تحميل الصفحة مباشرة (بدون حفظ في الذاكرة)
             setTimeout(() => {
                 const overlay = document.getElementById('tgPopupOverlay');
                 if (overlay) overlay.classList.add('active');
@@ -3140,7 +3341,11 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
-            initTelegramPopup(); // استدعاء دالة النافذة المنبثقة عند بدء التطبيق
+            initTelegramPopup();
+            
+            // ======== تحميل قنوات Xtream تلقائياً في الخلفية ========
+            loadXtreamChannels();
+            // ============================================
 
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
