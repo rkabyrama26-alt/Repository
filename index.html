@@ -53,262 +53,300 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ==================== شاشة الحماية الجديدة ==================== */
-        .security-shield {
+        /* ============================================
+           🛡️ شاشة الحماية الأمنية - تصميم جديد
+           ============================================ */
+        .sec-screen {
             position: fixed;
             inset: 0;
-            z-index: 99999;
-            background: radial-gradient(circle at 50% 40%, rgba(15, 23, 42, 0.98) 0%, rgba(3, 7, 18, 0.99) 70%);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            z-index: 999999;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(239, 68, 68, 0.18) 0%, transparent 55%),
+                radial-gradient(circle at 50% 100%, rgba(220, 38, 38, 0.12) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0202 0%, #030712 55%, #0a0202 100%);
             overflow: hidden;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
-
-        .security-shield.active {
+        .sec-screen.active {
             display: flex;
-            animation: shieldFadeIn 0.4s ease forwards;
+            opacity: 1;
         }
 
-        @keyframes shieldFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .security-shield::before {
-            content: '';
+        /* شبكة خلفية متحركة */
+        .sec-grid-bg {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 600px;
-            height: 600px;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 60%);
-            animation: shieldGlow 3s ease-in-out infinite;
+            inset: -50%;
+            background-image:
+                linear-gradient(rgba(239, 68, 68, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(239, 68, 68, 0.06) 1px, transparent 1px);
+            background-size: 42px 42px;
+            transform: perspective(600px) rotateX(55deg);
+            animation: secGridMove 12s linear infinite;
             pointer-events: none;
+            opacity: 0.55;
+        }
+        @keyframes secGridMove {
+            0%   { background-position: 0 0; }
+            100% { background-position: 0 420px; }
         }
 
-        @keyframes shieldGlow {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-            50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        /* خط ماسح أفقي */
+        .sec-scan-line {
+            position: absolute;
+            left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ef4444 45%, #ffffff 50%, #ef4444 55%, transparent);
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.9), 0 0 44px rgba(239, 68, 68, 0.5);
+            animation: secScan 3.4s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+        @keyframes secScan {
+            0%   { top: -2%; opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { top: 102%; opacity: 0; }
         }
 
-        .shield-card {
+        /* زوايا تأطيرية */
+        .sec-corner {
+            position: absolute;
+            width: 44px; height: 44px;
+            border: 2px solid rgba(239, 68, 68, 0.55);
+            pointer-events: none;
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+        }
+        .sec-corner.tl { top: 18px;    left: 18px;    border-right: none;  border-bottom: none; border-top-left-radius: 14px; }
+        .sec-corner.tr { top: 18px;    right: 18px;   border-left: none;   border-bottom: none; border-top-right-radius: 14px; }
+        .sec-corner.bl { bottom: 18px; left: 18px;    border-right: none;  border-top: none;    border-bottom-left-radius: 14px; }
+        .sec-corner.br { bottom: 18px; right: 18px;   border-left: none;   border-top: none;    border-bottom-right-radius: 14px; }
+
+        /* البطاقة الوسطية */
+        .sec-card {
             position: relative;
             width: 100%;
-            max-width: 400px;
-            background: linear-gradient(160deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            border-radius: 28px;
-            padding: 36px 24px 28px;
+            max-width: 420px;
+            background: linear-gradient(180deg, rgba(15, 8, 10, 0.92), rgba(8, 5, 6, 0.96));
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 26px;
+            padding: 34px 24px 26px;
             text-align: center;
-            box-shadow: 
-                0 25px 60px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(255, 255, 255, 0.03),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 0 0 1px rgba(239, 68, 68, 0.08),
+                0 25px 60px rgba(0, 0, 0, 0.7),
+                0 0 90px rgba(239, 68, 68, 0.18) inset;
+            transform: translateY(14px) scale(0.96);
+            animation: secCardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+        }
+        @keyframes secCardIn {
+            to { transform: translateY(0) scale(1); }
         }
 
-        @keyframes cardSlideUp {
-            from { transform: translateY(30px) scale(0.95); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        .shield-radar {
+        /* أيقونة الدرع مع حلقات النبض */
+        .sec-shield-wrap {
             position: relative;
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 24px;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 18px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .radar-ring {
+        .sec-ring {
             position: absolute;
             inset: 0;
             border-radius: 50%;
-            border: 1.5px solid rgba(239, 68, 68, 0.4);
-            animation: radarPulse 2.2s ease-out infinite;
+            border: 1.5px solid rgba(239, 68, 68, 0.55);
+            animation: secRingPulse 2.6s ease-out infinite;
+            opacity: 0;
+        }
+        .sec-ring.r2 { animation-delay: 0.85s; }
+        .sec-ring.r3 { animation-delay: 1.7s; }
+
+        @keyframes secRingPulse {
+            0%   { transform: scale(0.5); opacity: 0.9; }
+            80%  { transform: scale(1.35); opacity: 0; }
+            100% { transform: scale(1.35); opacity: 0; }
         }
 
-        .radar-ring:nth-child(2) {
-            animation-delay: 0.7s;
-        }
-
-        .radar-ring:nth-child(3) {
-            animation-delay: 1.4s;
-        }
-
-        @keyframes radarPulse {
-            0% { transform: scale(0.5); opacity: 1; border-color: rgba(239, 68, 68, 0.6); }
-            100% { transform: scale(1.4); opacity: 0; border-color: rgba(239, 68, 68, 0); }
-        }
-
-        .shield-icon-core {
+        .sec-shield-core {
             position: relative;
-            width: 72px;
-            height: 72px;
+            width: 84px;
+            height: 84px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            background: radial-gradient(circle at 30% 25%, #ef4444, #991b1b 75%);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 
-                0 0 30px rgba(239, 68, 68, 0.6),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2);
-            z-index: 2;
-            animation: iconPulse 1.8s ease-in-out infinite;
+            box-shadow:
+                0 0 30px rgba(239, 68, 68, 0.7),
+                0 0 60px rgba(239, 68, 68, 0.35),
+                inset 0 -6px 14px rgba(0, 0, 0, 0.5),
+                inset 0 4px 10px rgba(255, 255, 255, 0.25);
+            animation: secCoreBeat 2.6s ease-in-out infinite;
         }
-
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.2); }
-            50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(239, 68, 68, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.3); }
+        @keyframes secCoreBeat {
+            0%, 100% { transform: scale(1); }
+            50%      { transform: scale(1.06); }
         }
-
-        .shield-icon-core i {
-            font-size: 2rem;
+        .sec-shield-core i {
             color: #ffffff;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            font-size: 2.15rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
         }
 
-        .shield-title {
-            font-size: 1.35rem;
+        /* شارة "حماية تلقائية" */
+        .sec-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.68rem;
             font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+        }
+        .sec-badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: secDotBlink 1.2s ease-in-out infinite;
+        }
+        @keyframes secDotBlink {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.25; }
+        }
+
+        .sec-title {
+            font-size: 1.5rem;
+            font-weight: 900;
             color: #ffffff;
-            margin-bottom: 12px;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
         }
 
-        .shield-desc {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            line-height: 1.7;
-            margin-bottom: 22px;
+        .sec-title-underline {
+            width: 66px;
+            height: 3px;
+            margin: 0 auto 18px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, transparent, #ef4444, transparent);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+        }
+
+        .sec-message {
+            font-size: 0.88rem;
+            line-height: 1.85;
+            color: #cbd5e1;
             font-weight: 500;
-            padding: 0 6px;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+        .sec-message strong {
+            color: #fca5a5;
+            font-weight: 800;
         }
 
-        .shield-desc strong {
-            color: #f87171;
-            font-weight: 700;
-        }
-
-        .shield-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .shield-btn {
-            flex: 1;
-            height: 50px;
+        /* زر إعادة الفحص */
+        .sec-recheck-btn {
+            width: 100%;
+            padding: 15px;
             border: none;
-            border-radius: 14px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
             font-family: 'Alexandria', sans-serif;
-            font-size: 0.92rem;
-            font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: -0.2px;
+            gap: 10px;
+            letter-spacing: 0.3px;
+            box-shadow:
+                0 10px 24px rgba(239, 68, 68, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+                0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease;
+            position: relative;
+            overflow: hidden;
         }
-
-        .shield-btn.primary {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: #ffffff;
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+        .sec-recheck-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -75%;
+            width: 50%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-20deg);
+            animation: secBtnShine 3s infinite;
         }
-
-        .shield-btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+        @keyframes secBtnShine {
+            0%   { left: -75%; }
+            50%  { left: 125%; }
+            100% { left: 125%; }
         }
-
-        .shield-btn.primary:active {
-            transform: scale(0.97) translateY(0);
+        .sec-recheck-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
         }
-
-        .shield-btn i {
+        .sec-recheck-btn i {
             font-size: 1rem;
+            transition: transform 0.6s ease;
+        }
+        .sec-recheck-btn.checking i {
+            animation: secSpin 0.9s linear infinite;
+        }
+        @keyframes secSpin {
+            to { transform: rotate(360deg); }
         }
 
-        .shield-btn.loading i {
-            animation: spin 0.7s linear infinite;
-        }
-
-        .shield-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .shield-scan-status {
+        /* تلميح الحماية السفلي */
+        .sec-protected-tip {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-size: 0.75rem;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(148, 163, 184, 0.15);
             color: #64748b;
-            padding: 10px 0 4px;
-            font-weight: 600;
-            transition: color 0.3s ease;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+        .sec-protected-tip i {
+            color: #22c55e;
+            font-size: 0.85rem;
+            filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.7));
         }
 
-        .shield-scan-status .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
-            animation: statusPulse 1.6s ease-in-out infinite;
+        /* أنيميشن اهتزاز خفيف للبطاقة عند التهديد */
+        .sec-card.shake {
+            animation: secShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
         }
-
-        .shield-scan-status.scanning .status-dot {
-            background: #f59e0b;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        @keyframes secShake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-6px); }
+            40%      { transform: translateX(6px); }
+            60%      { transform: translateX(-4px); }
+            80%      { transform: translateX(4px); }
         }
-
-        .shield-scan-status.threat .status-dot {
-            background: #ef4444;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
-        }
-
-        @keyframes statusPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
-
-        .shield-footer {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 0.7rem;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        .shield-footer i {
-            color: #10b981;
-            font-size: 0.75rem;
-        }
-
-        .shield-brand {
-            background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-        /* =========================================================== */
+        /* ============================================ */
 
         .app-container {
             width: 100%;
@@ -1727,15 +1765,6 @@
             .player-controls-row {
                 gap: 8px;
             }
-            .shield-card {
-                padding: 30px 20px 24px;
-            }
-            .shield-title {
-                font-size: 1.2rem;
-            }
-            .shield-desc {
-                font-size: 0.8rem;
-            }
         }
     </style>
     
@@ -1751,39 +1780,51 @@
 </head>
 <body>
 
-    <!-- ==================== شاشة الحماية الأمنية الجديدة ==================== -->
-    <div class="security-shield" id="securityShield">
-        <div class="shield-card">
-            <div class="shield-radar">
-                <div class="radar-ring"></div>
-                <div class="radar-ring"></div>
-                <div class="radar-ring"></div>
-                <div class="shield-icon-core">
-                    <i class="fa-solid fa-shield-halved" id="shieldIcon"></i>
+    <!-- ============================================
+         🛡️ شاشة الحماية الأمنية - تصميم جديد
+         ============================================ -->
+    <div class="sec-screen" id="secScreen">
+        <div class="sec-grid-bg"></div>
+        <div class="sec-scan-line"></div>
+
+        <div class="sec-corner tl"></div>
+        <div class="sec-corner tr"></div>
+        <div class="sec-corner bl"></div>
+        <div class="sec-corner br"></div>
+
+        <div class="sec-card" id="secCard">
+            <div class="sec-shield-wrap">
+                <div class="sec-ring r1"></div>
+                <div class="sec-ring r2"></div>
+                <div class="sec-ring r3"></div>
+                <div class="sec-shield-core">
+                    <i class="fa-solid fa-shield-virus"></i>
                 </div>
             </div>
-            <h2 class="shield-title" id="shieldTitle">تنبيه أمني</h2>
-            <p class="shield-desc" id="shieldDesc">
-                تم اكتشاف <strong>تطبيق Reqable</strong> أو اتصال <strong>VPN مشبوه</strong> على جهازك.<br>
-                لحماية روابط البث، يرجى إغلاق التطبيق أو إيقاف الـVPN ثم إعادة الفحص للمتابعة.
+
+            <div class="sec-badge">حماية تلقائية مفعّلة</div>
+
+            <h2 class="sec-title">تنبيه أمني</h2>
+            <div class="sec-title-underline"></div>
+
+            <p class="sec-message">
+                تم اكتشاف اتصال <strong>VPN</strong> أو تطبيق <strong>Reqable</strong> يعمل على جهازك.<br>
+                لحماية البث وضمان استمرار التشغيل بشكل طبيعي،<br>
+                يرجى إغلاق تطبيق Reqable أو إيقاف اتصال VPN ثم إعادة المحاولة.
             </p>
-            <div class="shield-actions">
-                <button class="shield-btn primary" id="shieldRecheckBtn" onclick="recheckSecurity()">
-                    <i class="fa-solid fa-rotate-right" id="shieldBtnIcon"></i>
-                    <span id="shieldBtnText">إعادة الفحص</span>
-                </button>
-            </div>
-            <div class="shield-scan-status scanning" id="shieldStatus">
-                <div class="status-dot"></div>
-                <span id="shieldStatusText">جاري فحص الاتصال...</span>
-            </div>
-            <div class="shield-footer">
+
+            <button class="sec-recheck-btn" id="secRecheckBtn" onclick="recheckSecurity()">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>إعادة الفحص</span>
+            </button>
+
+            <div class="sec-protected-tip">
                 <i class="fa-solid fa-lock"></i>
-                <span><span class="shield-brand">نجم الشاشات</span> محمي</span>
+                <span>نجم الشاشات محمي بأعلى معايير الأمان</span>
             </div>
         </div>
     </div>
-    <!-- ==================================================================== -->
+    <!-- ============================================ -->
 
     <div class="app-container">
 
@@ -2150,6 +2191,193 @@
     <div class="toast-notification" id="toastNotification"></div>
 
     <script>
+        /* ========================================================
+           🛡️ نظام الحماية الأمنية - كشف VPN / Reqable / Proxy
+           ======================================================== */
+        let securityIntervalId = null;
+        let isSecurityChecking = false;
+
+        // فحص هل الأدوات مفتوحة أو لا
+        async function detectSecurityThreats() {
+            const threats = { reqable: false, vpn: false, proxy: false };
+
+            /* 1) فحص كائنات JavaScript المُحقَنة بواسطة أدوات اعتراض الشبكة */
+            try {
+                const signatures = [
+                    '__REQABLE__', 'Reqable', '_reqable', 'reqableSDK', 'reqable',
+                    'CharlesProxy', '__CHARLES__', 'Charles',
+                    'FiddlerProxy', '__FIDDLER__',
+                    'Proxyman', 'proxyman', '__PROXYMAN__',
+                    'HTTPToolkit', 'httpToolkit'
+                ];
+                for (const sig of signatures) {
+                    try {
+                        if (sig in window || typeof window[sig] !== 'undefined') {
+                            threats.reqable = true;
+                            break;
+                        }
+                    } catch (e) {}
+                }
+            } catch (e) {}
+
+            /* 2) فحص نوع الاتصال عبر Network Information API */
+            try {
+                if (navigator.connection) {
+                    const type = navigator.connection.type;
+                    if (type === 'vpn') threats.vpn = true;
+                    // بعض أنواع VPN تُبلَّغ عن نفسها بشكل غير مباشر
+                    if (type === 'none') threats.vpn = true;
+                }
+            } catch (e) {}
+
+            /* 3) فحص WebRTC لكشف VPN */
+            try {
+                const rtcSuspicious = await checkWebRTCSuspicious();
+                if (rtcSuspicious) threats.vpn = true;
+            } catch (e) {}
+
+            /* 4) فحص رؤوس البروكسي من استجابة الشبكة */
+            try {
+                const resp = await fetch('https://api.ipify.org?format=json&t=' + Date.now(), {
+                    cache: 'no-store',
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                const via = resp.headers.get('via');
+                const proxyConn = resp.headers.get('proxy-connection');
+                const xProxy = resp.headers.get('x-proxy-id') || resp.headers.get('x-proxy');
+                if (via || proxyConn || xProxy) threats.proxy = true;
+            } catch (e) {
+                // إذا فشل الطلب من أصل مصدر موثوق، فهذا مؤشر على اعتراض
+                // لكن قد يكون مجرد مشكلة شبكة عادية - لذا لا نُفعّل التهديد
+            }
+
+            return threats.reqable || threats.vpn || threats.proxy;
+        }
+
+        /* فحص WebRTC: كشف VPN عن طريق انعدام عناوين ICE العامة */
+        function checkWebRTCSuspicious() {
+            return new Promise((resolve) => {
+                if (!window.RTCPeerConnection) { resolve(false); return; }
+                let resolved = false;
+                let gotAnyCandidate = false;
+                let gotPublicCandidate = false;
+
+                const finish = (val) => {
+                    if (resolved) return;
+                    resolved = true;
+                    try { pc.close(); } catch (e) {}
+                    resolve(val);
+                };
+
+                let pc;
+                try {
+                    pc = new RTCPeerConnection({
+                        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                    });
+                    pc.createDataChannel('');
+
+                    const timeout = setTimeout(() => {
+                        // إذا لم نحصل على أي عنوان عام خلال 3 ثوان، فهذا مريب
+                        finish(!gotPublicCandidate);
+                    }, 3000);
+
+                    pc.onicecandidate = (e) => {
+                        if (!e.candidate) return;
+                        gotAnyCandidate = true;
+                        const cand = e.candidate.candidate || '';
+                        const m = cand.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+                        if (m) {
+                            const ip = m[1];
+                            const isPrivate =
+                                ip.startsWith('10.') ||
+                                ip.startsWith('127.') ||
+                                ip.startsWith('169.254.') ||
+                                ip.startsWith('192.168.') ||
+                                (ip.startsWith('172.') && (() => {
+                                    const o = parseInt(ip.split('.')[1], 10);
+                                    return o >= 16 && o <= 31;
+                                })());
+                            if (!isPrivate) {
+                                gotPublicCandidate = true;
+                                clearTimeout(timeout);
+                                finish(false); // يوجد عنوان عام → لا يوجد VPN
+                            }
+                        }
+                    };
+
+                    pc.createOffer()
+                        .then(o => pc.setLocalDescription(o))
+                        .catch(() => { clearTimeout(timeout); finish(false); });
+                } catch (e) {
+                    resolve(false);
+                }
+            });
+        }
+
+        /* إظهار شاشة الحماية */
+        function showSecurityScreen() {
+            const screen = document.getElementById('secScreen');
+            const card = document.getElementById('secCard');
+            if (!screen) return;
+            if (!screen.classList.contains('active')) {
+                screen.classList.add('active');
+                // اهتزاز البطاقة عند الظهور
+                if (card) {
+                    card.classList.remove('shake');
+                    void card.offsetWidth;
+                    card.classList.add('shake');
+                }
+            }
+        }
+
+        /* إخفاء شاشة الحماية */
+        function hideSecurityScreen() {
+            const screen = document.getElementById('secScreen');
+            if (screen) screen.classList.remove('active');
+        }
+
+        /* الفحص الرئيسي */
+        async function performSecurityCheck(showButtonLoading) {
+            if (isSecurityChecking) return;
+            isSecurityChecking = true;
+
+            const btn = document.getElementById('secRecheckBtn');
+            if (showButtonLoading && btn) btn.classList.add('checking');
+
+            try {
+                const hasThreat = await detectSecurityThreats();
+                if (hasThreat) {
+                    showSecurityScreen();
+                } else {
+                    hideSecurityScreen();
+                }
+            } catch (e) {
+                console.warn('Security check failed:', e);
+            } finally {
+                isSecurityChecking = false;
+                if (btn) setTimeout(() => btn.classList.remove('checking'), 500);
+            }
+        }
+
+        /* زر إعادة الفحص من داخل شاشة الحماية */
+        function recheckSecurity() {
+            performSecurityCheck(true);
+        }
+
+        /* بدء الفحص الدوري كل 3 ثوانٍ */
+        function startSecurityMonitor() {
+            performSecurityCheck(false);
+            if (securityIntervalId) clearInterval(securityIntervalId);
+            securityIntervalId = setInterval(() => performSecurityCheck(false), 3000);
+        }
+
+        /* تشغيل الفحص فور تحميل الصفحة */
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(startSecurityMonitor, 800);
+        });
+        /* ======================================================== */
+
         const categoriesData = {
             mbc: {
                 name: 'قنوات ام بي سي',
@@ -3261,290 +3489,6 @@
             if (newsInterval) { clearInterval(newsInterval); startNewsAutoScroll(); }
         }
 
-        /* ==================== نظام الحماية الأمني الجديد ==================== */
-        
-        let securityCheckRunning = false;
-        let securityThreatDetected = false;
-
-        // كشف VPN عبر WebRTC - يكتشف واجهات الشبكة الوهمية
-        function detectWebRTCVPN() {
-            return new Promise((resolve) => {
-                let resolved = false;
-                const finish = (val) => {
-                    if (!resolved) { resolved = true; resolve(val); }
-                };
-
-                const timer = setTimeout(() => finish(false), 3500);
-
-                try {
-                    if (!window.RTCPeerConnection) {
-                        clearTimeout(timer);
-                        return finish(false);
-                    }
-
-                    const pc = new RTCPeerConnection({
-                        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-                    });
-
-                    const localIPs = new Set();
-                    const publicIPs = new Set();
-                    let mdnsCount = 0;
-
-                    pc.onicecandidate = (e) => {
-                        if (!e.candidate) {
-                            clearTimeout(timer);
-                            try { pc.close(); } catch(err) {}
-                            
-                            // كشف VPN: إذا كان هناك أكثر من IP محلي
-                            // أو شبكة بمعدل غير طبيعي
-                            const suspicious = localIPs.size > 1 || publicIPs.size > 0;
-                            finish(suspicious);
-                            return;
-                        }
-
-                        const cand = e.candidate.candidate;
-                        
-                        // كشف mDNS (خصوصية عالية - طبيعي)
-                        if (cand.includes('.local')) {
-                            mdnsCount++;
-                            return;
-                        }
-
-                        const ipMatch = cand.match(/\b([0-9]{1,3}(\.[0-9]{1,3}){3})\b/);
-                        if (ipMatch) {
-                            const ip = ipMatch[1];
-                            const isPrivate = 
-                                ip.startsWith('10.') ||
-                                ip.startsWith('192.168.') ||
-                                ip.startsWith('169.254.') ||
-                                (ip.startsWith('172.') && (() => {
-                                    const second = parseInt(ip.split('.')[1]);
-                                    return second >= 16 && second <= 31;
-                                })());
-                            
-                            if (isPrivate) {
-                                localIPs.add(ip);
-                            } else if (!ip.startsWith('0.') && ip !== '0.0.0.0') {
-                                publicIPs.add(ip);
-                            }
-                        }
-                    };
-
-                    pc.createDataChannel('sectest');
-                    pc.createOffer()
-                        .then(o => pc.setLocalDescription(o))
-                        .catch(() => finish(false));
-                } catch (e) {
-                    clearTimeout(timer);
-                    finish(false);
-                }
-            });
-        }
-
-        // كشف Proxy عبر زمن الاستجابة
-        async function detectProxyLatency() {
-            try {
-                const samples = [];
-                
-                for (let i = 0; i < 3; i++) {
-                    const start = performance.now();
-                    try {
-                        await fetch('https://www.cloudflare.com/cdn-cgi/trace?nocache=' + Date.now(), {
-                            cache: 'no-store',
-                            mode: 'no-cors',
-                            signal: AbortSignal.timeout ? AbortSignal.timeout(2000) : undefined
-                        });
-                    } catch(e) {}
-                    samples.push(performance.now() - start);
-                }
-
-                const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
-                // إذا كان المعدل مرتفع جداً فهناك وسيط
-                return avg > 1800;
-            } catch(e) {
-                return false;
-            }
-        }
-
-        // كشف نوع الاتصال المشبوه
-        function detectConnectionAnomaly() {
-            try {
-                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                if (!conn) return false;
-
-                // أنواع غير معتادة تشير إلى VPN
-                if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') {
-                    if (conn.downlink && conn.downlink > 5) return true;
-                }
-
-                // سرعة منخفضة بشكل مشبوه مع نوع شبكة عالي
-                if (conn.effectiveType === '4g' && conn.downlink && conn.downlink < 0.5) {
-                    return true;
-                }
-
-                return false;
-            } catch(e) {
-                return false;
-            }
-        }
-
-        // كشف HTTPS Interception (Reqable)
-        async function detectSSLInterception() {
-            try {
-                // محاولة طلب مورد من دومين معروف
-                // إذا كان هناك اعتراض، عادة ما يفشل أو يتغير سلوكه
-                const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), 2500);
-                
-                try {
-                    const resp = await fetch('https://httpbin.org/get', {
-                        method: 'GET',
-                        cache: 'no-store',
-                        signal: controller.signal
-                    });
-                    clearTimeout(timer);
-                    
-                    if (resp.ok) {
-                        const data = await resp.json();
-                        // httpbin يعيد معلومات عن الاتصال
-                        // إذا كان هناك وسيط، قد تظهر معلومات غريبة
-                        if (data && data.headers) {
-                            const headers = data.headers;
-                            // ترويسات مشبوهة يضيفها الوسطاء
-                            if (headers['Via'] || headers['X-Forwarded-For'] || 
-                                headers['X-Proxy'] || headers['X-Cache']) {
-                                return true;
-                            }
-                        }
-                    }
-                } catch(e) {
-                    clearTimeout(timer);
-                }
-                
-                return false;
-            } catch(e) {
-                return false;
-            }
-        }
-
-        // الفحص الشامل
-        async function performSecurityScan() {
-            const results = await Promise.allSettled([
-                detectWebRTCVPN(),
-                detectProxyLatency(),
-                Promise.resolve(detectConnectionAnomaly()),
-                detectSSLInterception()
-            ]);
-
-            const threats = results.filter(r => 
-                r.status === 'fulfilled' && r.value === true
-            ).length;
-
-            // إذا تم اكتشاف تهديد واحد على الأقل
-            return threats >= 1;
-        }
-
-        // عرض شاشة الحماية
-        function showSecurityOverlay() {
-            const overlay = document.getElementById('securityShield');
-            const status = document.getElementById('shieldStatus');
-            const statusText = document.getElementById('shieldStatusText');
-            
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            status.classList.remove('scanning');
-            status.classList.add('threat');
-            statusText.textContent = 'تم اكتشاف تهديد أمني!';
-            securityThreatDetected = true;
-        }
-
-        // إخفاء شاشة الحماية
-        function hideSecurityOverlay() {
-            const overlay = document.getElementById('securityShield');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-            securityThreatDetected = false;
-        }
-
-        // إعادة الفحص عند الضغط على الزر
-        async function recheckSecurity() {
-            if (securityCheckRunning) return;
-            
-            const btn = document.getElementById('shieldRecheckBtn');
-            const btnIcon = document.getElementById('shieldBtnIcon');
-            const btnText = document.getElementById('shieldBtnText');
-            const status = document.getElementById('shieldStatus');
-            const statusText = document.getElementById('shieldStatusText');
-            
-            securityCheckRunning = true;
-            btn.disabled = true;
-            btnIcon.className = 'fa-solid fa-circle-notch';
-            btn.classList.add('loading');
-            btnText.textContent = 'جاري الفحص...';
-            
-            status.classList.remove('threat');
-            status.classList.add('scanning');
-            statusText.textContent = 'جاري فحص الاتصال من جديد...';
-
-            // انتظار قليل لعرض التحميل
-            await new Promise(r => setTimeout(r, 800));
-
-            const threat = await performSecurityScan();
-            
-            if (threat) {
-                status.classList.remove('scanning');
-                status.classList.add('threat');
-                statusText.textContent = 'لا يزال التهديد موجوداً!';
-            } else {
-                status.classList.remove('scanning', 'threat');
-                statusText.textContent = 'الاتصال آمن ✓';
-                
-                // إخفاء بعد لحظة
-                setTimeout(() => {
-                    hideSecurityOverlay();
-                }, 600);
-            }
-
-            btn.disabled = false;
-            btnIcon.className = 'fa-solid fa-rotate-right';
-            btn.classList.remove('loading');
-            btnText.textContent = 'إعادة الفحص';
-            securityCheckRunning = false;
-        }
-
-        // الفحص الأولي عند بدء التطبيق
-        async function initialSecurityCheck() {
-            const status = document.getElementById('shieldStatus');
-            const statusText = document.getElementById('shieldStatusText');
-            
-            status.classList.add('scanning');
-            statusText.textContent = 'جاري فحص الاتصال...';
-            
-            const threat = await performSecurityScan();
-            
-            if (threat) {
-                showSecurityOverlay();
-            } else {
-                hideSecurityOverlay();
-            }
-        }
-
-        // فحص دوري كل 8 ثواني للكشف الفوري عند تفعيل Reqable
-        setInterval(async () => {
-            if (securityCheckRunning) return;
-            
-            // فحص فقط إذا كانت الشاشة مخفية
-            if (!securityThreatDetected) {
-                const threat = await performSecurityScan();
-                if (threat) {
-                    showSecurityOverlay();
-                }
-            }
-        }, 8000);
-
-        /* ================================================================ */
-
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
 
@@ -3563,11 +3507,6 @@
                     }
                 }
             });
-
-            // تشغيل الفحص الأمني عند فتح التطبيق
-            setTimeout(() => {
-                initialSecurityCheck();
-            }, 1200);
         });
     </script>
 </body>
