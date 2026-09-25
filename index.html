@@ -1220,7 +1220,7 @@
 
         #pane-news.active { display: block; }
 
-        /* ===== قسم المسلسلات - ملء الشاشة مع السيرفر ===== */
+        /* ===== قسم المسلسلات بملء الشاشة ===== */
         #pane-series {
             position: fixed;
             top: 0;
@@ -1237,14 +1237,14 @@
 
         #pane-series.active { display: block; }
 
-        .series-server-iframe {
+        #pane-series iframe {
             width: 100%;
             height: 100%;
             border: none;
             display: block;
-            background: var(--bg-base);
+            background: #030712;
         }
-        /* ================================================ */
+        /* ===================================== */
 
         .news-feed-container {
             width: 100%;
@@ -1591,17 +1591,11 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات: تم حذف المحتوى القديم وإضافة السيرفر بملء الشاشة ===== -->
+            <!-- ===== قسم المسلسلات: تم حذف المحتوى وإضافة iframe بملء الشاشة ===== -->
             <div id="pane-series" class="section-pane">
-                <iframe 
-                    class="series-server-iframe" 
-                    src="https://agi-rust.vercel.app/" 
-                    allowfullscreen
-                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+                <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
-            <!-- ============================================================================== -->
+            <!-- ================================================================ -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -2523,8 +2517,6 @@
                 if (currentCategory) closeCategory();
             } else if (index === 1) { 
                 fetchSchedule();
-            } else if (index === 2) { 
-                // قسم المسلسلات - السيرفر يعمل تلقائياً
             } else if (index === 3) { 
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
@@ -2532,10 +2524,6 @@
                 if (newsInterval) clearInterval(newsInterval);
             }
         }
-
-        // ==========================================
-        // 🛠️ تم إصلاح دوال الأخبار والترجمة هنا 🛠️
-        // ==========================================
 
         async function translateText(text) {
             if (!text) return "";
@@ -2700,10 +2688,6 @@
             if (slides[currentNewsIndex]) slides[currentNewsIndex].classList.add('active');
             if (dots[currentNewsIndex]) dots[currentNewsIndex].classList.add('active');
         }
-
-        // ==========================================
-        // نهاية قسم إصلاح الأخبار
-        // ==========================================
 
         function openLanguageSheet() {
             document.getElementById('languageOverlay').classList.add('active');
