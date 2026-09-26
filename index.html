@@ -1616,127 +1616,84 @@
             transform: scale(0.97);
         }
 
-        /* ============================================== */
-        /* ===== شاشة الحماية الأمنية (Reqable/VPN) ===== */
-        /* ============================================== */
+        /* ==================== شاشة الحماية الأمنية ==================== */
         .security-overlay {
+            display: none;
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(239, 68, 68, 0.08) 0%, rgba(3, 7, 18, 0.98) 55%);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(3, 7, 18, 0.96);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             z-index: 999999;
-            display: none;
             align-items: center;
             justify-content: center;
-            padding: 22px;
-            direction: rtl;
+            padding: 20px;
+            animation: fadeInSec 0.25s ease;
         }
-        .security-overlay.active,
-        html.security-threat .security-overlay {
-            display: flex !important;
+        .security-overlay.active {
+            display: flex;
         }
-        html.security-threat .app-container,
-        html.security-threat .bottom-dock,
-        html.security-threat .video-modal,
-        html.security-threat .tg-popup-overlay,
-        html.security-threat .language-overlay,
-        html.security-threat .language-sheet,
-        html.security-threat .share-overlay,
-        html.security-threat .share-sheet {
-            display: none !important;
+        @keyframes fadeInSec {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .security-card {
-            background: linear-gradient(150deg, #0f172a 0%, #0b1121 100%);
-            border: 1px solid rgba(239, 68, 68, 0.28);
-            border-radius: 30px;
-            padding: 36px 24px 26px;
+            background: linear-gradient(145deg, #0f172a, #0b1121);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 28px;
+            padding: 34px 22px 26px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 
-                0 25px 70px -10px rgba(0, 0, 0, 0.85), 
-                0 0 45px rgba(239, 68, 68, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.04);
-            animation: secCardIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.9), 0 0 60px rgba(239, 68, 68, 0.15);
+            transform: translateY(15px) scale(0.96);
+            animation: popInSec 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .security-card::before {
-            content: '';
-            position: absolute;
-            top: -60px; right: -60px;
-            width: 160px; height: 160px;
-            background: #ef4444;
-            filter: blur(70px);
-            opacity: 0.15;
-            pointer-events: none;
-        }
-        @keyframes secCardIn {
-            from { opacity: 0; transform: translateY(25px) scale(0.94); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes popInSec {
+            to { transform: translateY(0) scale(1); }
         }
         .sec-shield {
-            width: 92px;
-            height: 92px;
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 22px;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(220, 38, 38, 0.08));
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 22px;
-            border: 2px solid rgba(239, 68, 68, 0.35);
-            animation: secPulse 2s infinite ease-in-out;
-            position: relative;
-            z-index: 1;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.55), inset 0 -4px 10px rgba(0,0,0,0.3);
+            animation: shieldPulse 1.8s infinite;
         }
-        @keyframes secPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45), inset 0 0 20px rgba(239, 68, 68, 0.1); }
-            50%      { box-shadow: 0 0 0 18px rgba(239, 68, 68, 0), inset 0 0 30px rgba(239, 68, 68, 0.25); }
+        @keyframes shieldPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(239, 68, 68, 0.55), inset 0 -4px 10px rgba(0,0,0,0.3); }
+            50% { transform: scale(1.06); box-shadow: 0 0 60px rgba(239, 68, 68, 0.75), inset 0 -4px 10px rgba(0,0,0,0.3); }
         }
         .sec-shield i {
             font-size: 2.6rem;
-            color: #ef4444;
-            filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.7));
-            animation: secShake 1.8s infinite;
-        }
-        @keyframes secShake {
-            0%, 100%, 90% { transform: rotate(0deg); }
-            92% { transform: rotate(-6deg); }
-            94% { transform: rotate(6deg); }
-            96% { transform: rotate(-4deg); }
-            98% { transform: rotate(4deg); }
+            color: #fff;
         }
         .sec-title {
             font-size: 1.4rem;
             font-weight: 800;
             color: #ffffff;
             margin-bottom: 14px;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff, #fca5a5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: -0.3px;
         }
         .sec-msg {
-            font-size: 0.85rem;
+            font-size: 0.86rem;
             color: #94a3b8;
-            line-height: 1.95;
+            line-height: 1.9;
             margin-bottom: 26px;
             font-weight: 500;
-            padding: 0 6px;
-            text-align: center;
+            padding: 0 4px;
         }
-        .sec-msg .line { display: block; }
-        .sec-msg .gap { display: block; height: 10px; }
-        .sec-msg .highlight { color: #fca5a5; font-weight: 700; }
         .sec-btn {
             width: 100%;
-            background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
-            color: #ffffff;
+            padding: 15px;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
             border: none;
-            padding: 16px;
             border-radius: 16px;
+            color: #ffffff;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
@@ -1745,38 +1702,31 @@
             justify-content: center;
             gap: 10px;
             font-family: 'Alexandria', sans-serif;
-            box-shadow: 0 10px 28px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 1;
+        }
+        .sec-btn i {
+            font-size: 1rem;
         }
         .sec-btn:active {
             transform: scale(0.97);
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.5);
-        }
-        .sec-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-        .sec-btn i {
-            font-size: 1.05rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.45);
         }
         .sec-note {
+            margin-top: 20px;
             font-size: 0.72rem;
             color: #64748b;
-            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
             font-weight: 600;
-            letter-spacing: 0.2px;
         }
         .sec-note i {
-            color: #38bdf8;
-            font-size: 0.75rem;
+            color: #22c55e;
+            font-size: 0.8rem;
         }
-        /* ============================================== */
+        /* ============================================================ */
 
         @media (max-width: 480px) {
             .player-btn {
@@ -1803,97 +1753,24 @@
         } else {
             document.documentElement.classList.add('fonts-loaded');
         }
-
-        // ============================================================
-        // ===== كشف Reqable / VPN — دقيق جداً (بدون إنذارات كاذبة) =====
-        // ============================================================
-        (function () {
-            // دالة الكشف الدقيقة — تتحقق فقط من البصمات المؤكدة لـ Reqable
-            function checkNow() {
-                // 1) الكائنات العامة التي يحقنها Reqable تحديداً في صفحة الويب
-                try {
-                    if (window.Reqable === true || window.__REQABLE__ === true || window.__reqable__ === true) return true;
-                    if (window.ReqableProxy || window.ReqableAndroid || window.ReqableClient) return true;
-                    if (window.__REQABLE_PROXY__ || window.__REQABLE_INJECT__) return true;
-                } catch (e) {}
-
-                // 2) بصمة User-Agent (خاصة بـ Reqable فقط)
-                try {
-                    var ua = (navigator.userAgent || '').toLowerCase();
-                    if (ua.indexOf('reqable') > -1) return true;
-                } catch (e) {}
-
-                // 3) عناصر DOM يحقنها Reqable في الصفحة
-                try {
-                    if (document.querySelector) {
-                        if (document.querySelector('[data-reqable]')) return true;
-                        if (document.querySelector('meta[name="reqable" i]')) return true;
-                        if (document.getElementById('reqable-inject')) return true;
-                    }
-                } catch (e) {}
-
-                // 4) كائنات خاصة على document
-                try {
-                    if (document.__reqableInjected || document.reqableInjected) return true;
-                } catch (e) {}
-
-                return false;
-            }
-
-            // الفحص المتزامن الأول (فوري 0ms)
-            if (checkNow()) {
-                document.documentElement.classList.add('security-threat');
-                window.__instantThreatDetected = true;
-            } else {
-                // فحص سريع جداً خلال أول ثانية (Reqable يحقن JS بعد التحميل بقليل)
-                var fastTicks = 0;
-                var fastInterval = setInterval(function () {
-                    fastTicks++;
-                    if (checkNow()) {
-                        clearInterval(fastInterval);
-                        document.documentElement.classList.add('security-threat');
-                        window.__instantThreatDetected = true;
-                    } else if (fastTicks >= 20) {
-                        clearInterval(fastInterval);
-                    }
-                }, 100);
-
-                // فحص دوري بطيء لالتقاط تشغيل Reqable لاحقاً
-                setInterval(function () {
-                    if (checkNow()) {
-                        document.documentElement.classList.add('security-threat');
-                        window.__instantThreatDetected = true;
-                    }
-                }, 2000);
-            }
-
-            window.__checkThreatNow = checkNow;
-        })();
-        // ============================================================
     </script>
 </head>
 <body>
 
-    <!-- ================= شاشة الحماية الأمنية (Reqable/VPN) ================= -->
+    <!-- ==================== شاشة الحماية الأمنية ==================== -->
     <div class="security-overlay" id="securityOverlay">
         <div class="security-card">
             <div class="sec-shield"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h2 class="sec-title">⚠️ تنبيه أمني</h2>
-            <p class="sec-msg">
-                <span class="line">تم اكتشاف اتصال <span class="highlight">VPN</span> أو تطبيق <span class="highlight">Reqable</span> يعمل على جهازك</span>
-                <span class="gap"></span>
-                <span class="line">لحماية البث وضمان استمرار التشغيل بشكل طبيعي</span>
-                <span class="line">يرجى إغلاق تطبيق <span class="highlight">Reqable</span> أو إيقاف اتصال <span class="highlight">VPN</span></span>
-                <span class="line">ثم إعادة المحاولة</span>
-            </p>
-            <button class="sec-btn" id="secRecheckBtn" onclick="recheckSecurity()">
+            <h2 class="sec-title" data-i18n="sec_title">تنبيه أمني</h2>
+            <p class="sec-msg" data-i18n="sec_msg">تم اكتشاف تطبيق Reqable أو اتصال VPN مشبوه على جهازك. لحماية روابط البث، يرجى إغلاق أو حذف التطبيق أو إيقاف الـVPN ثم إعادة الفحص للمتابعة</p>
+            <button class="sec-btn" onclick="recheckSecurity()">
                 <i class="fa-solid fa-rotate-right"></i>
-                <span>إعادة الفحص</span>
+                <span data-i18n="sec_recheck">إعادة الفحص</span>
             </button>
-            <div class="sec-note"><i class="fa-solid fa-lock"></i> <span>نجم الشاشات محمي</span></div>
+            <div class="sec-note"><i class="fa-solid fa-lock"></i> <span data-i18n="sec_note">نجم الشاشات محمي</span></div>
         </div>
     </div>
-    <!-- ====================================================================== -->
+    <!-- ============================================================ -->
 
     <div class="app-container">
 
@@ -2279,95 +2156,144 @@
     </div>
 
     <script>
-        // ============================================================
-        // ============  شاشة الحماية الأمنية (Reqable/VPN)  ==========
-        // ============================================================
-        let securityBlocked = !!window.__instantThreatDetected;
+        // ==================================================================
+        // ===============  نظام الحماية الأمنية (Security Shield)  =========
+        // ==================================================================
+        let securityBlocked = false;
 
-        // فحص شامل (لا يعتمد على الشبكة إطلاقاً — لمنع الإنذارات الكاذبة)
-        function deepSecurityCheck() {
+        // كشف التطبيقات المشبوهة (Reqable / Canary / Charles / Mitmproxy / Fiddler / VPN)
+        async function detectSecurityThreat() {
             try {
-                if (typeof window.__checkThreatNow === 'function') {
-                    return window.__checkThreatNow();
-                }
-            } catch (e) {}
-            return false;
-        }
-
-        function activateSecurityOverlay() {
-            securityBlocked = true;
-            document.documentElement.classList.add('security-threat');
-            const overlay = document.getElementById('securityOverlay');
-            if (overlay) overlay.classList.add('active');
-            const tg = document.getElementById('tgPopupOverlay');
-            if (tg) tg.classList.remove('active');
-            try {
-                const v = document.getElementById('videoPlayer');
-                if (v) v.pause();
-            } catch (e) {}
-        }
-
-        function deactivateSecurityOverlay() {
-            securityBlocked = false;
-            document.documentElement.classList.remove('security-threat');
-            const overlay = document.getElementById('securityOverlay');
-            if (overlay) overlay.classList.remove('active');
-        }
-
-        function runSecurityCheck() {
-            const isThreat = deepSecurityCheck();
-            if (isThreat) {
-                activateSecurityOverlay();
-            } else {
-                deactivateSecurityOverlay();
-            }
-            return !isThreat;
-        }
-
-        function recheckSecurity() {
-            const btn = document.getElementById('secRecheckBtn');
-            if (btn) {
-                btn.disabled = true;
-                const span = btn.querySelector('span');
-                if (span) span.textContent = 'جاري إعادة الفحص...';
-            }
-
-            // مهلة صغيرة ليغلق المستخدم Reqable
-            setTimeout(function () {
-                const ok = runSecurityCheck();
-
-                if (btn) {
-                    btn.disabled = false;
-                    const span = btn.querySelector('span');
-                    if (span) span.textContent = 'إعادة الفحص';
+                // 1) فحص نوع الاتصال (VPN)
+                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (conn && (conn.type === 'vpn' || conn.type === 'VPN')) {
+                    return true;
                 }
 
-                if (ok) {
-                    deactivateSecurityOverlay();
-                    // إظهار نافذة التلغرام لاحقاً
-                    setTimeout(function () {
-                        const tg = document.getElementById('tgPopupOverlay');
-                        if (tg && !securityBlocked) {
-                            tg.classList.add('active');
-                        }
-                    }, 400);
-                }
-            }, 700);
-        }
+                // 2) فحص الاستجابة بحثاً عن بروكسي MITM
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 2500);
+                const probeUrl = window.location.origin + window.location.pathname + '?_sec_probe=' + Date.now();
 
-        // ============================================================
-        // ================== فحص دوري في الخلفية =====================
-        // ============================================================
-        setInterval(function () {
-            try {
-                if (typeof window.__checkThreatNow === 'function' && window.__checkThreatNow()) {
-                    if (!securityBlocked) {
-                        activateSecurityOverlay();
+                const res = await fetch(probeUrl, {
+                    method: 'HEAD',
+                    cache: 'no-store',
+                    signal: controller.signal
+                }).catch(() => null);
+                clearTimeout(timer);
+
+                if (res && res.headers) {
+                    // فحص الهيدرات التي تضاف عادة من بروكسيات التقاط الشبكة
+                    const proxyHeaders = [
+                        'x-forwarded-for', 'via', 'x-proxy-id',
+                        'x-reqable', 'x-charles', 'x-mitmproxy',
+                        'x-canary', 'x-fiddler', 'proxy-connection'
+                    ];
+                    for (const h of proxyHeaders) {
+                        if (res.headers.get(h)) return true;
+                    }
+                    // فحص السيرفر
+                    const serverHdr = (res.headers.get('server') || '').toLowerCase();
+                    if (serverHdr.includes('reqable') || serverHdr.includes('charles') ||
+                        serverHdr.includes('mitm') || serverHdr.includes('canary') ||
+                        serverHdr.includes('fiddler')) {
+                        return true;
                     }
                 }
-            } catch (e) {}
-        }, 2000);
-        // ============================================================
+
+                // 3) فحص أداء الاتصال - التوقيتات غير الطبيعية تشير إلى اعتراض (Canary/Reqable)
+                const t0 = performance.now();
+                await fetch(window.location.origin + '/favicon.ico?_=' + Date.now(), {
+                    method: 'HEAD',
+                    cache: 'no-store',
+                    mode: 'no-cors'
+                }).catch(() => {});
+                const elapsed = performance.now() - t0;
+
+                // إذا كانت الاستجابة أسرع من 1ms فهذا مؤشر على اعتراض محلي (Cache محلي للبروكسي)
+                // ملاحظة: هذا فحص مساعد ولا يعني بالضرورة وجود تهديد
+                // (تم تعطيله لأنّ بعض الشبكات السريعة قد تعطي نتائج خاطئة)
+
+                return false;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // إظهار شاشة الحماية
+        function showSecurityOverlay() {
+            securityBlocked = true;
+            const overlay = document.getElementById('securityOverlay');
+            if (overlay) {
+                overlay.classList.add('active');
+            }
+            document.body.style.overflow = 'hidden';
+        }
+
+        // إخفاء شاشة الحماية
+        function hideSecurityOverlay() {
+            securityBlocked = false;
+            const overlay = document.getElementById('securityOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            document.body.style.overflow = '';
+        }
+
+        // الفحص الفوري - يُنفّذ مباشرة عند فتح التطبيق
+        async function runSecurityCheck() {
+            const isThreat = await detectSecurityThreat();
+            if (isThreat) {
+                showSecurityOverlay();
+            } else {
+                hideSecurityOverlay();
+            }
+        }
+
+        // زر إعادة الفحص
+        async function recheckSecurity() {
+            const isThreat = await detectSecurityThreat();
+            if (isThreat) {
+                // يبقى محظوراً
+                showSecurityOverlay();
+            } else {
+                hideSecurityOverlay();
+                if (typeof showToast === 'function') {
+                    showToast('✓ الجهاز آمن، يمكنك المتابعة');
+                }
+            }
+        }
+
+        // تنفيذ الفحص فوراً (بدون انتظار أي حدث)
+        (function immediateSecurityCheck() {
+            // تشغيل الفحص الفوري قبل أي شيء
+            const initialCheck = detectSecurityThreat();
+            
+            // إظهار الشاشة مباشرة إذا كان الفحص متزامناً
+            if (typeof initialCheck === 'boolean' && initialCheck) {
+                // ننتظر DOM
+                document.addEventListener('DOMContentLoaded', showSecurityOverlay);
+            } else if (initialCheck && typeof initialCheck.then === 'function') {
+                initialCheck.then(threat => {
+                    if (threat) {
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', showSecurityOverlay);
+                        } else {
+                            showSecurityOverlay();
+                        }
+                    }
+                });
+            }
+
+            // فحص دوري كل ثانية لضمان الحماية المستمرة
+            setInterval(async () => {
+                const t = await detectSecurityThreat();
+                if (t && !securityBlocked) {
+                    showSecurityOverlay();
+                }
+            }, 1000);
+        })();
+        // ==================================================================
 
         const categoriesData = {
             mbc: {
@@ -3167,7 +3093,6 @@
         };
 
         function switchPane(index) {
-            if (securityBlocked) return;
             if (document.getElementById('videoModal').classList.contains('active')) {
                 closeVideoPlayer();
             }
@@ -3357,7 +3282,6 @@
         }
 
         function openLanguageSheet() {
-            if (securityBlocked) return;
             document.getElementById('languageOverlay').classList.add('active');
             document.getElementById('languageSheet').classList.add('active');
             updateLanguageSelection();
@@ -3389,7 +3313,6 @@
         }
 
         function openShareSheet() {
-            if (securityBlocked) return;
             document.getElementById('shareOverlay').classList.add('active');
             document.getElementById('shareSheet').classList.add('active');
         }
@@ -3640,7 +3563,7 @@
         function initTelegramPopup() {
             setTimeout(() => {
                 const overlay = document.getElementById('tgPopupOverlay');
-                if (overlay && !securityBlocked) overlay.classList.add('active');
+                if (overlay) overlay.classList.add('active');
             }, 50);
         }
 
@@ -3654,17 +3577,9 @@
             closeTelegramPopup();
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
-
-            // إذا كان التهديد مكتشفاً مسبقاً، فعّل الشاشة فوراً
-            if (window.__instantThreatDetected) {
-                activateSecurityOverlay();
-            }
-
-            if (!securityBlocked) {
-                initTelegramPopup();
-            }
+            initTelegramPopup();
             
             loadXtreamChannels();
 
