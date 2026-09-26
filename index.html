@@ -13,8 +13,12 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <style>
-        html { visibility: hidden; }
-        html.fonts-loaded { visibility: visible; }
+        html {
+            visibility: hidden;
+        }
+        html.fonts-loaded {
+            visibility: visible;
+        }
 
         :root {
             --bg-base: #030712;
@@ -31,187 +35,27 @@
         }
 
         html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             background-color: var(--bg-base);
             overflow: hidden;
             -webkit-text-size-adjust: 100%;
         }
 
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Alexandria', sans-serif;
             font-weight: 600;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ==================== شاشة الحماية الأمنية ==================== */
-        .security-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(239, 68, 68, 0.12), transparent 60%),
-                        radial-gradient(circle at 50% 80%, rgba(99, 102, 241, 0.12), transparent 60%),
-                        rgba(3, 7, 18, 0.98);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            z-index: 999999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        .security-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .security-card {
-            background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(8, 12, 24, 0.98));
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            border-radius: 32px;
-            padding: 42px 26px 30px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow:
-                0 25px 60px -12px rgba(0, 0, 0, 0.85),
-                0 0 70px rgba(239, 68, 68, 0.18),
-                inset 0 1px 0 rgba(255, 255, 255, 0.06);
-            animation: secCardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes secCardEnter {
-            0% { opacity: 0; transform: translateY(24px) scale(0.94); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .sec-shield {
-            width: 96px; height: 96px;
-            margin: 0 auto 24px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sec-shield .sec-shield-core {
-            width: 76px; height: 76px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 3;
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
-            animation: secShieldPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes secShieldPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .sec-shield-core i {
-            color: #ffffff;
-            font-size: 2.2rem;
-        }
-
-        .sec-shield-ring {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            border: 2px solid rgba(239, 68, 68, 0.4);
-            animation: secRingExpand 2s ease-out infinite;
-        }
-        .sec-shield-ring:nth-child(2) { animation-delay: 0.7s; }
-        .sec-shield-ring:nth-child(3) { animation-delay: 1.4s; }
-
-        @keyframes secRingExpand {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        .sec-title {
-            font-size: 1.35rem;
-            font-weight: 900;
-            color: #ffffff;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .sec-title i { color: #ef4444; font-size: 1.1rem; }
-
-        .sec-msg {
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            line-height: 1.85;
-            margin-bottom: 26px;
-            font-weight: 500;
-            padding: 0 6px;
-        }
-        .sec-msg strong { color: #f87171; font-weight: 800; }
-
-        .sec-btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 18px;
-            border: none;
-            background: linear-gradient(135deg, #6366f1, #38bdf8);
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: 800;
-            font-family: 'Alexandria', sans-serif;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-            transition: all 0.25s ease;
-        }
-        .sec-btn:active { transform: scale(0.97); }
-        .sec-btn.loading i { animation: secSpin 0.8s linear infinite; }
-        @keyframes secSpin { to { transform: rotate(360deg); } }
-
-        .sec-note {
-            margin-top: 20px;
-            padding-top: 18px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 0.72rem;
-            color: #64748b;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .sec-note i { color: #6366f1; font-size: 0.75rem; }
-
-        .security-card.shake {
-            animation: secShake 0.55s cubic-bezier(.36,.07,.19,.97);
-        }
-        @keyframes secShake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-7px, 0, 0); }
-            40%, 60% { transform: translate3d(7px, 0, 0); }
-        }
-
-        body.security-active .app-container {
-            pointer-events: none;
-            filter: blur(6px) grayscale(0.5);
-            transition: filter 0.3s ease;
-        }
-        /* ============================================================ */
-
         .app-container {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             background-color: var(--bg-base);
             position: relative;
             display: flex;
@@ -230,20 +74,79 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .viewport-area::-webkit-scrollbar { display: none; }
+
+        .viewport-area::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            background: transparent;
+        }
 
         .section-pane {
             display: none;
             opacity: 0;
             transform: translateY(12px) scale(0.98);
         }
+
         .section-pane.active {
             display: block;
             animation: paneEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+
         @keyframes paneEnter {
             from { opacity: 0; transform: translateY(15px) scale(0.97); }
             to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .hero-banner {
+            width: 100%;
+            height: 185px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.1)), var(--surface-glass);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 120px; height: 120px;
+            background: var(--accent-primary);
+            filter: blur(50px);
+            opacity: 0.3;
+        }
+
+        .hero-badge {
+            position: absolute;
+            top: 16px; right: 18px;
+            background: rgba(99, 102, 241, 0.25);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
+        }
+
+        .hero-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .pane-header-title {
@@ -256,12 +159,60 @@
             color: var(--text-main);
         }
 
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .grid-card {
+            background: var(--surface-glass);
+            border-radius: 24px;
+            padding: 20px 16px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-card:hover {
+            background: var(--surface-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.12);
+        }
+
+        .grid-card i {
+            font-size: 1.8rem;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .grid-card h3 {
+            font-size: 0.92rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .grid-card p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
         .stack-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
         }
+
         .stack-item {
             display: flex;
             align-items: center;
@@ -273,9 +224,15 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .stack-item:hover { background: var(--surface-hover); transform: translateX(-3px); }
+
+        .stack-item:hover {
+            background: var(--surface-hover);
+            transform: translateX(-3px);
+        }
+
         .stack-icon-box {
-            width: 48px; height: 48px;
+            width: 48px;
+            height: 48px;
             border-radius: 16px;
             background: rgba(99, 102, 241, 0.1);
             color: var(--accent-primary);
@@ -285,22 +242,29 @@
             font-size: 1.2rem;
             flex-shrink: 0;
         }
+
         .stack-info-box {
-            flex: 1; min-width: 0;
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+
         .stack-item-title {
             font-size: 0.92rem;
             font-weight: 800;
             margin-bottom: 3px;
             color: var(--text-main);
+            line-height: 1.3;
         }
+
         .stack-item-sub {
             font-size: 0.74rem;
             color: var(--text-muted);
             font-weight: 500;
+            line-height: 1.3;
+            display: block;
         }
 
         .categories-grid {
@@ -309,6 +273,7 @@
             gap: 16px 12px;
             margin-bottom: 24px;
         }
+
         .category-card {
             display: flex;
             flex-direction: column;
@@ -319,7 +284,11 @@
             background: transparent;
             border: none;
         }
-        .category-card:active { transform: scale(0.95); }
+
+        .category-card:active {
+            transform: scale(0.95);
+        }
+
         .category-icon-wrap {
             width: 100%;
             max-width: 80px;
@@ -329,20 +298,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 0; 
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.04);
             position: relative;
             overflow: hidden;
             margin: 0 auto;
         }
+
         .category-icon-img {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover; 
             border-radius: inherit; 
         }
+
+        /* شارة عدد قنوات Xtream */
         .category-count-badge {
             position: absolute;
-            top: 5px; right: 5px;
+            top: 5px;
+            right: 5px;
             background: linear-gradient(135deg, #6366f1, #38bdf8);
             color: #ffffff;
             font-size: 0.58rem;
@@ -350,15 +325,19 @@
             padding: 3px 7px;
             border-radius: 10px;
             z-index: 3;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.5);
             min-width: 22px;
             text-align: center;
+            letter-spacing: 0.2px;
         }
+
         .category-card-title {
             font-size: 0.72rem;
             font-weight: 700;
             color: var(--text-main);
             text-align: center;
             line-height: 1.4;
+            padding: 0 2px;
         }
 
         .channels-list-header {
@@ -367,8 +346,10 @@
             gap: 14px;
             margin-bottom: 20px;
         }
+
         .back-btn {
-            width: 44px; height: 44px;
+            width: 44px;
+            height: 44px;
             border-radius: 14px;
             background: var(--surface-glass);
             border: 1px solid var(--border-glass);
@@ -382,18 +363,26 @@
             backdrop-filter: blur(20px);
             flex-shrink: 0;
         }
-        .back-btn:active { transform: scale(0.92); background: var(--surface-hover); }
+
+        .back-btn:active {
+            transform: scale(0.92);
+            background: var(--surface-hover);
+        }
+
         .channels-list-title {
             font-size: 1.15rem;
             font-weight: 800;
             color: var(--text-main);
+            letter-spacing: -0.3px;
         }
+
         .channels-grid {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-bottom: 24px;
         }
+
         .channel-card {
             display: flex;
             align-items: center;
@@ -403,20 +392,27 @@
             border-radius: 20px;
             padding: 12px 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(20px);
             border: none;
             position: relative;
             overflow: hidden;
         }
+
         .channel-card:hover {
             transform: translateX(-4px);
             background: var(--surface-hover);
             box-shadow: 0 12px 28px rgba(99, 102, 241, 0.18);
+            border-color: var(--border-glow);
         }
-        .channel-card:active { transform: scale(0.98); }
+
+        .channel-card:active {
+            transform: scale(0.98);
+        }
+
         .channel-logo-wrap {
-            width: 62px; height: 62px;
+            width: 62px;
+            height: 62px;
             flex-shrink: 0;
             border-radius: 16px;
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(56, 189, 248, 0.05));
@@ -425,32 +421,55 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            border: none;
         }
+
+        .channel-logo-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15), transparent 65%);
+            pointer-events: none;
+        }
+
         .channel-logo-wrap img {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
             transition: transform 0.4s ease;
             position: relative;
             z-index: 1;
         }
-        .channel-card:hover .channel-logo-wrap img { transform: scale(1.1); }
+
+        .channel-card:hover .channel-logo-wrap img {
+            transform: scale(1.1);
+        }
+
         .channel-info {
-            flex: 1; min-width: 0;
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             gap: 4px;
             text-align: right;
             justify-content: center;
         }
+
         .channel-name {
             font-size: 0.8rem;
             font-weight: 800;
             color: var(--text-main);
+            line-height: 1.3;
+            letter-spacing: -0.2px;
+            padding: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .live-badge {
+            position: static;
             flex-shrink: 0;
             background: #ef4444;
             color: #ffffff;
@@ -461,15 +480,20 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            z-index: 3;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.45);
+            letter-spacing: 0.3px;
         }
+
         .live-badge::before {
             content: '';
-            width: 5px; height: 5px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: #ffffff;
             animation: pulseDot 1.2s infinite;
         }
+
         @keyframes pulseDot {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.35; transform: scale(0.85); }
@@ -484,20 +508,30 @@
             align-items: center;
             justify-content: center;
         }
-        .video-modal.active { display: flex; }
+
+        .video-modal.active {
+            display: flex;
+        }
+
         .video-player-container {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             position: relative;
             background: #000;
         }
+
         .video-element {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             background-color: #000000;
         }
+
         .player-top-bar {
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             padding: 15px 20px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
             display: flex;
@@ -507,9 +541,14 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .video-modal.show-controls .player-top-bar { opacity: 1; }
+
+        .video-modal.show-controls .player-top-bar {
+            opacity: 1;
+        }
+
         .player-back-btn {
-            width: 40px; height: 40px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: rgba(255,255,255,0.1);
             border: none;
@@ -520,11 +559,13 @@
             justify-content: center;
             backdrop-filter: blur(10px);
         }
+
         .player-channel-info {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .player-live-badge {
             background: #ef4444;
             color: white;
@@ -537,23 +578,29 @@
             gap: 6px;
             cursor: pointer;
         }
+
         .player-live-badge::before {
             content: '';
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             background: white;
             border-radius: 50%;
             animation: pulseDot 1.2s infinite;
         }
+
         .player-channel-name {
             color: white;
             font-weight: 700;
             font-size: 1rem;
         }
+
         .player-center-play {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 70px; height: 70px;
+            width: 70px;
+            height: 70px;
             background: rgba(0,0,0,0.6);
             border-radius: 50%;
             display: flex;
@@ -561,22 +608,41 @@
             justify-content: center;
             cursor: pointer;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.2s ease;
             z-index: 5;
             border: 2px solid rgba(255,255,255,0.2);
         }
-        .player-center-play.show { opacity: 1; }
-        .player-center-play i { color: white; font-size: 1.8rem; margin-right: -4px; }
+
+        .player-center-play.show {
+            opacity: 1;
+        }
+
+        .player-center-play:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        .player-center-play i {
+            color: white;
+            font-size: 1.8rem;
+            margin-right: -4px;
+        }
+
         .player-controls {
             position: absolute;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
             padding: 20px 20px 35px;
             z-index: 10;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .video-modal.show-controls .player-controls { opacity: 1; }
+
+        .video-modal.show-controls .player-controls {
+            opacity: 1;
+        }
+
         .player-progress-container {
             width: 100%;
             height: 5px;
@@ -586,26 +652,51 @@
             cursor: pointer;
             position: relative;
         }
+
         .player-progress-bar {
             height: 100%;
             background: var(--accent-secondary);
             border-radius: 3px;
             width: 0%;
+            position: relative;
             transition: width 0.1s linear;
         }
+
+        .player-progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .player-progress-container:hover .player-progress-bar::after {
+            opacity: 1;
+        }
+
         .player-controls-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 15px;
         }
+
         .player-controls-left, .player-controls-right {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .player-btn {
-            width: 42px; height: 42px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.1);
@@ -617,15 +708,25 @@
             backdrop-filter: blur(10px);
             transition: all 0.2s ease;
         }
-        .player-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
-        .player-btn i { font-size: 1.1rem; }
+
+        .player-btn:active {
+            transform: scale(0.9);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .player-btn i {
+            font-size: 1.1rem;
+        }
+
         .player-time {
             color: white;
             font-size: 0.85rem;
             font-weight: 600;
+            font-variant-numeric: tabular-nums;
             min-width: 45px;
             text-align: center;
         }
+
         .player-popup {
             position: absolute;
             bottom: 90px;
@@ -633,6 +734,7 @@
             transform: translateX(-50%) translateY(20px);
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-glass);
             border-radius: 16px;
             padding: 16px;
@@ -640,13 +742,16 @@
             z-index: 20;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
+
         .player-popup.active {
             opacity: 1;
             pointer-events: all;
             transform: translateX(-50%) translateY(0);
         }
+
         .popup-header {
             display: flex;
             justify-content: space-between;
@@ -655,18 +760,31 @@
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-glass);
         }
-        .popup-header span { color: white; font-weight: 700; font-size: 0.9rem; }
+
+        .popup-header span {
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
         .popup-header button {
             background: transparent;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            width: 28px; height: 28px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+
+        .popup-header button:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
         .popup-options {
             display: flex;
             flex-direction: column;
@@ -674,6 +792,15 @@
             max-height: 200px;
             overflow-y: auto;
         }
+
+        .popup-options::-webkit-scrollbar {
+            width: 4px;
+        }
+        .popup-options::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+
         .popup-option {
             display: flex;
             align-items: center;
@@ -685,48 +812,75 @@
             cursor: pointer;
             transition: background 0.2s;
         }
+
         .popup-option:hover, .popup-option.active {
             background: rgba(99, 102, 241, 0.25);
             color: var(--accent-secondary);
         }
+
+        .popup-option i {
+            font-size: 0.8rem;
+        }
+
         .player-loading {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             z-index: 8;
         }
+
         .player-loading-spinner {
-            width: 50px; height: 50px;
+            width: 50px;
+            height: 50px;
             border: 3px solid rgba(255,255,255,0.1);
             border-top-color: var(--accent-secondary);
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         .volume-container {
             position: relative;
             display: flex;
             align-items: center;
         }
+
         .volume-slider {
             width: 0;
             height: 4px;
             background: rgba(255,255,255,0.3);
             border-radius: 2px;
+            margin-right: 0;
             transition: width 0.3s ease;
             cursor: pointer;
             overflow: hidden;
         }
-        .volume-container:hover .volume-slider { width: 70px; margin-right: 8px; }
-        .volume-level { height: 100%; background: white; width: 70%; border-radius: 2px; }
+
+        .volume-container:hover .volume-slider {
+            width: 70px;
+            margin-right: 8px;
+        }
+
+        .volume-level {
+            height: 100%;
+            background: white;
+            width: 70%;
+            border-radius: 2px;
+        }
 
         .bottom-dock {
             position: absolute;
-            bottom: 15px; left: 15px; right: 15px;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
             height: 68px;
             background: rgba(15, 20, 30, 0.85); 
             backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -736,6 +890,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); 
             border: 1px solid rgba(255, 255, 255, 0.06); 
         }
+
         .dock-tab-btn {
             display: flex;
             flex-direction: column;
@@ -745,58 +900,76 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
             height: 56px;
             border-radius: 28px; 
+            position: relative;
             margin: 0 2px;
         }
+
         .dock-tab-btn i {
             font-size: 1.15rem;
             margin-bottom: 3px;
-            transition: transform 0.35s ease;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
         }
+
         .dock-tab-btn span {
             font-size: 0.6rem;
             font-weight: 700;
+            transition: opacity 0.3s ease;
             color: var(--text-muted);
         }
+
         .dock-tab-btn.active {
             color: var(--accent-secondary);
             background: rgba(0, 0, 0, 0.45); 
         }
+
         .dock-tab-btn.active i {
-            transform: scale(1.1);
+            transform: translateY(-1px) scale(1.1);
+            color: var(--accent-secondary);
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+        }
+
+        .dock-tab-btn.active span {
             color: var(--accent-secondary);
         }
-        .dock-tab-btn.active span { color: var(--accent-secondary); }
 
-        .language-overlay, .share-overlay {
+        .language-overlay {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
         }
-        .language-overlay.active, .share-overlay.active { display: block; }
+
+        .language-overlay.active { display: block; }
+
         .language-sheet {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: var(--bg-base);
             border-radius: 20px 20px 0 0;
             padding: 12px 20px 40px;
             z-index: 1001;
             transform: translateY(100%);
-            transition: transform 0.35s ease;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             border-top: 1px solid var(--border-glass);
         }
+
         .language-sheet.active { transform: translateY(0); }
+
         .sheet-handle {
-            width: 40px; height: 4px;
+            width: 40px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 2px;
             margin: 0 auto 20px;
         }
+
         .sheet-title {
             font-size: 1.15rem;
             font-weight: 800;
@@ -804,6 +977,7 @@
             margin-bottom: 18px;
             text-align: right;
         }
+
         .sheet-language-option {
             display: flex;
             align-items: center;
@@ -812,53 +986,85 @@
             margin-bottom: 10px;
             border-radius: 14px;
             cursor: pointer;
+            transition: all 0.3s ease;
             background: var(--surface-glass);
             border: 1px solid var(--border-glass);
         }
+
         .sheet-language-option.selected {
             background: var(--surface-hover);
             border-color: var(--accent-primary);
         }
+
         .sheet-language-option-text {
             font-size: 1.05rem;
             font-weight: 700;
             color: var(--text-main);
         }
+
         .sheet-radio {
-            width: 26px; height: 26px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
             border: 2px solid var(--text-muted);
             background: transparent;
+            transition: all 0.3s ease;
         }
+
         .sheet-language-option.selected .sheet-radio {
             border-color: var(--accent-primary);
             background: var(--accent-primary);
         }
-        .sheet-radio-check { display: none; color: #ffffff; font-size: 0.75rem; }
+
+        .sheet-radio-check {
+            display: none;
+            color: #ffffff;
+            font-size: 0.75rem;
+        }
+
         .sheet-language-option.selected .sheet-radio-check { display: block; }
+
+        .share-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+        }
+
+        .share-overlay.active { display: block; }
 
         .share-sheet {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: #0a0f1c;
             border-radius: 24px 24px 0 0;
             padding: 18px 18px 24px;
             z-index: 2001;
             transform: translateY(100%);
-            transition: transform 0.35s ease;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             max-height: 92vh;
             overflow-y: auto;
             scrollbar-width: none;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
         }
+
         .share-sheet::-webkit-scrollbar { display: none; }
         .share-sheet.active { transform: translateY(0); }
+
         .share-close-btn {
             position: absolute;
-            top: 16px; left: 16px;
-            width: 36px; height: 36px;
+            top: 16px;
+            left: 16px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: transparent;
             border: none;
@@ -869,6 +1075,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .share-sheet-title {
             font-size: 1.5rem;
             font-weight: 800;
@@ -876,38 +1083,52 @@
             margin-top: 30px;
             margin-bottom: 8px;
             text-align: center;
+            letter-spacing: -0.5px;
         }
+
         .share-sheet-subtitle {
             font-size: 0.82rem;
             color: var(--text-muted);
             text-align: center;
             margin-bottom: 22px;
+            font-weight: 500;
+            line-height: 1.5;
         }
+
         .share-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 18px 10px;
             margin-bottom: 22px;
+            padding: 0 4px;
         }
+
         .share-grid-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            transition: transform 0.2s ease;
             width: calc(25% - 10px);
             max-width: 80px;
         }
+
+        .share-grid-item:active { transform: scale(0.9); }
+
         .share-grid-icon {
-            width: 58px; height: 58px;
+            width: 58px;
+            height: 58px;
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.7rem;
             color: #ffffff;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
         }
+
         .share-grid-icon.instagram { background: linear-gradient(45deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%); }
         .share-grid-icon.facebook { background: #1877f2; }
         .share-grid-icon.whatsapp { background: #25d366; }
@@ -915,18 +1136,23 @@
         .share-grid-icon.email { background: #1e88e5; }
         .share-grid-icon.viber { background: #7360f2; }
         .share-grid-icon.telegram { background: #229ED9; }
+
         .share-grid-item span {
             font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-main);
             text-align: center;
+            line-height: 1.2;
         }
+
         .share-actions-row {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 14px;
             margin-bottom: 18px;
+            padding: 0 4px;
         }
+
         .share-action-btn {
             display: flex;
             flex-direction: column;
@@ -937,10 +1163,15 @@
             background: rgba(255, 255, 255, 0.045);
             border-radius: 18px;
             cursor: pointer;
+            transition: all 0.25s ease;
             border: none;
         }
+
+        .share-action-btn:active { transform: scale(0.96); }
+
         .share-action-icon {
-            width: 44px; height: 44px;
+            width: 44px;
+            height: 44px;
             border-radius: 14px;
             background: rgba(99, 102, 241, 0.12);
             display: flex;
@@ -949,11 +1180,13 @@
             font-size: 1.3rem;
             color: var(--accent-secondary);
         }
+
         .share-action-btn span {
             font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-main);
         }
+
         .share-cancel-button {
             width: 100%;
             padding: 16px;
@@ -964,11 +1197,13 @@
             font-weight: 800;
             cursor: pointer;
             font-family: 'Alexandria', sans-serif;
+            margin-top: 6px;
         }
 
         .toast-notification {
             position: fixed;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%) scale(0.8);
             background: rgba(16, 185, 129, 0.95);
             color: white;
@@ -979,69 +1214,116 @@
             z-index: 9999;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .toast-notification.show {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
         }
 
-        #pane-news, #pane-series {
+        #pane-news {
             position: fixed;
-            inset: 0;
-            width: 100%; height: 100%;
-            padding: 0; margin: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
             z-index: 50;
             background: var(--bg-base);
         }
-        #pane-news.active, #pane-series.active { display: block; }
+
+        #pane-news.active { display: block; }
+
+        /* ===== قسم المسلسلات بملء الشاشة ===== */
+        #pane-series {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            z-index: 50;
+            background: var(--bg-base);
+        }
+
+        #pane-series.active { display: block; }
+
         #pane-series iframe {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             border: none;
             display: block;
             background: #030712;
         }
+        /* ===================================== */
 
         .news-feed-container {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             position: relative;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
+
         .news-slide {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             position: absolute;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             opacity: 0;
             transition: opacity 0.5s ease;
             pointer-events: none;
         }
-        .news-slide.active { opacity: 1; pointer-events: all; z-index: 10; }
+
+        .news-slide.active {
+            opacity: 1;
+            pointer-events: all;
+            z-index: 10;
+        }
+
         .news-background {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
         }
+
         .news-background img {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             opacity: 0.4;
         }
+
         .news-content {
             position: absolute;
             bottom: 100px;
-            left: 20px; right: 20px;
+            left: 20px;
+            right: 20px;
             color: white;
             background: linear-gradient(to top, rgba(3, 7, 18, 0.95) 0%, rgba(3, 7, 18, 0.7) 50%, transparent 100%);
             padding: 20px;
             border-radius: 20px;
         }
+
         .news-title {
             font-family: 'Cairo', sans-serif;
             font-size: 1.4rem;
             font-weight: 900;
             margin-bottom: 12px;
             line-height: 1.5;
+            letter-spacing: -0.5px;
         }
+
         .news-description {
             font-family: 'Cairo', sans-serif;
             font-size: 1rem;
@@ -1050,19 +1332,23 @@
             line-height: 1.7;
             margin-bottom: 15px;
         }
+
         .news-meta {
             display: flex;
             align-items: center;
             gap: 15px;
+            font-family: 'Cairo', sans-serif;
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-muted);
         }
+
         .news-meta span {
             display: flex;
             align-items: center;
             gap: 5px;
         }
+
         .news-navigation {
             position: absolute;
             right: 20px;
@@ -1073,14 +1359,20 @@
             gap: 10px;
             z-index: 20;
         }
+
         .nav-dot {
-            width: 6px; height: 30px;
+            width: 6px;
+            height: 30px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 3px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .nav-dot.active { background: var(--accent-secondary); height: 40px; }
+
+        .nav-dot.active {
+            background: var(--accent-secondary);
+            height: 40px;
+        }
 
         .match-card {
             background: var(--surface-glass);
@@ -1088,12 +1380,15 @@
             padding: 18px 16px;
             margin-bottom: 12px;
             backdrop-filter: blur(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .match-teams {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .match-team {
             display: flex;
             flex-direction: column;
@@ -1101,17 +1396,26 @@
             flex: 1;
             gap: 10px;
         }
+
         .match-team-logo {
-            width: 46px; height: 46px;
+            width: 46px;
+            height: 46px;
             object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
         }
+
+        .match-card:hover .match-team-logo { transform: scale(1.1); }
+
         .match-team-name {
             font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-main);
             text-align: center;
+            line-height: 1.3;
             max-width: 100px;
         }
+
         .match-center {
             display: flex;
             flex-direction: column;
@@ -1120,13 +1424,19 @@
             min-width: 90px;
             gap: 8px;
         }
+
         .match-score {
             font-size: 1.7rem;
             font-weight: 900;
             color: var(--text-main);
             letter-spacing: 3px;
         }
-        .match-score.live { color: #ef4444; }
+
+        .match-score.live {
+            color: #ef4444;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
         .match-status {
             font-size: 0.72rem;
             font-weight: 700;
@@ -1135,15 +1445,26 @@
             background: rgba(255, 255, 255, 0.06);
             color: var(--text-muted);
         }
+
         .match-status.live {
             background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
+            animation: pulseLive 1.5s infinite;
         }
+
+        @keyframes pulseLive {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
         .match-time {
             font-size: 1.1rem;
             font-weight: 800;
             color: var(--accent-secondary);
+            letter-spacing: 1px;
         }
+
         .schedule-loading {
             text-align: center;
             padding: 50px 20px;
@@ -1155,11 +1476,30 @@
             gap: 12px;
         }
 
+        /* شريط تحميل قنوات Xtream */
+        .xtream-loading-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0.7;
+        }
+        .xtream-loading-card .category-icon-wrap {
+            background: rgba(99, 102, 241, 0.08);
+        }
+        .xtream-loading-card i {
+            font-size: 1.4rem;
+            color: var(--accent-primary);
+        }
+
+        /* ================= Telegram Popup Styles ================= */
         .tg-popup-overlay {
             position: fixed;
             inset: 0;
             background: rgba(3, 7, 18, 0.85);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: 10000;
             display: flex;
             align-items: center;
@@ -1168,20 +1508,30 @@
             pointer-events: none;
             transition: opacity 0.2s ease;
         }
-        .tg-popup-overlay.active { opacity: 1; pointer-events: all; }
+        .tg-popup-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
         .tg-popup-card {
             background: linear-gradient(145deg, #0f172a, #0b1121);
             border: 1px solid rgba(34, 158, 217, 0.2);
             border-radius: 28px;
             padding: 30px 15px 25px;
-            width: 92%; max-width: 380px;
+            width: 92%;
+            max-width: 380px;
             text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(34, 158, 217, 0.1);
             transform: translateY(20px) scale(0.95);
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .tg-popup-overlay.active .tg-popup-card { transform: translateY(0) scale(1); }
+        .tg-popup-overlay.active .tg-popup-card {
+            transform: translateY(0) scale(1);
+        }
         .tg-icon-container {
-            width: 85px; height: 85px;
+            width: 85px;
+            height: 85px;
             margin: 0 auto 22px;
             position: relative;
             display: flex;
@@ -1193,25 +1543,39 @@
             color: #ffffff;
             z-index: 2;
             position: relative;
+            transform: translateX(-2px);
+            filter: drop-shadow(0 4px 10px rgba(34, 158, 217, 0.5));
         }
         .tg-glow-ring {
             position: absolute;
             inset: 0;
             border-radius: 50%;
             background: linear-gradient(135deg, #229ED9, #1c8bbf);
+            box-shadow: 0 0 25px rgba(34, 158, 217, 0.4);
             z-index: 1;
+            animation: pulseGlow 2.5s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.05); opacity: 1; }
         }
         .tg-title {
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffffff;
             margin-bottom: 12px;
+            line-height: 1.4;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
         }
         .tg-desc {
             font-size: 0.75rem;
             color: #94a3b8;
             line-height: 1.8;
             margin-bottom: 28px;
+            font-weight: 500;
+            padding: 0 5px;
+            white-space: nowrap;
         }
         .tg-actions {
             display: flex;
@@ -1231,6 +1595,15 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            box-shadow: 0 8px 25px rgba(34, 158, 217, 0.35);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tg-btn-join i {
+            font-size: 1.2rem;
+        }
+        .tg-btn-join:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 15px rgba(34, 158, 217, 0.4);
         }
         .tg-btn-cancel {
             background: rgba(255, 255, 255, 0.05);
@@ -1241,13 +1614,28 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .tg-btn-cancel:active {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(0.97);
+        }
+        /* ========================================================= */
 
         @media (max-width: 480px) {
-            .player-btn { width: 38px; height: 38px; }
-            .player-btn i { font-size: 1rem; }
-            .player-controls { padding: 15px 15px 30px; }
-            .player-controls-row { gap: 8px; }
+            .player-btn {
+                width: 38px;
+                height: 38px;
+            }
+            .player-btn i {
+                font-size: 1rem;
+            }
+            .player-controls {
+                padding: 15px 15px 30px;
+            }
+            .player-controls-row {
+                gap: 8px;
+            }
         }
     </style>
     
@@ -1263,95 +1651,80 @@
 </head>
 <body>
 
-    <!-- ==================== شاشة الحماية الأمنية ==================== -->
-    <div class="security-overlay" id="securityOverlay">
-        <div class="security-card" id="securityCard">
-            <div class="sec-shield">
-                <span class="sec-shield-ring"></span>
-                <span class="sec-shield-ring"></span>
-                <span class="sec-shield-ring"></span>
-                <div class="sec-shield-core">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-            </div>
-            <h2 class="sec-title">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                تنبيه أمني
-            </h2>
-            <p class="sec-msg">
-                تم اكتشاف <strong>تطبيق Reqable / Canary</strong> أو اتصال VPN مشبوه على جهازك.
-                لحماية روابط البث، يرجى إغلاق أو حذف التطبيق أو إيقاف الـ VPN ثم إعادة الفحص للمتابعة.
-            </p>
-            <button class="sec-btn" id="secRecheckBtn" onclick="recheckSecurity()">
-                <i class="fa-solid fa-rotate-right"></i>
-                <span>إعادة الفحص</span>
-            </button>
-            <div class="sec-note">
-                <i class="fa-solid fa-lock"></i>
-                نجم الشاشات محمي
-            </div>
-        </div>
-    </div>
-
     <div class="app-container">
+
         <div class="viewport-area">
+
             <div id="pane-channels" class="section-pane active">
+
                 <div id="channelsCategoriesView">
                     <div class="categories-grid" id="mainCategoriesGrid">
+                        <!-- قنوات ام بي سي -->
                         <div class="category-card" onclick="openCategory('mbc')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
                             </div>
                             <div class="category-card-title">قنوات ام بي سي</div>
                         </div>
+                        
+                        <!-- ===== قسم الكاس الجديد ===== -->
                         <div class="category-card" onclick="openCategory('kas')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/nMRCsHh6/Picsart-26-07-15-13-24-44-209.webp" alt="Al Kass">
                             </div>
                             <div class="category-card-title">قنوات الكاس</div>
                         </div>
+                        <!-- ============================ -->
+                        
                         <div class="category-card" onclick="openCategory('kids')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/TMJKgRzf/Picsart-26-07-15-14-39-47-072.webp" alt="Kids">
                             </div>
                             <div class="category-card-title">قنوات الأطفال</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('religious')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/chNGn7HW/Picsart-26-07-15-14-21-08-193.webp" alt="Religious">
                             </div>
                             <div class="category-card-title">قنوات دينية</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('quran')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/tPF2TBDP/Picsart-26-07-15-14-31-27-911.webp" alt="Quran">
                             </div>
                             <div class="category-card-title">قنوات القرآن</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('news_channels')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/VWM2zv9F/Picsart-26-07-19-18-52-42-472.webp" alt="News">
                             </div>
                             <div class="category-card-title">قنوات اخبار</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('alwan_sports')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/RGMDwL9S/Picsart-26-07-15-13-18-09-025.webp" alt="Alwan Sports">
                             </div>
                             <div class="category-card-title">الوان الرياضية</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('bein_sports')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp" alt="BeIN Sports">
                             </div>
                             <div class="category-card-title">بين سبورت</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('iraqi_channels')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/bMHGr6hM/Picsart-26-07-15-14-02-14-662.webp" alt="Iraqi Channels">
                             </div>
                             <div class="category-card-title">قنوات عراقية</div>
                         </div>
+                        
                         <div class="category-card" onclick="openCategory('thamania_sports')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/hRK9Tvdq/Picsart-26-07-15-13-20-34-639.webp" alt="Thamania Sports">
@@ -1370,6 +1743,7 @@
                     </div>
                     <div class="channels-grid" id="channelsGrid"></div>
                 </div>
+
             </div>
 
             <div id="pane-schedule" class="section-pane">
@@ -1381,9 +1755,11 @@
                 </div>
             </div>
 
+            <!-- ===== قسم المسلسلات: تم حذف المحتوى وإضافة iframe بملء الشاشة ===== -->
             <div id="pane-series" class="section-pane">
                 <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
+            <!-- ================================================================ -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -1393,6 +1769,7 @@
             </div>
 
             <div id="pane-settings" class="section-pane">
+                
                 <div class="stack-list">
                     <div class="stack-item" onclick="openLanguageSheet()">
                         <div class="stack-icon-box" style="color: #6366f1; background: rgba(99, 102, 241, 0.1);">
@@ -1452,7 +1829,9 @@
                         <i class="fa-solid fa-chevron-left" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                     </a>
                 </div>
+
             </div>
+
         </div>
 
         <nav class="bottom-dock">
@@ -1477,6 +1856,7 @@
                 <span data-key="navSettings">الإعدادات</span>
             </button>
         </nav>
+
     </div>
 
     <div class="video-modal" id="videoModal">
@@ -1640,6 +2020,7 @@
 
     <div class="toast-notification" id="toastNotification"></div>
 
+    <!-- ================= Telegram Popup HTML ================= -->
     <div class="tg-popup-overlay" id="tgPopupOverlay">
         <div class="tg-popup-card">
             <div class="tg-icon-container">
@@ -1658,211 +2039,7 @@
             </div>
         </div>
     </div>
-
-    <!-- ============================================================ -->
-    <!-- ==================== كود الحماية الأمنية ==================== -->
-    <!-- ============================================================ -->
-    <script>
-    (function() {
-        'use strict';
-
-        // ============ إعدادات الحماية ============
-        const SECURITY_CONFIG = {
-            timingThresholdMs: 450,   // عتبة التأخير ms
-            timingSamples: 3,          // عدد العينات
-            checkIntervalMs: 1200,     // فحص كل 1.2 ثانية
-            testUrls: [
-                'https://www.gstatic.com/generate_204',
-                'https://cp.cloudflare.com/generate_204',
-                'https://www.google.com/generate_204'
-            ]
-        };
-
-        // بصمات أدوات اعتراض الشبكة
-        const PROXY_MARKERS = [
-            'canary', 'reqable', 'charles', 'fiddler',
-            'proxyman', 'mitmproxy', 'burp', 'httptoolkit',
-            'httpcanary', 'stream', 'zap', 'wireshark'
-        ];
-
-        // متغيرات النافذة المشبوهة
-        const SUSPICIOUS_WINDOW_KEYS = [
-            '__REQABLE__', '__CANARY__', 'canary',
-            '__CHARLES__', '__FIDDLER__', '__PROXYMAN__'
-        ];
-
-        // 🔒 قفل - بمجرد الكشف لا يتم الإخفاء أبداً تلقائياً
-        let threatLatched = false;
-
-        // ============ دوال الكشف ============
-
-        // 1. فحص User-Agent
-        function checkUserAgent() {
-            const ua = (navigator.userAgent || '').toLowerCase();
-            for (let i = 0; i < PROXY_MARKERS.length; i++) {
-                if (ua.indexOf(PROXY_MARKERS[i]) !== -1) return true;
-            }
-            return false;
-        }
-
-        // 2. فحص نوع الاتصال (VPN)
-        function checkConnectionType() {
-            if (!navigator.connection) return false;
-            const type = (navigator.connection.type || '').toLowerCase();
-            return type === 'vpn';
-        }
-
-        // 3. فحص متغيرات النافذة
-        function checkWindowInjection() {
-            for (let i = 0; i < SUSPICIOUS_WINDOW_KEYS.length; i++) {
-                try {
-                    if (window[SUSPICIOUS_WINDOW_KEYS[i]] !== undefined) return true;
-                } catch(e) {}
-            }
-            return false;
-        }
-
-        // 4. فحص التأخير الزمني
-        function checkTiming() {
-            return new Promise((resolve) => {
-                let completed = 0;
-                let suspiciousCount = 0;
-                const total = SECURITY_CONFIG.timingSamples;
-
-                for (let i = 0; i < total; i++) {
-                    const url = SECURITY_CONFIG.testUrls[i % SECURITY_CONFIG.testUrls.length];
-                    const start = performance.now();
-                    
-                    fetch(url + '?_=' + Date.now() + '_' + i, {
-                        mode: 'no-cors',
-                        cache: 'no-store',
-                        method: 'HEAD'
-                    })
-                    .catch(() => {})
-                    .finally(() => {
-                        const elapsed = performance.now() - start;
-                        if (elapsed > SECURITY_CONFIG.timingThresholdMs) suspiciousCount++;
-                        completed++;
-                        
-                        if (completed === total) {
-                            resolve(suspiciousCount >= Math.ceil(total / 2));
-                        }
-                    });
-                }
-            });
-        }
-
-        // ============ التحكم بالواجهة ============
-
-        function showSecurityOverlay() {
-            const overlay = document.getElementById('securityOverlay');
-            if (!overlay) return;
-            if (!overlay.classList.contains('active')) {
-                overlay.classList.add('active');
-                document.body.classList.add('security-active');
-                const video = document.getElementById('videoPlayer');
-                if (video) { try { video.pause(); } catch(e) {} }
-            }
-        }
-
-        function hideSecurityOverlay() {
-            const overlay = document.getElementById('securityOverlay');
-            if (overlay) {
-                overlay.classList.remove('active');
-                document.body.classList.remove('security-active');
-            }
-        }
-
-        // ============ الفحص الرئيسي ============
-
-        function runSecurityCheck() {
-            // ✅ الفحوصات الفورية (متزامنة - 0ms)
-            const uaThreat = checkUserAgent();
-            const connThreat = checkConnectionType();
-            const winThreat = checkWindowInjection();
-
-            if (uaThreat || connThreat || winThreat) {
-                threatLatched = true;
-                showSecurityOverlay();
-                return;
-            }
-
-            // 🔒 إذا كان مقفولاً - اترك الرسالة ظاهرة ولا تخفها أبداً
-            if (threatLatched) {
-                showSecurityOverlay();
-                return;
-            }
-
-            // فحص التأخير (async)
-            checkTiming().then(timingThreat => {
-                if (timingThreat) {
-                    threatLatched = true;
-                    showSecurityOverlay();
-                }
-            });
-        }
-
-        // ============ إعادة الفحص (زر) ============
-
-        window.recheckSecurity = function() {
-            const btn = document.getElementById('secRecheckBtn');
-            const card = document.getElementById('securityCard');
-            if (btn) btn.classList.add('loading');
-
-            setTimeout(async () => {
-                const ua = checkUserAgent();
-                const conn = checkConnectionType();
-                const win = checkWindowInjection();
-                let timing = false;
-                try { timing = await checkTiming(); } catch(e) {}
-
-                if (btn) btn.classList.remove('loading');
-
-                if (ua || conn || win || timing) {
-                    // لا يزال هناك تهديد - اهتزاز البطاقة
-                    threatLatched = true;
-                    showSecurityOverlay();
-                    if (card) {
-                        card.classList.remove('shake');
-                        void card.offsetWidth;
-                        card.classList.add('shake');
-                    }
-                } else {
-                    // ✅ اختفى التهديد - إعادة تحميل
-                    threatLatched = false;
-                    hideSecurityOverlay();
-                    setTimeout(() => location.reload(), 300);
-                }
-            }, 700);
-        };
-
-        // ============ بدء الفحص ============
-
-        function initSecurity() {
-            // فحص فوري
-            runSecurityCheck();
-            // فحص دوري
-            setInterval(runSecurityCheck, SECURITY_CONFIG.checkIntervalMs);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initSecurity, { once: true });
-        } else {
-            initSecurity();
-        }
-
-        // فحص عند العودة للتطبيق
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) runSecurityCheck();
-        });
-
-        window.addEventListener('focus', () => {
-            runSecurityCheck();
-        });
-
-    })();
-    </script>
-    <!-- ============================================================ -->
+    <!-- ======================================================= -->
 
     <script>
         const categoriesData = {
@@ -1974,6 +2151,9 @@
             }
         };
 
+        // ============================================================
+        // ============  إعدادات قنوات Xtream (المشترك)  ==============
+        // ============================================================
         const XTREAM_CONFIG = {
             host: 'http://sts.mydroon.com',
             username: '9127491274',
@@ -1981,11 +2161,14 @@
             maxChannels: 700
         };
         
-        let xtreamCategories = {};
+        let xtreamCategories = {};     // { category_id: { name, channels: [...] } }
         let xtreamLoaded = false;
         let xtreamLoading = false;
+        // ============================================================
+
         let currentCategory = null;
 
+        // =========== تحميل قنوات Xtream من السيرفر ===========
         async function loadXtreamChannels() {
             if (xtreamLoading || xtreamLoaded) return;
             xtreamLoading = true;
@@ -1993,6 +2176,7 @@
             try {
                 const base = `${XTREAM_CONFIG.host}/player_api.php?username=${encodeURIComponent(XTREAM_CONFIG.username)}&password=${encodeURIComponent(XTREAM_CONFIG.password)}`;
                 
+                // جلب الأقسام والقنوات بالتوازي للسرعة
                 const [catRes, streamRes] = await Promise.all([
                     fetch(`${base}&action=get_live_categories`).then(r => r.json()),
                     fetch(`${base}&action=get_live_streams`).then(r => r.json())
@@ -2002,6 +2186,7 @@
                     throw new Error('بيانات Xtream غير صالحة');
                 }
                 
+                // خريطة أسماء الأقسام
                 const catNameMap = {};
                 catRes.forEach(c => {
                     if (c && c.category_id != null) {
@@ -2009,6 +2194,7 @@
                     }
                 });
                 
+                // تجميع القنوات حسب القسم مع حد 700 قناة
                 const grouped = {};
                 let totalCount = 0;
                 
@@ -2038,6 +2224,7 @@
                 xtreamLoaded = true;
                 xtreamLoading = false;
                 
+                // عرض الأقسام
                 renderXtreamCategories();
                 
             } catch (err) {
@@ -2047,6 +2234,7 @@
             }
         }
 
+        // =========== عرض أقسام Xtream في الشبكة ===========
         function renderXtreamCategories() {
             const grid = document.getElementById('mainCategoriesGrid');
             const catKeys = Object.keys(xtreamCategories);
@@ -2091,6 +2279,7 @@
         }
 
         function openCategory(catKey) {
+            // =========== دعم أقسام Xtream ===========
             if (catKey && catKey.startsWith('xtream_')) {
                 const catId = catKey.replace('xtream_', '');
                 const cat = xtreamCategories[catId];
@@ -2106,6 +2295,7 @@
                 const grid = document.getElementById('channelsGrid');
                 const defaultImgUrl = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
                 
+                // بناء سريع باستخدام مصفوفة واحدة
                 const htmlParts = new Array(cat.channels.length);
                 for (let i = 0; i < cat.channels.length; i++) {
                     const ch = cat.channels[i];
@@ -2129,6 +2319,7 @@
                 document.querySelector('.viewport-area').scrollTop = 0;
                 return;
             }
+            // ========================================
             
             const cat = categoriesData[catKey];
             if (!cat) return;
@@ -3129,6 +3320,7 @@
             if (newsInterval) { clearInterval(newsInterval); startNewsAutoScroll(); }
         }
 
+        // ================= Telegram Popup Functions =================
         function initTelegramPopup() {
             setTimeout(() => {
                 const overlay = document.getElementById('tgPopupOverlay');
@@ -3145,12 +3337,15 @@
             window.open('https://t.me/azcajfaj', '_blank');
             closeTelegramPopup();
         }
+        // ============================================================
 
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
             initTelegramPopup();
             
+            // ======== تحميل قنوات Xtream تلقائياً في الخلفية ========
             loadXtreamChannels();
+            // ============================================
 
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
