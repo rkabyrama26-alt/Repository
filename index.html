@@ -7,15 +7,21 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//shd-gcp-live.edgenextcdn.net">
+    <link rel="dns-prefetch" href="//shd-amg-fast.edgenextcdn.net">
+    <link rel="preconnect" href="https://shd-gcp-live.edgenextcdn.net" crossorigin>
+    <link rel="preconnect" href="https://shd-amg-fast.edgenextcdn.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=block" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest/dist/mpegts.js"></script>
     
     <style>
         html {
             visibility: hidden;
-            font-size: 16px; /* قيمة افتراضية، يتم تحديثها تلقائياً بواسطة JS حسب حجم الشاشة */
+            font-size: 16px;
         }
         html.fonts-loaded {
             visibility: visible;
@@ -32,7 +38,7 @@
             --gradient-main: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
             --text-main: #ffffff;
             --text-muted: #94a3b8;
-            --nav-height: 6.25rem; /* 100px */
+            --nav-height: 6.25rem;
         }
 
         html, body {
@@ -315,7 +321,6 @@
             border-radius: inherit; 
         }
 
-        /* شارة عدد قنوات Xtream */
         .category-count-badge {
             position: absolute;
             top: 0.3125rem;
@@ -1240,7 +1245,6 @@
 
         #pane-news.active { display: block; }
 
-        /* ===== قسم المسلسلات بملء الشاشة ===== */
         #pane-series {
             position: fixed;
             top: 0;
@@ -1264,7 +1268,6 @@
             display: block;
             background: #030712;
         }
-        /* ===================================== */
 
         .news-feed-container {
             width: 100%;
@@ -1478,7 +1481,6 @@
             gap: 0.75rem;
         }
 
-        /* شريط تحميل قنوات Xtream */
         .xtream-loading-card {
             display: flex;
             flex-direction: column;
@@ -1495,7 +1497,6 @@
             color: var(--accent-primary);
         }
 
-        /* ================= Telegram Popup Styles ================= */
         .tg-popup-overlay {
             position: fixed;
             inset: 0;
@@ -1622,7 +1623,6 @@
             background: rgba(255, 255, 255, 0.1);
             transform: scale(0.97);
         }
-        /* ========================================================= */
 
         @media (max-width: 480px) {
             .player-btn {
@@ -1651,9 +1651,6 @@
         }
     </script>
 
-    <!-- ============================================================ -->
-    <!--  نظام التحجيم التلقائي حسب حجم الشاشة (هاتف / تابلت / تلفزيون) -->
-    <!-- ============================================================ -->
     <script>
         (function () {
             var lastWidth = -1;
@@ -1664,26 +1661,19 @@
                 var h = window.innerHeight;
                 var size;
 
-                // منحنى سلس متصل يغطي الهواتف الصغيرة والمتوسطة والكبيرة والتابلت والتلفزيونات
                 if (w <= 400) {
-                    // هواتف صغيرة (320 ~ 400) : من 12.8px إلى 16px
                     size = 16 * (w / 400);
                 } else if (w <= 800) {
-                    // هواتف كبيرة / تابلت صغير : 400 → 16px ، 800 → 20px
                     size = 16 + (w - 400) * 0.01;
                 } else if (w <= 1400) {
-                    // تابلت كبير / تلفزيون صغير : 800 → 20px ، 1400 → 26px
                     size = 20 + (w - 800) * 0.01;
                 } else {
-                    // تلفزيونات متوسطة وكبيرة جداً : 1920 → ~34px ، 3840 → ~63.8px
                     size = 26 + (w - 1400) * 0.0155;
                 }
 
-                // حدود دنيا وعليا لتفادي أي عنصر مقطوع أو مبالغ فيه
                 if (size < 11) size = 11;
                 if (size > 72) size = 72;
 
-                // على الشاشات الأفقية القصيرة جداً نقلل قليلاً لتفادي تراكم العناصر
                 if (w > h && h < 420 && w > 600) {
                     var hFactor = h / 420;
                     if (hFactor < 0.85) hFactor = 0.85;
@@ -1704,7 +1694,6 @@
                 document.documentElement.style.fontSize = computeRootSize() + 'px';
             }
 
-            // تطبيق فوري قبل الرسم
             applyScale();
 
             window.addEventListener('resize', applyScale, { passive: true });
@@ -1713,15 +1702,13 @@
             }, { passive: true });
             window.addEventListener('load', applyScale);
 
-            // مراقبة تغيّر حجم الشاشة (مفيد على أندرويد تي في والمتصفحات المدمجة)
             if (typeof ResizeObserver !== 'undefined') {
                 try {
                     new ResizeObserver(applyScale).observe(document.documentElement);
-                } catch (e) { /* تجاهل */ }
+                } catch (e) { }
             }
         })();
     </script>
-    <!-- ============================================================ -->
 </head>
 <body>
 
@@ -1733,7 +1720,6 @@
 
                 <div id="channelsCategoriesView">
                     <div class="categories-grid" id="mainCategoriesGrid">
-                        <!-- قنوات ام بي سي -->
                         <div class="category-card" onclick="openCategory('mbc')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/wrRbpmVd/Picsart-26-07-15-13-49-41-324.webp" alt="MBC">
@@ -1741,14 +1727,12 @@
                             <div class="category-card-title">قنوات ام بي سي</div>
                         </div>
                         
-                        <!-- ===== قسم الكاس الجديد ===== -->
                         <div class="category-card" onclick="openCategory('kas')">
                             <div class="category-icon-wrap">
                                 <img class="category-icon-img" src="https://i.ibb.co/nMRCsHh6/Picsart-26-07-15-13-24-44-209.webp" alt="Al Kass">
                             </div>
                             <div class="category-card-title">قنوات الكاس</div>
                         </div>
-                        <!-- ============================ -->
                         
                         <div class="category-card" onclick="openCategory('kids')">
                             <div class="category-icon-wrap">
@@ -1829,11 +1813,9 @@
                 </div>
             </div>
 
-            <!-- ===== قسم المسلسلات: تم حذف المحتوى وإضافة iframe بملء الشاشة ===== -->
             <div id="pane-series" class="section-pane">
                 <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
-            <!-- ================================================================ -->
 
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
@@ -2094,7 +2076,6 @@
 
     <div class="toast-notification" id="toastNotification"></div>
 
-    <!-- ================= Telegram Popup HTML ================= -->
     <div class="tg-popup-overlay" id="tgPopupOverlay">
         <div class="tg-popup-card">
             <div class="tg-icon-container">
@@ -2113,7 +2094,6 @@
             </div>
         </div>
     </div>
-    <!-- ======================================================= -->
 
     <script>
         const categoriesData = {
@@ -2225,9 +2205,6 @@
             }
         };
 
-        // ============================================================
-        // ============  إعدادات قنوات Xtream (المشترك)  ==============
-        // ============================================================
         const XTREAM_CONFIG = {
             host: 'http://sts.mydroon.com',
             username: '9127491274',
@@ -2238,7 +2215,6 @@
         let xtreamCategories = {};
         let xtreamLoaded = false;
         let xtreamLoading = false;
-        // ============================================================
 
         let currentCategory = null;
 
@@ -2418,17 +2394,101 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
+        // ============ المشغل السريع المطوّر (مع إعدادات نجم الشاشات السريعة) ============
         let hlsPlayer = null;
+        let dashPlayer = null;
+        let mpegtsPlayer = null;
         let currentVideoUrl = '';
-        let retryCount = 0;
-        const MAX_RETRIES = 15;
+        let currentStreamType = '';
         let controlsTimeout;
         let isPlaying = false;
+        let autoMuted = false;
+        let playingStarted = false;
+        let attempt = 0;
+        let loaderTimeout = null;
+
+        // كشف نوع البث تلقائياً من الرابط
+        function detectStreamType(url) {
+            if (!url) return 'unknown';
+            const lower = url.toLowerCase();
+            const clean = lower.split('?')[0].split('#')[0];
+
+            if (lower.startsWith('rtmp://') || lower.startsWith('rtmps://')) return 'rtmp';
+            if (lower.startsWith('rtsp://')) return 'rtsp';
+            if (lower.startsWith('rtp://')) return 'rtp';
+            if (lower.startsWith('udp://')) return 'udp';
+
+            if (clean.endsWith('.m3u8') || clean.endsWith('.m3u') || lower.includes('format=m3u8') || lower.includes('extension=m3u8')) return 'hls';
+            if (clean.endsWith('.mpd')) return 'dash';
+            if (clean.endsWith('.flv')) return 'flv';
+            if (clean.endsWith('.ts') || clean.endsWith('.mts') || clean.endsWith('.m2ts')) return 'mpegts';
+            if (clean.endsWith('.mp4') || clean.endsWith('.m4v') || clean.endsWith('.mov')) return 'mp4';
+            if (clean.endsWith('.webm')) return 'webm';
+            if (clean.endsWith('.mkv')) return 'mkv';
+            if (clean.endsWith('.avi')) return 'avi';
+            if (clean.endsWith('.aac')) return 'aac';
+            if (clean.endsWith('.mp3')) return 'mp3';
+            if (clean.endsWith('.mpeg') || clean.endsWith('.mpg')) return 'mpeg';
+            if (clean.endsWith('.ogg') || clean.endsWith('.ogv') || clean.endsWith('.oga')) return 'ogg';
+            if (clean.endsWith('.3gp')) return 'mp4';
+
+            if (lower.includes('.m3u8')) return 'hls';
+            if (lower.includes('.mpd')) return 'dash';
+            if (lower.includes('.flv')) return 'flv';
+            if (lower.includes('.mp4')) return 'mp4';
+
+            return 'auto';
+        }
+
+        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي
+        function tryPlayVideo(onPlaying) {
+            const video = document.getElementById('videoPlayer');
+            video.muted = false;
+            autoMuted = false;
+            const p = video.play();
+            if (p && p.catch) {
+                p.then(() => {
+                    if (typeof onPlaying === 'function') onPlaying();
+                }).catch(() => {
+                    autoMuted = true;
+                    video.muted = true;
+                    video.play().then(() => {
+                        if (typeof onPlaying === 'function') onPlaying();
+                    }).catch(() => {});
+                });
+            }
+        }
+
+        // تنظيف جميع المشغلات
+        function destroyAllPlayers() {
+            if (hlsPlayer) {
+                try { hlsPlayer.destroy(); } catch(e) {}
+                hlsPlayer = null;
+            }
+            if (dashPlayer) {
+                try { dashPlayer.reset(); } catch(e) {}
+                dashPlayer = null;
+            }
+            if (mpegtsPlayer) {
+                try {
+                    mpegtsPlayer.pause();
+                    mpegtsPlayer.unload();
+                    mpegtsPlayer.detachMediaElement();
+                    mpegtsPlayer.destroy();
+                } catch(e) {}
+                mpegtsPlayer = null;
+            }
+            playingStarted = false;
+        }
+
+        function destroyHls() { destroyAllPlayers(); }
 
         function playChannel(encodedUrl, name) {
             const url = decodeURIComponent(encodedUrl);
             currentVideoUrl = url;
-            retryCount = 0;
+            currentStreamType = detectStreamType(url);
+            attempt = 0;
+            playingStarted = false;
             
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
@@ -2450,97 +2510,84 @@
             }
             
             showControls();
+            
+            // مؤقت لإخفاء اللودر في حال الفشل
+            clearTimeout(loaderTimeout);
+            loaderTimeout = setTimeout(() => {
+                loading.style.display = 'none';
+            }, 8000);
+            
             initializePlayer(currentVideoUrl);
         }
 
-        function destroyHls() {
-            if (hlsPlayer) {
-                try { hlsPlayer.destroy(); } catch(e) {}
-                hlsPlayer = null;
-            }
-        }
-
-        function initializePlayer(url) {
-            const video = document.getElementById('videoPlayer');
-            const loading = document.getElementById('playerLoading');
-
-            destroyHls();
-            try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e) {}
-
-            const onPlaying = () => { 
-                loading.style.display = 'none';
-                isPlaying = true;
-                updatePlayPauseButton();
-            };
-
+        // مشغل HLS مع الإعدادات السريعة من نجم الشاشات
+        function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
+                    // ========== إعدادات نجم الشاشات السريعة ==========
                     enableWorker: true,
-                    lowLatencyMode: false,
                     progressive: true,
+                    lowLatencyMode: false,
+                    startLevel: 0,
+                    abrEwmaDefaultEstimate: 1000000,
+                    capLevelToPlayerSize: true,
+                    backBufferLength: 30,
+                    maxBufferLength: 60,
+                    maxMaxBufferLength: 90,
+                    maxBufferSize: 120 * 1000 * 1000,
+                    maxBufferHole: 0.5,
+                    
+                    // ========== إعادة المحاولات ==========
+                    manifestLoadingTimeOut: 8000,
+                    manifestLoadingMaxRetry: 4,
+                    manifestLoadingRetryDelay: 1000,
+                    levelLoadingTimeOut: 8000,
+                    levelLoadingMaxRetry: 4,
+                    levelLoadingRetryDelay: 1000,
+                    fragLoadingTimeOut: 12000,
+                    fragLoadingMaxRetry: 5,
+                    fragLoadingRetryDelay: 1000,
+                    
+                    // ========== تحسينات البث المباشر ==========
                     startFragPrefetch: true,
                     testBandwidth: true,
-                    startLevel: 0,
-                    capLevelToPlayerSize: true,
-                    maxBufferLength: 30,
-                    maxMaxBufferLength: 60,
-                    maxBufferSize: 60 * 1000 * 1000,
-                    maxBufferHole: 0.5,
-                    liveSyncDuration: 3,
-                    liveMaxLatencyDuration: 10,
-                    liveDurationInfinity: true,
-                    liveBackBufferLength: 10,
-                    maxLiveSyncPlaybackRate: 1.5,
-                    abrEwmaDefaultEstimate: 500000,
-                    abrBandWidthFactor: 0.8,
-                    abrBandWidthUpFactor: 0.7,
-                    fragLoadingMaxRetry: 6,
-                    fragLoadingMaxRetryTimeout: 64000,
-                    fragLoadingRetryDelay: 1000,
-                    manifestLoadingMaxRetry: 6,
-                    manifestLoadingMaxRetryTimeout: 64000,
-                    manifestLoadingRetryDelay: 1000,
-                    levelLoadingMaxRetry: 6,
-                    levelLoadingMaxRetryTimeout: 64000,
-                    levelLoadingRetryDelay: 1000,
-                    appendErrorMaxRetry: 10,
+                    liveSyncDurationCount: 5,
+                    liveMaxLatencyDurationCount: 10,
                     nudgeOffset: 0.1,
-                    nudgeMaxRetry: 10,
-                    highBufferWatchdogPeriod: 3,
+                    nudgeMaxRetry: 5,
+                    starveThreshold: 2.0,
+                    
                     xhrSetup: function(xhr, xhrUrl) {
                         xhr.withCredentials = false;
-                        xhr.timeout = 10000;
                     }
                 };
 
                 hlsPlayer = new Hls(hlsConfig);
-                hlsPlayer.loadSource(url);
                 hlsPlayer.attachMedia(video);
+                hlsPlayer.loadSource(url);
 
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.play().then(onPlaying).catch(() => {
-                        video.muted = true;
-                        video.play().then(onPlaying).catch(() => silentRetry(url));
-                    });
-                });
-
-                hlsPlayer.on(Hls.Events.FRAG_LOADED, () => {
-                    if (video.paused && !isPlaying) {
-                        video.play().then(onPlaying).catch(() => {});
-                    }
+                    tryPlayVideo(onPlaying);
                 });
 
                 hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                silentRetry(url);
+                                if (hlsPlayer.currentLevel > 0) {
+                                    hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
+                                }
+                                try { hlsPlayer.startLoad(); } catch(e) {
+                                    loading.style.display = 'none';
+                                }
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
-                                hlsPlayer.recoverMediaError();
+                                try { hlsPlayer.recoverMediaError(); } catch(e) {
+                                    loading.style.display = 'none';
+                                }
                                 break;
                             default:
-                                silentRetry(url);
+                                loading.style.display = 'none';
                                 break;
                         }
                     }
@@ -2548,53 +2595,219 @@
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.preload = 'auto';
-                video.addEventListener('loadedmetadata', onPlaying, { once: true });
+                video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
                 video.addEventListener('playing', onPlaying, { once: true });
-                video.addEventListener('error', () => silentRetry(url), { once: true });
-                video.play().catch(() => {
-                    video.muted = true;
-                    video.play().catch(() => silentRetry(url));
-                });
+                video.addEventListener('error', () => { loading.style.display = 'none'; }, { once: true });
+                tryPlayVideo(onPlaying);
             } else {
-                video.src = url;
-                video.preload = 'auto';
-                video.addEventListener('loadedmetadata', onPlaying, { once: true });
-                video.addEventListener('playing', onPlaying, { once: true });
-                video.addEventListener('error', () => silentRetry(url), { once: true });
-                video.play().catch(() => {
-                    video.muted = true;
-                    video.play().catch(() => silentRetry(url));
-                });
+                loading.style.display = 'none';
+                showToast('متصفحك لا يدعم HLS');
+            }
+        }
+
+        // مشغل DASH مع إعدادات سريعة
+        function initDashPlayer(url, video, loading, onPlaying) {
+            if (window.dashjs && dashjs.MediaPlayer) {
+                try {
+                    dashPlayer = dashjs.MediaPlayer().create();
+                    dashPlayer.updateSettings({
+                        streaming: {
+                            lowLatencyMode: false,
+                            rebufferingGoal: 8,
+                            bufferingGoal: 45,
+                            bufferBehind: 45,
+                            retryParameters: { timeout: 12000, maxAttempts: 6, baseDelay: 1000, backoffFactor: 2 },
+                            liveDelay: 3,
+                            liveCatchup: {
+                                maxDrift: 1.5,
+                                playbackRate: 0.5
+                            },
+                            buffer: {
+                                fastSwitchEnabled: true,
+                                bufferTimeAtTopQuality: 45,
+                                bufferToKeep: 45
+                            }
+                        },
+                        abr: {
+                            enabled: true,
+                            initialBitrate: { audio: -1, video: -1 },
+                            autoSwitchBitrate: { audio: true, video: true },
+                            defaultBandwidthEstimate: 1500000,
+                            switchInterval: 10,
+                            bandwidthUpgradeTarget: 0.85,
+                            bandwidthDowngradeTarget: 0.95
+                        }
+                    });
+                    dashPlayer.initialize(video, url, true);
+                    
+                    dashPlayer.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, onPlaying);
+                    dashPlayer.on(dashjs.MediaPlayer.events.CAN_PLAY, onPlaying);
+                    dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => {
+                        loading.style.display = 'none';
+                    });
+                } catch(e) {
+                    console.warn('DASH init error:', e);
+                    loading.style.display = 'none';
+                }
+            } else {
+                loading.style.display = 'none';
+                showToast('متصفحك لا يدعم DASH');
+            }
+        }
+
+        // مشغل MPEG-TS / FLV مع إعدادات نجم الشاشات السريعة
+        function initMpegtsPlayer(url, type, video, loading, onPlaying) {
+            if (window.mpegts && mpegts.isSupported()) {
+                try {
+                    // استخدام m2ts للتي اس و flv للفلاش
+                    const mpegtsType = (type === 'flv') ? 'flv' : 'm2ts';
+                    
+                    mpegtsPlayer = mpegts.createPlayer({
+                        type: mpegtsType,
+                        isLive: true,
+                        url: url
+                    }, {
+                        enableWorker: true,
+                        enableStashBuffer: true,
+                        stashInitialSize: 256 * 1024,
+                        liveBufferLatencyChasing: false,
+                        liveBufferLatencyMaxLatency: 5.0,
+                        liveBufferLatencyMinRemain: 2.0,
+                        autoCleanupSourceBuffer: true,
+                        autoCleanupMaxBackwardDuration: 40,
+                        autoCleanupMinBackwardDuration: 30,
+                        lazyLoad: false
+                    });
+                    
+                    mpegtsPlayer.attachMediaElement(video);
+                    mpegtsPlayer.on(mpegts.Events.ERROR, (type, info) => {
+                        console.warn('mpegts error:', type, info);
+                        loading.style.display = 'none';
+                    });
+                    
+                    mpegtsPlayer.on(mpegts.Events.MEDIA_INFO, onPlaying);
+                    
+                    mpegtsPlayer.load();
+                    tryPlayVideo(onPlaying);
+                } catch(e) {
+                    console.warn('mpegts init error:', e);
+                    loading.style.display = 'none';
+                }
+            } else {
+                loading.style.display = 'none';
+                showToast('متصفحك لا يدعم هذه الصيغة');
+            }
+        }
+
+        // مشغل الصيغ الأصلية (video.src مباشرة)
+        function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
+            video.src = url;
+            video.preload = 'auto';
+            video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
+            video.addEventListener('playing', onPlaying, { once: true });
+            video.addEventListener('error', () => {
+                if (typeof fallbackFn === 'function') {
+                    fallbackFn();
+                } else {
+                    loading.style.display = 'none';
+                }
+            }, { once: true });
+            tryPlayVideo(onPlaying);
+        }
+
+        function initializePlayer(url) {
+            const video = document.getElementById('videoPlayer');
+            const loading = document.getElementById('playerLoading');
+            const type = detectStreamType(url);
+            currentStreamType = type;
+
+            destroyAllPlayers();
+            try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e) {}
+
+            const onPlaying = () => { 
+                playingStarted = true;
+                clearTimeout(loaderTimeout);
+                loading.style.display = 'none';
+                isPlaying = true;
+                updatePlayPauseButton();
+            };
+
+            switch(type) {
+                case 'hls':
+                    initHlsPlayer(url, video, loading, onPlaying);
+                    break;
+
+                case 'dash':
+                    initDashPlayer(url, video, loading, onPlaying);
+                    break;
+
+                case 'flv':
+                    initMpegtsPlayer(url, 'flv', video, loading, onPlaying);
+                    break;
+
+                case 'mpegts':
+                    initMpegtsPlayer(url, 'mpegts', video, loading, onPlaying);
+                    break;
+
+                case 'mp4':
+                case 'webm':
+                case 'mkv':
+                case 'avi':
+                case 'aac':
+                case 'mp3':
+                case 'mpeg':
+                case 'ogg':
+                    initNativePlayer(url, video, loading, onPlaying, () => {
+                        if (window.mpegts && mpegts.isSupported()) {
+                            initMpegtsPlayer(url, 'mpegts', video, loading, onPlaying);
+                        } else {
+                            loading.style.display = 'none';
+                            showToast('تعذّر تشغيل هذا الملف');
+                        }
+                    });
+                    break;
+
+                case 'rtmp':
+                case 'rtsp':
+                case 'rtp':
+                case 'udp':
+                    console.warn('Protocol not natively supported in browser:', type);
+                    initHlsPlayer(url, video, loading, onPlaying);
+                    break;
+
+                case 'auto':
+                default:
+                    // كشف تلقائي: جرّب native أولاً، ثم HLS
+                    video.src = url;
+                    video.preload = 'auto';
+                    const tryNativeThenHls = () => {
+                        const nativePlay = video.play();
+                        if (nativePlay && nativePlay.then) {
+                            nativePlay.then(onPlaying).catch(() => {
+                                try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                                initHlsPlayer(url, video, loading, onPlaying);
+                            });
+                        } else {
+                            initHlsPlayer(url, video, loading, onPlaying);
+                        }
+                    };
+                    
+                    video.addEventListener('loadedmetadata', tryNativeThenHls, { once: true });
+                    video.addEventListener('error', () => {
+                        try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                        initHlsPlayer(url, video, loading, onPlaying);
+                    }, { once: true });
+                    
+                    setTimeout(() => {
+                        if (video.readyState === 0 && loading.style.display !== 'none') {
+                            try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                            initHlsPlayer(url, video, loading, onPlaying);
+                        }
+                    }, 3000);
+                    break;
             }
 
             setupPlayerEvents();
-        }
-
-        function silentRetry(url) {
-            if (retryCount < MAX_RETRIES) {
-                retryCount++;
-                const loading = document.getElementById('playerLoading');
-                if (loading) loading.style.display = 'block';
-                
-                const delay = Math.min(1000 * Math.pow(1.5, retryCount), 8000);
-                
-                setTimeout(() => {
-                    const video = document.getElementById('videoPlayer');
-                    if (hlsPlayer && !hlsPlayer.media) {
-                        try { hlsPlayer.attachMedia(video); } catch(e) {}
-                    }
-                    if (hlsPlayer) {
-                        try { hlsPlayer.startLoad(); } catch(e) {}
-                    } else {
-                        try { video.load(); video.play().catch(() => {}); } catch(e) {}
-                    }
-                }, delay);
-            } else {
-                retryCount = 0;
-                setTimeout(() => {
-                    initializePlayer(url);
-                }, 2000);
-            }
         }
 
         function setupPlayerEvents() {
@@ -2612,6 +2825,12 @@
                     currentTimeEl.textContent = formatTime(video.currentTime);
                     progressBar.style.width = '100%';
                 }
+            });
+
+            video.addEventListener('playing', () => {
+                playingStarted = true;
+                clearTimeout(loaderTimeout);
+                document.getElementById('playerLoading').style.display = 'none';
             });
 
             progressContainer.addEventListener('click', (e) => {
@@ -2643,6 +2862,25 @@
                 }
                 lastTap = currentTime;
             });
+
+            // محاولة إلغاء الكتم عند أي لمسة
+            const unmuteHandler = () => {
+                if (autoMuted && video.muted) {
+                    video.muted = false;
+                    autoMuted = false;
+                    updateVolumeIcon();
+                }
+            };
+            modal.addEventListener('pointerdown', unmuteHandler);
+            video.addEventListener('click', unmuteHandler);
+        }
+
+        function updateVolumeIcon() {
+            const video = document.getElementById('videoPlayer');
+            const icon = document.getElementById('volumeIcon');
+            if (icon) {
+                icon.className = video.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+            }
         }
 
         function showControls() {
@@ -2663,10 +2901,12 @@
             
             if (video.paused) {
                 video.play();
+                if (mpegtsPlayer) { try { mpegtsPlayer.play(); } catch(e){} }
                 isPlaying = true;
                 centerPlay.classList.remove('show');
             } else {
                 video.pause();
+                if (mpegtsPlayer) { try { mpegtsPlayer.pause(); } catch(e){} }
                 isPlaying = false;
                 centerPlay.classList.add('show');
             }
@@ -2699,9 +2939,9 @@
 
         function toggleMute() {
             const video = document.getElementById('videoPlayer');
-            const icon = document.getElementById('volumeIcon');
             video.muted = !video.muted;
-            icon.className = video.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+            autoMuted = false;
+            updateVolumeIcon();
             showControls();
         }
 
@@ -2755,6 +2995,10 @@
             const video = document.getElementById('videoPlayer');
             if (hlsPlayer && hlsPlayer.liveSyncPosition) {
                 video.currentTime = hlsPlayer.liveSyncPosition;
+            } else if (dashPlayer && dashPlayer.seek) {
+                try { dashPlayer.seek(dashPlayer.duration()); } catch(e) {}
+            } else if (mpegtsPlayer) {
+                try { mpegtsPlayer.play(); } catch(e) {}
             } else {
                 video.currentTime = video.duration || video.currentTime;
             }
@@ -2790,7 +3034,42 @@
                     };
                     optionsContainer.appendChild(div);
                 });
-            } else {
+            }
+            else if (dashPlayer && typeof dashPlayer.getBitrateInfoListFor === 'function') {
+                try {
+                    const bitrateList = dashPlayer.getBitrateInfoListFor('video') || [];
+                    if (bitrateList.length > 1) {
+                        const autoDiv = document.createElement('div');
+                        autoDiv.className = 'popup-option active';
+                        autoDiv.innerHTML = '<span>تلقائي (موصى به للسرعة)</span><i class="fa-solid fa-check"></i>';
+                        autoDiv.onclick = () => {
+                            dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: true } } } });
+                            closePopups();
+                            showToast('تم تعيين الجودة على التلقائي');
+                        };
+                        optionsContainer.appendChild(autoDiv);
+
+                        bitrateList.forEach((info, index) => {
+                            const height = info.height || Math.round((info.bitrate || 0) / 1000) + 'kbps';
+                            const div = document.createElement('div');
+                            div.className = 'popup-option';
+                            div.innerHTML = `<span>${height}p</span>`;
+                            div.onclick = () => {
+                                dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: false } } } });
+                                dashPlayer.setQualityFor('video', index, true);
+                                closePopups();
+                                showToast(`الجودة: ${height}p`);
+                            };
+                            optionsContainer.appendChild(div);
+                        });
+                    } else {
+                        optionsContainer.innerHTML = '<div class="popup-option active"><span>جودة واحدة متاحة</span><i class="fa-solid fa-check"></i></div>';
+                    }
+                } catch(e) {
+                    optionsContainer.innerHTML = '<div class="popup-option active"><span>جودة واحدة متاحة</span><i class="fa-solid fa-check"></i></div>';
+                }
+            }
+            else {
                 optionsContainer.innerHTML = '<div class="popup-option active"><span>جودة واحدة متاحة</span><i class="fa-solid fa-check"></i></div>';
             }
             
@@ -2805,6 +3084,30 @@
             optionsContainer.innerHTML = '';
 
             const video = document.getElementById('videoPlayer');
+
+            if (dashPlayer && typeof dashPlayer.getTracksFor === 'function') {
+                try {
+                    const audioTracks = dashPlayer.getTracksFor('audio') || [];
+                    if (audioTracks.length > 1) {
+                        audioTracks.forEach((track, index) => {
+                            const label = track.lang || track.labels && track.labels.audio || ('تعليق ' + (index + 1));
+                            const div = document.createElement('div');
+                            div.className = 'popup-option';
+                            div.innerHTML = `<span>${label}</span>`;
+                            div.onclick = () => {
+                                dashPlayer.setCurrentTrack(track);
+                                closePopups();
+                                showToast(label);
+                            };
+                            optionsContainer.appendChild(div);
+                        });
+                        popup.classList.add('active');
+                        showControls();
+                        return;
+                    }
+                } catch(e) {}
+            }
+
             if (video.audioTracks && video.audioTracks.length > 1) {
                 Array.from(video.audioTracks).forEach((track, index) => {
                     const div = document.createElement('div');
@@ -2851,12 +3154,13 @@
                 video.load();
             } catch(e) {}
             
-            destroyHls();
+            clearTimeout(loaderTimeout);
+            destroyAllPlayers();
             
             modal.classList.remove('active', 'show-controls');
             closePopups();
             isPlaying = false;
-            retryCount = 0;
+            playingStarted = false;
         }
 
         function formatTime(seconds) {
@@ -3385,7 +3689,6 @@
             if (newsInterval) { clearInterval(newsInterval); startNewsAutoScroll(); }
         }
 
-        // ================= Telegram Popup Functions =================
         function initTelegramPopup() {
             setTimeout(() => {
                 const overlay = document.getElementById('tgPopupOverlay');
@@ -3402,15 +3705,12 @@
             window.open('https://t.me/azcajfaj', '_blank');
             closeTelegramPopup();
         }
-        // ============================================================
 
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
             initTelegramPopup();
             
-            // ======== تحميل قنوات Xtream تلقائياً في الخلفية ========
             loadXtreamChannels();
-            // ============================================
 
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
