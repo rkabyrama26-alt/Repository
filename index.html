@@ -527,6 +527,7 @@
             background: #000;
         }
 
+        /* ✅ التعديل: إزالة !important للسماح للمشغل بالتمدد وملء الشاشة بدون قص الشعار */
         .video-element {
             width: 100%;
             height: 100%;
@@ -2206,9 +2207,9 @@
         };
 
         const XTREAM_CONFIG = {
-            host: 'http://cname1.elg-26.com:8080',
-            username: 'Abdo20250505',
-            password: 'hze7pmru27',
+            host: 'http://sts.mydroon.com',
+            username: '9127491274',
+            password: 'QDXDbuLzFDYaYbD',
             maxChannels: 700
         };
         
@@ -2499,6 +2500,9 @@
             modal.classList.add('active');
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
+
+            // إعادة تعيين object-fit للحالة الافتراضية عند فتح قناة جديدة
+            video.style.objectFit = 'contain';
 
             const container = document.querySelector('.video-player-container');
             if (container.requestFullscreen) {
@@ -2979,17 +2983,18 @@
             showControls();
         }
 
+        // ================== التعديل الجديد: تمدد الفيديو لملء الشاشة دون قص الشعار ==================
         function toggleAspectRatio() {
             const video = document.getElementById('videoPlayer');
-            if (video.style.objectFit === 'contain') {
-                video.style.objectFit = 'cover';
-                showToast('ملء الشاشة');
-            } else {
+            // التبديل بين الوضع المملوء (الذي يزيل السواد ويتمدد) والوضع الأصلي (الذي يحافظ على النسبة)
+            if (video.style.objectFit === 'fill') {
                 video.style.objectFit = 'contain';
-                showToast('نسبة الأصلية');
+            } else {
+                video.style.objectFit = 'fill';
             }
             showControls();
         }
+        // ========================================================================================
 
         function goToLiveEdge() {
             const video = document.getElementById('videoPlayer');
