@@ -1278,26 +1278,49 @@
             bottom: 0;
             width: 100%;
             height: 100%;
-            padding: 0 0 6.25rem 0;
+            padding: 0;
             margin: 0;
             z-index: 50;
-            background: var(--bg-base);
+            background: #000;
         }
 
         #pane-shorts.active { display: block; }
 
-        .shorts-feed {
+        .shorts-container {
             width: 100%;
             height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow-y: scroll;
             scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            background: #000;
         }
 
-        .shorts-feed::-webkit-scrollbar { display: none; }
+        .shorts-container::-webkit-scrollbar {
+            display: none;
+            width: 0;
+        }
+
+        .shorts-loading-state {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .shorts-loading-state i {
+            font-size: 2.5rem;
+            color: var(--accent-primary);
+        }
 
         .short-item {
             width: 100%;
@@ -1305,145 +1328,125 @@
             scroll-snap-align: start;
             scroll-snap-stop: always;
             position: relative;
-            overflow: hidden;
-            background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #000;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .short-poster {
-            position: absolute;
-            inset: 0;
-        }
-
-        .short-poster img {
+        .short-video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            filter: blur(1px) brightness(0.45);
-            transform: scale(1.06);
+            object-fit: contain;
+            background: #000;
+            display: block;
         }
 
-        .short-overlay {
+        .short-overlay-info {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(3, 7, 18, 0.98) 0%, rgba(3, 7, 18, 0.45) 50%, rgba(3, 7, 18, 0.85) 100%);
-            z-index: 1;
+            bottom: 6.5rem;
+            right: 1rem;
+            left: 1rem;
+            z-index: 5;
+            pointer-events: none;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(to top, rgba(3,7,18,0.9) 0%, rgba(3,7,18,0.55) 70%, transparent 100%);
+            border-radius: 1.25rem;
+            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.8);
+        }
+
+        .short-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            font-family: 'Alexandria', sans-serif;
+        }
+
+        .short-hashtag {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #38bdf8;
+            font-family: 'Alexandria', sans-serif;
+            letter-spacing: 0.0125rem;
         }
 
         .short-play-btn {
-            position: relative;
-            z-index: 2;
-            width: 5.5rem;
-            height: 5.5rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4.5rem;
+            height: 4.5rem;
+            background: rgba(0,0,0,0.55);
+            border: 0.125rem solid rgba(255,255,255,0.25);
             border-radius: 50%;
-            background: rgba(99, 102, 241, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 0.1875rem solid rgba(255, 255, 255, 0.25);
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0.5rem 2rem rgba(99, 102, 241, 0.5);
+            color: white;
+            font-size: 1.75rem;
+            z-index: 6;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
 
-        .short-play-btn:active {
-            transform: scale(0.9);
+        .short-item.paused .short-play-btn {
+            display: flex;
         }
 
         .short-play-btn i {
             margin-right: -0.25rem;
         }
 
-        .short-info {
+        .short-sound-btn {
             position: absolute;
-            bottom: 2rem;
-            right: 1.5rem;
-            left: 1.5rem;
-            z-index: 2;
-            text-align: right;
-            pointer-events: none;
-        }
-
-        .short-title-text {
-            font-size: 1.35rem;
-            font-weight: 800;
+            top: 1rem;
+            right: 1rem;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.55);
+            border: 0.0625rem solid rgba(255,255,255,0.15);
             color: white;
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-            text-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.9);
-            display: block;
-        }
-
-        .short-hashtag {
             font-size: 1rem;
-            font-weight: 700;
-            color: #38bdf8;
-            text-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.7);
-            display: block;
-        }
-
-        .short-type-badge {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            z-index: 2;
-            background: rgba(99, 102, 241, 0.9);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 0.375rem 0.875rem;
-            border-radius: 1.25rem;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);
-            letter-spacing: 0.025rem;
-        }
-
-        .shorts-loading, .shorts-empty {
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            color: var(--text-muted);
-            gap: 0.875rem;
-            padding: 2rem;
-            text-align: center;
+            z-index: 6;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
 
-        .shorts-loading i, .shorts-empty i {
-            font-size: 2.2rem;
-            color: var(--accent-primary);
+        .short-sound-btn:active {
+            transform: scale(0.9);
         }
 
-        .shorts-empty i {
-            color: #ef4444;
+        .short-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.125rem;
+            height: 3.125rem;
+            border: 0.1875rem solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-secondary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            z-index: 4;
+            display: none;
         }
 
-        .shorts-retry-btn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.75rem;
-            background: linear-gradient(135deg, #6366f1, #38bdf8);
-            color: white;
-            border: none;
-            border-radius: 1rem;
-            font-size: 0.95rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 0.5rem 1.5rem rgba(99, 102, 241, 0.4);
-            font-family: 'Alexandria', sans-serif;
+        .short-item.loading .short-loader {
+            display: block;
         }
 
-        .shorts-retry-btn:active {
-            transform: scale(0.96);
-        }
-        /* ==================== نهاية قسم المقاطع القصيرة ==================== */
+        /* ============================================================== */
 
         .news-feed-container {
             width: 100%;
@@ -1815,21 +1818,7 @@
                 gap: 0.5rem;
             }
             .dock-tab-btn span {
-                font-size: 0.5rem;
-            }
-            .dock-tab-btn i {
-                font-size: 0.95rem;
-            }
-            .short-play-btn {
-                width: 4.5rem;
-                height: 4.5rem;
-                font-size: 1.6rem;
-            }
-            .short-title-text {
-                font-size: 1.15rem;
-            }
-            .short-hashtag {
-                font-size: 0.9rem;
+                font-size: 0.55rem;
             }
         }
     </style>
@@ -2010,21 +1999,23 @@
                 <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
 
-            <div id="pane-shorts" class="section-pane">
-                <div class="shorts-feed" id="shortsFeed">
-                    <div class="shorts-loading">
-                        <i class="fa-solid fa-circle-notch fa-spin"></i>
-                        <span>جاري تحميل المقاطع...</span>
-                    </div>
-                </div>
-            </div>
-
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
                     <div class="news-navigation" id="newsNavigation"></div>
                     <div id="newsSlidesContainer"></div>
                 </div>
             </div>
+
+            <!-- ==================== قسم المقاطع القصيرة ==================== -->
+            <div id="pane-shorts" class="section-pane">
+                <div class="shorts-container" id="shortsContainer">
+                    <div class="shorts-loading-state">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        <span>جاري تحميل المقاطع...</span>
+                    </div>
+                </div>
+            </div>
+            <!-- ============================================================== -->
 
             <div id="pane-settings" class="section-pane">
                 
@@ -2106,12 +2097,12 @@
                 <span data-key="navSeries">مسلسلات</span>
             </button>
             <button class="dock-tab-btn" onclick="switchPane(3)">
-                <i class="fa-solid fa-clapperboard"></i>
-                <span data-key="navShorts">مقاطع قصيرة</span>
-            </button>
-            <button class="dock-tab-btn" onclick="switchPane(4)">
                 <i class="fa-solid fa-newspaper"></i>
                 <span data-key="navNews">أخبار</span>
+            </button>
+            <button class="dock-tab-btn" onclick="switchPane(4)">
+                <i class="fa-solid fa-clapperboard"></i>
+                <span>مقاطع قصيرة</span>
             </button>
             <button class="dock-tab-btn" onclick="switchPane(5)">
                 <i class="fa-solid fa-gear"></i>
@@ -2417,6 +2408,21 @@
             password: 'QDXDbuLzFDYaYbD',
             maxChannels: 700
         };
+
+        // ==================== إعدادات قسم المقاطع القصيرة ====================
+        const SHORTS_XTREAM = {
+            host: 'http://cname1.elg-26.com:8080',
+            username: 'Abdo20250505',
+            password: 'hze7pmru27',
+            maxItems: 80,
+            maxSeries: 6
+        };
+
+        let shortsLoaded = false;
+        let shortsLoading = false;
+        let shortsData = [];
+        let shortsObserver = null;
+        // ======================================================================
         
         let xtreamCategories = {};
         let xtreamLoaded = false;
@@ -2599,221 +2605,6 @@
             currentCategory = null;
             document.querySelector('.viewport-area').scrollTop = 0;
         }
-
-        // ============ قسم المقاطع القصيرة - Xtream Shorts (محسّن وسريع) ============
-        const SHORTS_CONFIG = {
-            host: 'http://ts1.eagtop.lol',
-            username: 'e1uf3olh92',
-            password: 'j18aurmqt5',
-            maxItems: 60,
-            timeout: 12000
-        };
-
-        let shortsData = [];
-        let shortsLoaded = false;
-        let shortsLoading = false;
-
-        function fetchWithTimeout(url, ms) {
-            return new Promise((resolve, reject) => {
-                const controller = new AbortController();
-                const timer = setTimeout(() => {
-                    controller.abort();
-                    reject(new Error('timeout'));
-                }, ms);
-                fetch(url, { signal: controller.signal })
-                    .then(r => {
-                        clearTimeout(timer);
-                        resolve(r);
-                    })
-                    .catch(err => {
-                        clearTimeout(timer);
-                        reject(err);
-                    });
-            });
-        }
-
-        async function loadShorts() {
-            if (shortsLoading) return;
-            if (shortsLoaded && shortsData.length > 0) {
-                renderShorts();
-                return;
-            }
-            shortsLoading = true;
-
-            const feed = document.getElementById('shortsFeed');
-            if (!feed) { shortsLoading = false; return; }
-
-            feed.innerHTML = '<div class="shorts-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span>جاري تحميل المقاطع...</span></div>';
-
-            const base = `${SHORTS_CONFIG.host}/player_api.php?username=${encodeURIComponent(SHORTS_CONFIG.username)}&password=${encodeURIComponent(SHORTS_CONFIG.password)}`;
-
-            // جلب الأفلام والمسلسلات بالتوازي مع مهلة زمنية
-            const results = await Promise.allSettled([
-                fetchWithTimeout(`${base}&action=get_vod_streams`, SHORTS_CONFIG.timeout).then(r => r.json()),
-                fetchWithTimeout(`${base}&action=get_series`, SHORTS_CONFIG.timeout).then(r => r.json())
-            ]);
-
-            const items = [];
-
-            // معالجة الأفلام VOD
-            if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
-                results[0].value.forEach(m => {
-                    if (!m || !m.stream_id || !m.name) return;
-                    const ext = m.container_extension || 'mp4';
-                    items.push({
-                        type: 'movie',
-                        name: m.name,
-                        poster: m.stream_icon || '',
-                        url: `${SHORTS_CONFIG.host}/movie/${SHORTS_CONFIG.username}/${SHORTS_CONFIG.password}/${m.stream_id}.${ext}`
-                    });
-                });
-            }
-
-            // معالجة المسلسلات
-            if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
-                results[1].value.forEach(s => {
-                    if (!s || !s.series_id || !s.name) return;
-                    items.push({
-                        type: 'series',
-                        name: s.name,
-                        poster: s.cover || '',
-                        seriesId: s.series_id
-                    });
-                });
-            }
-
-            if (items.length === 0) {
-                feed.innerHTML = `
-                    <div class="shorts-empty">
-                        <i class="fa-solid fa-video-slash"></i>
-                        <span>لا توجد مقاطع متاحة حالياً</span>
-                        <button class="shorts-retry-btn" onclick="retryShorts()">إعادة المحاولة</button>
-                    </div>`;
-                shortsLoading = false;
-                return;
-            }
-
-            // خلط عشوائي
-            for (let i = items.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [items[i], items[j]] = [items[j], items[i]];
-            }
-
-            // فضل العناصر التي تحتوي على صورة، ثم اخلط كل مجموعة
-            const withPoster = items.filter(it => it.poster);
-            const withoutPoster = items.filter(it => !it.poster);
-
-            // خلط كل مجموعة على حدة
-            for (let i = withPoster.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [withPoster[i], withPoster[j]] = [withPoster[j], withPoster[i]];
-            }
-            for (let i = withoutPoster.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [withoutPoster[i], withoutPoster[j]] = [withoutPoster[j], withoutPoster[i]];
-            }
-
-            // دمج: أولاً العناصر بصور (مخلوطة)، ثم بدون صور
-            const finalList = withPoster.concat(withoutPoster);
-
-            shortsData = finalList.slice(0, SHORTS_CONFIG.maxItems);
-
-            renderShorts();
-            shortsLoaded = true;
-            shortsLoading = false;
-        }
-
-        function retryShorts() {
-            shortsLoaded = false;
-            shortsData = [];
-            loadShorts();
-        }
-
-        function renderShorts() {
-            const feed = document.getElementById('shortsFeed');
-            if (!feed) return;
-
-            if (shortsData.length === 0) {
-                feed.innerHTML = '<div class="shorts-empty"><i class="fa-solid fa-video-slash"></i><span>لا توجد مقاطع متاحة</span></div>';
-                return;
-            }
-
-            const defaultPoster = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
-
-            const html = shortsData.map((item, i) => {
-                const poster = item.poster || defaultPoster;
-                const typeLabel = item.type === 'movie' ? 'فيلم' : 'مسلسل';
-                const safeName = String(item.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-                return `
-                    <div class="short-item">
-                        <div class="short-poster">
-                            <img src="${poster}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${defaultPoster}'">
-                        </div>
-                        <div class="short-overlay"></div>
-                        <div class="short-type-badge">${typeLabel}</div>
-                        <button class="short-play-btn" onclick="playShortItem(${i})" aria-label="تشغيل">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                        <div class="short-info">
-                            <div class="short-title-text">${safeName}</div>
-                            <div class="short-hashtag">#نجم_الشاشات</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            feed.innerHTML = html;
-        }
-
-        async function playShortItem(index) {
-            const item = shortsData[index];
-            if (!item) return;
-
-            if (item.type === 'movie') {
-                playChannel(encodeURIComponent(item.url), item.name);
-                return;
-            }
-
-            if (item.type === 'series') {
-                showToast('جاري تحميل الحلقة الأولى...');
-                try {
-                    const base = `${SHORTS_CONFIG.host}/player_api.php?username=${encodeURIComponent(SHORTS_CONFIG.username)}&password=${encodeURIComponent(SHORTS_CONFIG.password)}`;
-                    const res = await fetchWithTimeout(`${base}&action=get_series_info&series_id=${item.seriesId}`, SHORTS_CONFIG.timeout);
-                    const data = await res.json();
-
-                    if (!data || !data.episodes) {
-                        showToast('لا توجد حلقات متاحة لهذا المسلسل');
-                        return;
-                    }
-
-                    const seasonKeys = Object.keys(data.episodes);
-                    if (seasonKeys.length === 0) {
-                        showToast('لا توجد حلقات متاحة');
-                        return;
-                    }
-
-                    seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
-
-                    const firstSeason = data.episodes[seasonKeys[0]];
-                    if (!firstSeason || firstSeason.length === 0) {
-                        showToast('لا توجد حلقات متاحة');
-                        return;
-                    }
-
-                    const firstEp = firstSeason[0];
-                    const ext = firstEp.container_extension || 'mp4';
-                    const epUrl = `${SHORTS_CONFIG.host}/series/${SHORTS_CONFIG.username}/${SHORTS_CONFIG.password}/${firstEp.id}.${ext}`;
-
-                    playChannel(encodeURIComponent(epUrl), item.name);
-
-                } catch (err) {
-                    console.error('Series play error:', err);
-                    showToast('فشل تشغيل المسلسل');
-                }
-            }
-        }
-        // ============ نهاية قسم المقاطع القصيرة ============
 
         // ============ المشغل السريع المطوّر ============
         let hlsPlayer = null;
@@ -3574,6 +3365,232 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
+        // ==================== دوال قسم المقاطع القصيرة ====================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text || '');
+            return div.innerHTML;
+        }
+
+        async function loadShorts() {
+            if (shortsLoading || shortsLoaded) return;
+            shortsLoading = true;
+            
+            const container = document.getElementById('shortsContainer');
+            container.innerHTML = `
+                <div class="shorts-loading-state">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>جاري تحميل المقاطع...</span>
+                </div>
+            `;
+            
+            try {
+                const base = `${SHORTS_XTREAM.host}/player_api.php?username=${encodeURIComponent(SHORTS_XTREAM.username)}&password=${encodeURIComponent(SHORTS_XTREAM.password)}`;
+                
+                // جلب الأفلام
+                const vodRes = await fetch(`${base}&action=get_vod_streams`).then(r => r.json()).catch(() => []);
+                
+                const items = [];
+                
+                if (Array.isArray(vodRes)) {
+                    const shuffled = [...vodRes].sort(() => Math.random() - 0.5);
+                    
+                    for (const v of shuffled) {
+                        if (items.length >= SHORTS_XTREAM.maxItems) break;
+                        if (!v || v.stream_id == null || !v.name) continue;
+                        const ext = v.container_extension || 'mp4';
+                        const url = `${SHORTS_XTREAM.host}/movie/${SHORTS_XTREAM.username}/${SHORTS_XTREAM.password}/${v.stream_id}.${ext}`;
+                        items.push({
+                            type: 'movie',
+                            title: v.name,
+                            poster: v.stream_icon || '',
+                            url: url
+                        });
+                    }
+                }
+                
+                // جلب المسلسلات
+                try {
+                    const seriesRes = await fetch(`${base}&action=get_series`).then(r => r.json());
+                    if (Array.isArray(seriesRes) && seriesRes.length > 0) {
+                        const seriesShuffled = [...seriesRes].sort(() => Math.random() - 0.5).slice(0, SHORTS_XTREAM.maxSeries);
+                        
+                        const seriesPromises = seriesShuffled.map(async (s) => {
+                            try {
+                                const infoRes = await fetch(`${base}&action=get_series_info&series_id=${s.series_id}`).then(r => r.json());
+                                const eps = infoRes.episodes;
+                                if (eps && typeof eps === 'object') {
+                                    const seasons = Object.keys(eps);
+                                    if (seasons.length > 0 && eps[seasons[0]] && eps[seasons[0]][0]) {
+                                        const firstEp = eps[seasons[0]][0];
+                                        const ext = firstEp.container_extension || 'mp4';
+                                        return {
+                                            type: 'series',
+                                            title: s.name || 'مسلسل',
+                                            poster: s.cover || '',
+                                            url: `${SHORTS_XTREAM.host}/series/${SHORTS_XTREAM.username}/${SHORTS_XTREAM.password}/${firstEp.id}.${ext}`
+                                        };
+                                    }
+                                }
+                            } catch(e) {}
+                            return null;
+                        });
+                        
+                        const seriesResults = await Promise.all(seriesPromises);
+                        seriesResults.forEach(r => { if (r) items.push(r); });
+                    }
+                } catch(e) {
+                    console.warn('Series load failed:', e);
+                }
+                
+                // خلط العناصر
+                items.sort(() => Math.random() - 0.5);
+                
+                shortsData = items;
+                shortsLoaded = true;
+                shortsLoading = false;
+                
+                if (items.length === 0) {
+                    container.innerHTML = `
+                        <div class="shorts-loading-state">
+                            <i class="fa-solid fa-film"></i>
+                            <span>لا توجد مقاطع متاحة حالياً</span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                renderShorts();
+                
+            } catch (err) {
+                console.error('Shorts load error:', err);
+                shortsLoading = false;
+                container.innerHTML = `
+                    <div class="shorts-loading-state" style="color:#ef4444;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>فشل تحميل المقاطع</span>
+                    </div>
+                `;
+            }
+        }
+
+        function renderShorts() {
+            const container = document.getElementById('shortsContainer');
+            container.innerHTML = '';
+            
+            const frag = document.createDocumentFragment();
+            
+            shortsData.forEach((item, index) => {
+                const el = document.createElement('div');
+                el.className = 'short-item';
+                el.dataset.index = index;
+                el.dataset.src = item.url;
+                
+                const safeTitle = escapeHtml(item.title);
+                
+                el.innerHTML = `
+                    <video class="short-video" preload="none" playsinline webkit-playsinline loop muted></video>
+                    <div class="short-loader"></div>
+                    <div class="short-play-btn"><i class="fa-solid fa-play"></i></div>
+                    <button class="short-sound-btn"><i class="fa-solid fa-volume-xmark"></i></button>
+                    <div class="short-overlay-info">
+                        <div class="short-title">${safeTitle}</div>
+                        <div class="short-hashtag">#نجم_الشاشات</div>
+                    </div>
+                `;
+                
+                const video = el.querySelector('video');
+                const soundBtn = el.querySelector('.short-sound-btn');
+                
+                video.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (video.paused) {
+                        video.play().catch(()=>{});
+                        el.classList.remove('paused');
+                    } else {
+                        video.pause();
+                        el.classList.add('paused');
+                    }
+                });
+                
+                video.addEventListener('waiting', () => {
+                    el.classList.add('loading');
+                });
+                
+                video.addEventListener('playing', () => {
+                    el.classList.remove('loading');
+                });
+                
+                video.addEventListener('canplay', () => {
+                    el.classList.remove('loading');
+                });
+                
+                soundBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    video.muted = !video.muted;
+                    const icon = soundBtn.querySelector('i');
+                    icon.className = video.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+                });
+                
+                frag.appendChild(el);
+            });
+            
+            container.appendChild(frag);
+            
+            setupShortsObserver();
+        }
+
+        function setupShortsObserver() {
+            if (shortsObserver) shortsObserver.disconnect();
+            
+            const container = document.getElementById('shortsContainer');
+            const items = container.querySelectorAll('.short-item');
+            
+            shortsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    if (!video) return;
+                    
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                        if (!video.src && entry.target.dataset.src) {
+                            video.src = entry.target.dataset.src;
+                            video.load();
+                        }
+                        video.muted = true;
+                        const soundIcon = entry.target.querySelector('.short-sound-btn i');
+                        if (soundIcon) soundIcon.className = 'fa-solid fa-volume-xmark';
+                        
+                        video.play().catch(() => {});
+                        entry.target.classList.remove('paused');
+                        
+                        items.forEach(item => {
+                            if (item !== entry.target) {
+                                const v = item.querySelector('video');
+                                if (v && !v.paused) v.pause();
+                            }
+                        });
+                    } else {
+                        if (video && !video.paused) {
+                            video.pause();
+                        }
+                    }
+                });
+            }, {
+                threshold: [0, 0.6],
+                root: container
+            });
+            
+            items.forEach(item => shortsObserver.observe(item));
+        }
+
+        function pauseAllShorts() {
+            const items = document.querySelectorAll('.short-item video');
+            items.forEach(v => {
+                try { v.pause(); } catch(e) {}
+            });
+        }
+        // ================================================================
+
         const panesArr = document.querySelectorAll('.section-pane');
         const dockBtnsArr = document.querySelectorAll('.dock-tab-btn');
         let currentLanguage = 'ar';
@@ -3597,7 +3614,7 @@
                 socialSupport: "مواقع التواصل والدعم", telegramChannel: "قناة التلغرام", telegramDesc: "انضم لقناتنا على تلغرام",
                 youtubeChannel: "قناة اليوتيوب", youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
                 emailSupport: "الدعم الفني", emailSupportDesc: "تواصل مع فريق نجم الشاشات",
-                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navShorts: "مقاطع قصيرة", navNews: "أخبار", navSettings: "الإعدادات",
+                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navSettings: "الإعدادات",
                 now: "الآن", minutesAgo: "منذ", minute: "دقيقة", hour: "ساعة", day: "يوم",
                 starScreens: "نجم الشاشات", linkCopied: "تم نسخ الرابط بنجاح!",
                 shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
@@ -3617,7 +3634,7 @@
                 socialSupport: "Social Media and Support", telegramChannel: "Telegram Channel", telegramDesc: "Join our channel on Telegram",
                 youtubeChannel: "YouTube Channel", youtubeDesc: "Watch the latest videos and shows",
                 emailSupport: "Technical Support", emailSupportDesc: "Contact Star Screens Team",
-                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navShorts: "Short Clips", navNews: "News", navSettings: "Settings",
+                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navSettings: "Settings",
                 now: "Now", minutesAgo: "", minute: "minute", hour: "hour", day: "day",
                 starScreens: "Star Screens", linkCopied: "Link copied successfully!",
                 shareText: " Star Screens App\nBest Live Streaming Platform\n",
@@ -3628,6 +3645,16 @@
         function switchPane(index) {
             if (document.getElementById('videoModal').classList.contains('active')) {
                 closeVideoPlayer();
+            }
+
+            // إيقاف فيديوهات المقاطع عند مغادرة القسم
+            if (index !== 4) {
+                pauseAllShorts();
+            }
+            
+            // إيقاف تشغيل أخبار تلقائي عند مغادرة القسم
+            if (index !== 3 && newsInterval) {
+                clearInterval(newsInterval);
             }
 
             panesArr.forEach(pane => pane.classList.remove('active'));
@@ -3642,13 +3669,27 @@
                 if (currentCategory) closeCategory();
             } else if (index === 1) { 
                 fetchSchedule();
-            } else if (index === 3) {
-                loadShorts();
-            } else if (index === 4) { 
+            } else if (index === 3) { 
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
-            } else {
-                if (newsInterval) clearInterval(newsInterval);
+            } else if (index === 4) {
+                if (!shortsLoaded) {
+                    loadShorts();
+                } else {
+                    // استئناف تشغيل أول فيديو ظاهر
+                    setTimeout(() => {
+                        const container = document.getElementById('shortsContainer');
+                        if (!container) return;
+                        const items = container.querySelectorAll('.short-item');
+                        items.forEach(item => {
+                            const r = item.getBoundingClientRect();
+                            if (r.top >= -r.height/2 && r.top < r.height/2) {
+                                const v = item.querySelector('video');
+                                if (v && v.src) v.play().catch(()=>{});
+                            }
+                        });
+                    }, 150);
+                }
             }
         }
 
