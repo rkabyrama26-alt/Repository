@@ -1514,7 +1514,7 @@
             top: 3.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
             color: #fff;
             padding: 0.5rem 1rem;
@@ -1527,6 +1527,8 @@
             gap: 0.5rem;
             pointer-events: none;
             box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.5);
+            max-width: 90%;
+            text-align: center;
         }
 
         .clips-status.show { display: flex; }
@@ -1551,6 +1553,23 @@
         }
 
         .clips-retry-btn:active { transform: scale(0.95); }
+
+        .clips-debug {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.75rem;
+            max-width: 320px;
+            line-height: 1.6;
+            font-family: monospace;
+            direction: ltr;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+        }
         /* ======================================================== */
 
         .news-feed-container {
@@ -2532,13 +2551,13 @@
             maxSeries: 25
         };
 
-        // قائمة بروكسيات CORS للتجربة بالترتيب
+        // بروكسيات CORS المتاحة
         const CORS_PROXIES = [
-            { name: 'مباشر', build: (url) => url },
             { name: 'corsproxy.io', build: (url) => 'https://corsproxy.io/?' + encodeURIComponent(url) },
-            { name: 'allorigins', build: (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) },
+            { name: 'allorigins.win', build: (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) },
             { name: 'cors.eu.org', build: (url) => 'https://cors.eu.org/' + url },
-            { name: 'thingproxy', build: (url) => 'https://thingproxy.freeboard.io/fetch/' + url }
+            { name: 'whateverorigin', build: (url) => 'https://www.whateverorigin.org/get?url=' + encodeURIComponent(url) },
+            { name: 'cors-anywhere', build: (url) => 'https://cors-anywhere.herokuapp.com/' + url }
         ];
         // ============================================================================
         
@@ -4025,11 +4044,19 @@
             closeTelegramPopup();
         }
 
-        // ==================== وظائف قسم المقاطع القصيرة (مطوّرة مع دعم CORS Proxies) ====================
+        // ==================== وظائف قسم المقاطع القصيرة (نسخة محسّنة جداً) ====================
         let clipsLoaded = false;
         let clipsLoading = false;
         let clipsData = [];
         let clipsObserver = null;
+        let clipsDebugLog = [];
+
+        function logClips(msg) {
+            const time = new Date().toLocaleTimeString('ar-SA');
+            clipsDebugLog.push(`[${time}] ${msg}`);
+            if (clipsDebugLog.length > 20) clipsDebugLog.shift();
+            console.log('[CLIPS]', msg);
+        }
 
         function updateClipsStatus(text, showSpinner) {
             const status = document.getElementById('clipsStatus');
@@ -4049,64 +4076,131 @@
             }
         }
 
-        // دالة جلب مع تجربة عدة بروكسيات
-        async function fetchWithProxies(url, timeoutMs) {
-            timeoutMs = timeoutMs || 12000;
-            let lastError = null;
+        // توليد قائمة عناوين URL بديلة للسيرفر
+        function buildUrlVariants(endpoint) {
+            const base = `${CLIPS_CONFIG.host}/player_api.php?username=${encodeURIComponent(CLIPS_CONFIG.username)}&password=${encodeURIComponent(CLIPS_CONFIG.password)}&action=${endpoint}`;
+            const variants = [base];
 
-            for (let i = 0; i < CORS_PROXIES.length; i++) {
-                const proxy = CORS_PROXIES[i];
-                const proxiedUrl = proxy.build(url);
-                updateClipsStatus(`جرب ${proxy.name}...`, true);
+            // نسخة HTTPS إذا كان الرابط الأساسي HTTP
+            if (base.startsWith('http://')) {
+                variants.push(base.replace('http://', 'https://'));
+            }
 
+            // بدون /player_api.php (بعض السيرفرات تقبل /panel_api.php)
+            const panelVariant = base.replace('/player_api.php', '/panel_api.php');
+            variants.push(panelVariant);
+
+            return variants;
+        }
+
+        // محاولة جلب JSON واحدة
+        async function tryFetchJson(url, timeoutMs) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+            try {
+                const response = await fetch(url, {
+                    signal: controller.signal,
+                    credentials: 'omit',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                clearTimeout(timer);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const text = await response.text();
+                if (!text || text.length < 2) {
+                    throw new Error('استجابة فارغة');
+                }
+
+                // محاولة استخراج JSON
+                let data;
                 try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                    data = JSON.parse(text);
+                } catch (e) {
+                    const match = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+                    if (match) {
+                        data = JSON.parse(match[1]);
+                    } else {
+                        throw new Error('JSON غير صالح');
+                    }
+                }
 
-                    const response = await fetch(proxiedUrl, {
-                        method: 'GET',
-                        signal: controller.signal,
-                        headers: { 'Accept': 'application/json, text/plain, */*' }
+                return data;
+            } catch (err) {
+                clearTimeout(timer);
+                throw err;
+            }
+        }
+
+        // دالة الجلب الشاملة مع تجربة جميع الطرق
+        async function fetchClipsAPI(endpoint) {
+            const urlVariants = buildUrlVariants(endpoint);
+            const attempts = [];
+
+            // 1) محاولات مباشرة أولاً (الأسرع)
+            urlVariants.forEach((u, i) => {
+                attempts.push({ label: i === 0 ? 'اتصال مباشر' : 'HTTPS', url: u, timeout: 12000 });
+            });
+
+            // 2) ثم البروكسيات لكل متغير
+            for (const u of urlVariants) {
+                for (const proxy of CORS_PROXIES) {
+                    attempts.push({ 
+                        label: proxy.name, 
+                        url: proxy.build(u), 
+                        timeout: 10000 
                     });
-
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error('HTTP ' + response.status);
-                    }
-
-                    const text = await response.text();
-                    if (!text || text.length < 2) {
-                        throw new Error('استجابة فارغة');
-                    }
-
-                    let data;
-                    try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        // ربما يكون هناك HTML أو نص ملوث - حاول استخراج JSON
-                        const match = text.match(/[\[{][\s\S]*[\]}]/);
-                        if (match) {
-                            data = JSON.parse(match[0]);
-                        } else {
-                            throw new Error('JSON غير صالح');
-                        }
-                    }
-
-                    return { data, proxyName: proxy.name, usedUrl: proxiedUrl };
-                } catch (err) {
-                    lastError = err;
-                    console.warn(`[Proxy ${proxy.name}] failed:`, err.message);
-                    continue;
                 }
             }
 
-            throw lastError || new Error('جميع البروكسيات فشلت');
+            let lastError = null;
+            for (let i = 0; i < attempts.length; i++) {
+                const attempt = attempts[i];
+                const progress = `(${i+1}/${attempts.length})`;
+                updateClipsStatus(`${attempt.label} ${progress}`, true);
+                logClips(`محاولة ${attempt.label}: ${attempt.url.substring(0, 80)}...`);
+
+                try {
+                    const data = await tryFetchJson(attempt.url, attempt.timeout);
+                    
+                    // التحقق من صحة البيانات
+                    if (Array.isArray(data)) {
+                        logClips(`✅ نجح ${attempt.label} - عناصر: ${data.length}`);
+                        return data;
+                    } else if (data && typeof data === 'object') {
+                        // بعض البروكسيات ترجع {contents: "..."} 
+                        if (typeof data.contents === 'string') {
+                            try {
+                                const parsed = JSON.parse(data.contents);
+                                if (Array.isArray(parsed)) {
+                                    logClips(`✅ نجح ${attempt.label} (contents) - عناصر: ${parsed.length}`);
+                                    return parsed;
+                                }
+                            } catch (e) {}
+                        }
+                        logClips(`⚠️ ${attempt.label} رجع كائن غير متوقع`);
+                    } else {
+                        logClips(`⚠️ ${attempt.label} رجع نوع غير متوقع: ${typeof data}`);
+                    }
+                } catch (err) {
+                    logClips(`❌ فشل ${attempt.label}: ${err.message}`);
+                    lastError = err;
+                }
+            }
+
+            throw lastError || new Error('فشلت جميع المحاولات');
         }
 
         async function loadClips() {
             if (clipsLoading || clipsLoaded) return;
             clipsLoading = true;
+            clipsDebugLog = [];
+
+            logClips('🚀 بدء تحميل المقاطع');
 
             const feed = document.getElementById('clipsFeed');
             feed.innerHTML = `
@@ -4115,32 +4209,35 @@
                     <span>جاري الاتصال بالسيرفر...</span>
                 </div>`;
 
-            const base = `${CLIPS_CONFIG.host}/player_api.php?username=${encodeURIComponent(CLIPS_CONFIG.username)}&password=${encodeURIComponent(CLIPS_CONFIG.password)}`;
-
             try {
-                // جلب الأفلام والمسلسلات بالتوازي عبر البروكسيات
+                // ==== جلب الأفلام ====
                 updateClipsStatus('جاري جلب الأفلام...', true);
-                const vodResult = await fetchWithProxies(`${base}&action=get_vod_streams`, 15000).catch(err => {
-                    console.warn('VOD fetch failed:', err);
-                    return { data: null };
+                const vodRes = await fetchClipsAPI('get_vod_streams').catch(err => {
+                    logClips(`فشل جلب الأفلام: ${err.message}`);
+                    return null;
                 });
 
+                // ==== جلب المسلسلات ====
                 updateClipsStatus('جاري جلب المسلسلات...', true);
-                const seriesResult = await fetchWithProxies(`${base}&action=get_series`, 15000).catch(err => {
-                    console.warn('Series fetch failed:', err);
-                    return { data: null };
+                const seriesRes = await fetchClipsAPI('get_series').catch(err => {
+                    logClips(`فشل جلب المسلسلات: ${err.message}`);
+                    return null;
                 });
 
-                const vodRes = vodResult && Array.isArray(vodResult.data) ? vodResult.data : null;
-                const seriesRes = seriesResult && Array.isArray(seriesResult.data) ? seriesResult.data : null;
+                logClips(`نتيجة الأفلام: ${vodRes ? vodRes.length : 'لا شيء'}`);
+                logClips(`نتيجة المسلسلات: ${seriesRes ? seriesRes.length : 'لا شيء'}`);
 
-                if (!vodRes && !seriesRes) {
+                if ((!vodRes || vodRes.length === 0) && (!seriesRes || seriesRes.length === 0)) {
                     updateClipsStatus('', false);
+                    const debugText = clipsDebugLog.slice(-6).join('\n');
                     feed.innerHTML = `
                         <div class="clips-empty">
                             <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: #ef4444;"></i>
                             <span>تعذّر الاتصال بالسيرفر</span>
-                            <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">قد يكون السيرفر لا يدعم الطلبات من المتصفح (CORS) أو غير متاح حالياً</span>
+                            <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">
+                                قد يكون السيرفر لا يدعم CORS أو غير متاح حالياً
+                            </span>
+                            <div class="clips-debug">${debugText || 'لا توجد تفاصيل'}</div>
                             <button class="clips-retry-btn" onclick="resetClipsAndReload()">
                                 <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
                             </button>
@@ -4152,7 +4249,7 @@
                 const items = [];
 
                 // ==== إضافة الأفلام ====
-                if (vodRes) {
+                if (Array.isArray(vodRes) && vodRes.length > 0) {
                     const movies = vodRes.slice(0, CLIPS_CONFIG.maxMovies);
                     movies.forEach(m => {
                         if (!m || !m.stream_id) return;
@@ -4167,28 +4264,26 @@
                 }
 
                 // ==== إضافة المسلسلات (الحلقة الأولى) ====
-                if (seriesRes && seriesRes.length > 0) {
+                if (Array.isArray(seriesRes) && seriesRes.length > 0) {
                     const seriesList = seriesRes.slice(0, CLIPS_CONFIG.maxSeries);
 
-                    updateClipsStatus(`جاري تحميل ${seriesList.length} مسلسل...`, true);
+                    updateClipsStatus(`جلب حلقات ${seriesList.length} مسلسل...`, true);
 
-                    // جلب المعلومات بالتوازي، كل واحدة مع بروكسي
                     const seriesPromises = seriesList.map(async (s) => {
                         if (!s || !s.series_id) return null;
                         try {
-                            const infoUrl = `${base}&action=get_series_info&series_id=${s.series_id}`;
-                            const infoResult = await fetchWithProxies(infoUrl, 10000);
-                            const info = infoResult.data;
+                            const infoData = await fetchClipsAPI(`get_series_info&series_id=${s.series_id}`);
+                            if (!infoData || !infoData.episodes) return null;
 
-                            if (!info || !info.episodes) return null;
-                            const seasons = Object.keys(info.episodes);
+                            const seasons = Object.keys(infoData.episodes);
                             if (seasons.length === 0) return null;
-                            const firstSeason = info.episodes[seasons[0]];
+                            const firstSeason = infoData.episodes[seasons[0]];
                             if (!firstSeason || firstSeason.length === 0) return null;
                             const ep = firstSeason[0];
                             const ext = ep.container_extension || 'mp4';
                             const epId = ep.id || ep.episode_id;
                             if (!epId) return null;
+
                             return {
                                 title: s.name || 'مسلسل',
                                 url: `${CLIPS_CONFIG.host}/series/${CLIPS_CONFIG.username}/${CLIPS_CONFIG.password}/${epId}.${ext}`,
@@ -4212,6 +4307,8 @@
                     [items[i], items[j]] = [items[j], items[i]];
                 }
 
+                logClips(`✅ تم تجميع ${items.length} مقطع`);
+
                 clipsData = items;
                 clipsLoaded = true;
                 clipsLoading = false;
@@ -4229,14 +4326,16 @@
                 renderClipsFeed();
 
             } catch (err) {
-                console.error('Clips load error:', err);
+                logClips(`❌ خطأ عام: ${err.message}`);
                 clipsLoading = false;
                 updateClipsStatus('', false);
+                const debugText = clipsDebugLog.slice(-6).join('\n');
                 feed.innerHTML = `
                     <div class="clips-empty">
                         <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: #ef4444;"></i>
                         <span>فشل تحميل المقاطع</span>
                         <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">${(err && err.message) || 'خطأ غير معروف'}</span>
+                        <div class="clips-debug">${debugText}</div>
                         <button class="clips-retry-btn" onclick="resetClipsAndReload()">
                             <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
                         </button>
@@ -4339,7 +4438,6 @@
                         }
 
                         attachClipProgress(item, video);
-
                     } else {
                         try { video.pause(); } catch (e) {}
                         try { video.currentTime = 0; } catch (e) {}
