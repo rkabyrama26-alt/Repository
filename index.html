@@ -912,17 +912,17 @@
             height: 3.5rem;
             border-radius: 1.75rem; 
             position: relative;
-            margin: 0 0.125rem;
+            margin: 0 0.0625rem;
         }
 
         .dock-tab-btn i {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             margin-bottom: 0.1875rem;
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
         }
 
         .dock-tab-btn span {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             font-weight: 700;
             transition: opacity 0.3s ease;
             color: var(--text-muted);
@@ -1270,7 +1270,7 @@
         }
 
         /* ==================== قسم المقاطع القصيرة ==================== */
-        #pane-shorts {
+        #pane-clips {
             position: fixed;
             top: 0;
             left: 0;
@@ -1284,169 +1284,274 @@
             background: #000;
         }
 
-        #pane-shorts.active { display: block; }
+        #pane-clips.active {
+            display: block;
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
 
-        .shorts-container {
+        .clips-feed {
             width: 100%;
             height: 100%;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
             background: #000;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .shorts-container::-webkit-scrollbar {
-            display: none;
-            width: 0;
-        }
+        .clips-feed::-webkit-scrollbar { display: none; }
 
-        .shorts-loading-state {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .shorts-loading-state i {
-            font-size: 2.5rem;
-            color: var(--accent-primary);
-        }
-
-        .short-item {
+        .clip-item {
             width: 100%;
             height: 100%;
             scroll-snap-align: start;
             scroll-snap-stop: always;
             position: relative;
+            background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #000;
             overflow: hidden;
-            flex-shrink: 0;
         }
 
-        .short-video {
+        .clip-video {
             width: 100%;
             height: 100%;
             object-fit: contain;
             background: #000;
-            display: block;
         }
 
-        .short-overlay-info {
+        .clip-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 35%, transparent 65%, rgba(0,0,0,0.35) 100%);
+            z-index: 2;
+        }
+
+        .clip-info {
             position: absolute;
             bottom: 6.5rem;
             right: 1rem;
-            left: 1rem;
+            left: 4.5rem;
+            color: #fff;
             z-index: 5;
             pointer-events: none;
-            padding: 1rem 1.25rem;
-            background: linear-gradient(to top, rgba(3,7,18,0.9) 0%, rgba(3,7,18,0.55) 70%, transparent 100%);
-            border-radius: 1.25rem;
-            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.8);
         }
 
-        .short-title {
-            font-size: 1.05rem;
+        .clip-title {
+            font-size: 1rem;
             font-weight: 800;
-            color: #fff;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.375rem;
             line-height: 1.4;
-            font-family: 'Alexandria', sans-serif;
+            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.9);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .short-hashtag {
-            font-size: 0.9rem;
-            font-weight: 700;
+        .clip-hashtag {
             color: #38bdf8;
-            font-family: 'Alexandria', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.9);
             letter-spacing: 0.0125rem;
         }
 
-        .short-play-btn {
+        .clip-actions {
+            position: absolute;
+            bottom: 7rem;
+            left: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+            z-index: 6;
+        }
+
+        .clip-action-btn {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 0.0625rem solid rgba(255,255,255,0.15);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .clip-action-btn:active {
+            transform: scale(0.9);
+            background: rgba(99, 102, 241, 0.6);
+        }
+
+        .clip-action-btn i {
+            font-size: 1.05rem;
+        }
+
+        .clip-center-play {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 4.5rem;
             height: 4.5rem;
+            border-radius: 50%;
             background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(10px);
             border: 0.125rem solid rgba(255,255,255,0.25);
-            border-radius: 50%;
+            color: #fff;
             display: none;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 1.75rem;
             z-index: 6;
             cursor: pointer;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            transition: transform 0.2s;
         }
 
-        .short-item.paused .short-play-btn {
-            display: flex;
-        }
+        .clip-center-play.show { display: flex; }
+        .clip-center-play:active { transform: translate(-50%, -50%) scale(0.9); }
+        .clip-center-play i { font-size: 1.8rem; margin-right: -0.25rem; }
 
-        .short-play-btn i {
-            margin-right: -0.25rem;
-        }
-
-        .short-sound-btn {
+        .clip-loading-badge {
             position: absolute;
-            top: 1rem;
+            top: 3rem;
             right: 1rem;
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.55);
-            border: 0.0625rem solid rgba(255,255,255,0.15);
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 7;
+        }
+
+        .clip-loading-badge.show { display: flex; }
+
+        .clip-loading-badge i {
+            font-size: 0.8rem;
+            color: var(--accent-secondary);
+        }
+
+        .clips-loading, .clips-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #fff;
+            gap: 1rem;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 1.25rem;
+        }
+
+        .clips-loading i { font-size: 2rem; color: var(--accent-primary); }
+
+        .clip-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0.1875rem;
+            background: rgba(255,255,255,0.1);
+            z-index: 7;
+        }
+
+        .clip-progress-bar {
+            height: 100%;
+            background: var(--accent-secondary);
+            width: 0%;
+            transition: width 0.15s linear;
+            box-shadow: 0 0 0.625rem rgba(56, 189, 248, 0.7);
+        }
+
+        .clips-top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+            z-index: 8;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 6;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            pointer-events: none;
         }
 
-        .short-sound-btn:active {
-            transform: scale(0.9);
+        .clips-top-title {
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.0125rem;
+            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .short-loader {
+        .clips-top-title i {
+            color: var(--accent-secondary);
+            font-size: 1rem;
+        }
+
+        .clips-status {
             position: absolute;
-            top: 50%;
+            top: 3.5rem;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 3.125rem;
-            height: 3.125rem;
-            border: 0.1875rem solid rgba(255,255,255,0.1);
-            border-top-color: var(--accent-secondary);
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            z-index: 4;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            z-index: 9;
             display: none;
+            align-items: center;
+            gap: 0.5rem;
+            pointer-events: none;
+            box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.5);
         }
 
-        .short-item.loading .short-loader {
-            display: block;
+        .clips-status.show { display: flex; }
+        .clips-status i { font-size: 0.8rem; color: var(--accent-secondary); }
+
+        .clips-retry-btn {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            color: #fff;
+            border: none;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Alexandria', sans-serif;
+            pointer-events: all;
+            box-shadow: 0 0.5rem 1.5rem rgba(99, 102, 241, 0.4);
         }
 
-        /* ============================================================== */
+        .clips-retry-btn:active { transform: scale(0.95); }
+        /* ======================================================== */
 
         .news-feed-container {
             width: 100%;
@@ -1817,9 +1922,6 @@
             .player-controls-row {
                 gap: 0.5rem;
             }
-            .dock-tab-btn span {
-                font-size: 0.55rem;
-            }
         }
     </style>
     
@@ -2006,16 +2108,26 @@
                 </div>
             </div>
 
-            <!-- ==================== قسم المقاطع القصيرة ==================== -->
-            <div id="pane-shorts" class="section-pane">
-                <div class="shorts-container" id="shortsContainer">
-                    <div class="shorts-loading-state">
+            <!-- ==================== قسم المقاطع القصيرة (جديد) ==================== -->
+            <div id="pane-clips" class="section-pane">
+                <div class="clips-top-bar">
+                    <div class="clips-top-title">
+                        <i class="fa-solid fa-clapperboard"></i>
+                        <span>مقاطع قصيرة</span>
+                    </div>
+                </div>
+                <div class="clips-status" id="clipsStatus">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span id="clipsStatusText">جاري التحميل...</span>
+                </div>
+                <div class="clips-feed" id="clipsFeed">
+                    <div class="clips-loading">
                         <i class="fa-solid fa-circle-notch fa-spin"></i>
                         <span>جاري تحميل المقاطع...</span>
                     </div>
                 </div>
             </div>
-            <!-- ============================================================== -->
+            <!-- ==================================================================== -->
 
             <div id="pane-settings" class="section-pane">
                 
@@ -2100,10 +2212,12 @@
                 <i class="fa-solid fa-newspaper"></i>
                 <span data-key="navNews">أخبار</span>
             </button>
+            <!-- ==================== زر المقاطع القصيرة (جديد) ==================== -->
             <button class="dock-tab-btn" onclick="switchPane(4)">
                 <i class="fa-solid fa-clapperboard"></i>
-                <span>مقاطع قصيرة</span>
+                <span data-key="navClips">مقاطع</span>
             </button>
+            <!-- ==================================================================== -->
             <button class="dock-tab-btn" onclick="switchPane(5)">
                 <i class="fa-solid fa-gear"></i>
                 <span data-key="navSettings">الإعدادات</span>
@@ -2409,20 +2523,24 @@
             maxChannels: 700
         };
 
-        // ==================== إعدادات قسم المقاطع القصيرة ====================
-        const SHORTS_XTREAM = {
-            host: 'http://cname1.elg-26.com:8080',
-            username: 'Abdo20250505',
-            password: 'hze7pmru27',
-            maxItems: 80,
-            maxSeries: 6
+        // ==================== إعدادات سيرفر المقاطع القصيرة (جديد) ====================
+        const CLIPS_CONFIG = {
+            host: 'http://ts1.eagtop.lol',
+            username: 'e1uf3olh92',
+            password: 'j18aurmqt5',
+            maxMovies: 100,
+            maxSeries: 25
         };
 
-        let shortsLoaded = false;
-        let shortsLoading = false;
-        let shortsData = [];
-        let shortsObserver = null;
-        // ======================================================================
+        // قائمة بروكسيات CORS للتجربة بالترتيب
+        const CORS_PROXIES = [
+            { name: 'مباشر', build: (url) => url },
+            { name: 'corsproxy.io', build: (url) => 'https://corsproxy.io/?' + encodeURIComponent(url) },
+            { name: 'allorigins', build: (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) },
+            { name: 'cors.eu.org', build: (url) => 'https://cors.eu.org/' + url },
+            { name: 'thingproxy', build: (url) => 'https://thingproxy.freeboard.io/fetch/' + url }
+        ];
+        // ============================================================================
         
         let xtreamCategories = {};
         let xtreamLoaded = false;
@@ -3365,232 +3483,6 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // ==================== دوال قسم المقاطع القصيرة ====================
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = String(text || '');
-            return div.innerHTML;
-        }
-
-        async function loadShorts() {
-            if (shortsLoading || shortsLoaded) return;
-            shortsLoading = true;
-            
-            const container = document.getElementById('shortsContainer');
-            container.innerHTML = `
-                <div class="shorts-loading-state">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i>
-                    <span>جاري تحميل المقاطع...</span>
-                </div>
-            `;
-            
-            try {
-                const base = `${SHORTS_XTREAM.host}/player_api.php?username=${encodeURIComponent(SHORTS_XTREAM.username)}&password=${encodeURIComponent(SHORTS_XTREAM.password)}`;
-                
-                // جلب الأفلام
-                const vodRes = await fetch(`${base}&action=get_vod_streams`).then(r => r.json()).catch(() => []);
-                
-                const items = [];
-                
-                if (Array.isArray(vodRes)) {
-                    const shuffled = [...vodRes].sort(() => Math.random() - 0.5);
-                    
-                    for (const v of shuffled) {
-                        if (items.length >= SHORTS_XTREAM.maxItems) break;
-                        if (!v || v.stream_id == null || !v.name) continue;
-                        const ext = v.container_extension || 'mp4';
-                        const url = `${SHORTS_XTREAM.host}/movie/${SHORTS_XTREAM.username}/${SHORTS_XTREAM.password}/${v.stream_id}.${ext}`;
-                        items.push({
-                            type: 'movie',
-                            title: v.name,
-                            poster: v.stream_icon || '',
-                            url: url
-                        });
-                    }
-                }
-                
-                // جلب المسلسلات
-                try {
-                    const seriesRes = await fetch(`${base}&action=get_series`).then(r => r.json());
-                    if (Array.isArray(seriesRes) && seriesRes.length > 0) {
-                        const seriesShuffled = [...seriesRes].sort(() => Math.random() - 0.5).slice(0, SHORTS_XTREAM.maxSeries);
-                        
-                        const seriesPromises = seriesShuffled.map(async (s) => {
-                            try {
-                                const infoRes = await fetch(`${base}&action=get_series_info&series_id=${s.series_id}`).then(r => r.json());
-                                const eps = infoRes.episodes;
-                                if (eps && typeof eps === 'object') {
-                                    const seasons = Object.keys(eps);
-                                    if (seasons.length > 0 && eps[seasons[0]] && eps[seasons[0]][0]) {
-                                        const firstEp = eps[seasons[0]][0];
-                                        const ext = firstEp.container_extension || 'mp4';
-                                        return {
-                                            type: 'series',
-                                            title: s.name || 'مسلسل',
-                                            poster: s.cover || '',
-                                            url: `${SHORTS_XTREAM.host}/series/${SHORTS_XTREAM.username}/${SHORTS_XTREAM.password}/${firstEp.id}.${ext}`
-                                        };
-                                    }
-                                }
-                            } catch(e) {}
-                            return null;
-                        });
-                        
-                        const seriesResults = await Promise.all(seriesPromises);
-                        seriesResults.forEach(r => { if (r) items.push(r); });
-                    }
-                } catch(e) {
-                    console.warn('Series load failed:', e);
-                }
-                
-                // خلط العناصر
-                items.sort(() => Math.random() - 0.5);
-                
-                shortsData = items;
-                shortsLoaded = true;
-                shortsLoading = false;
-                
-                if (items.length === 0) {
-                    container.innerHTML = `
-                        <div class="shorts-loading-state">
-                            <i class="fa-solid fa-film"></i>
-                            <span>لا توجد مقاطع متاحة حالياً</span>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                renderShorts();
-                
-            } catch (err) {
-                console.error('Shorts load error:', err);
-                shortsLoading = false;
-                container.innerHTML = `
-                    <div class="shorts-loading-state" style="color:#ef4444;">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span>فشل تحميل المقاطع</span>
-                    </div>
-                `;
-            }
-        }
-
-        function renderShorts() {
-            const container = document.getElementById('shortsContainer');
-            container.innerHTML = '';
-            
-            const frag = document.createDocumentFragment();
-            
-            shortsData.forEach((item, index) => {
-                const el = document.createElement('div');
-                el.className = 'short-item';
-                el.dataset.index = index;
-                el.dataset.src = item.url;
-                
-                const safeTitle = escapeHtml(item.title);
-                
-                el.innerHTML = `
-                    <video class="short-video" preload="none" playsinline webkit-playsinline loop muted></video>
-                    <div class="short-loader"></div>
-                    <div class="short-play-btn"><i class="fa-solid fa-play"></i></div>
-                    <button class="short-sound-btn"><i class="fa-solid fa-volume-xmark"></i></button>
-                    <div class="short-overlay-info">
-                        <div class="short-title">${safeTitle}</div>
-                        <div class="short-hashtag">#نجم_الشاشات</div>
-                    </div>
-                `;
-                
-                const video = el.querySelector('video');
-                const soundBtn = el.querySelector('.short-sound-btn');
-                
-                video.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (video.paused) {
-                        video.play().catch(()=>{});
-                        el.classList.remove('paused');
-                    } else {
-                        video.pause();
-                        el.classList.add('paused');
-                    }
-                });
-                
-                video.addEventListener('waiting', () => {
-                    el.classList.add('loading');
-                });
-                
-                video.addEventListener('playing', () => {
-                    el.classList.remove('loading');
-                });
-                
-                video.addEventListener('canplay', () => {
-                    el.classList.remove('loading');
-                });
-                
-                soundBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    video.muted = !video.muted;
-                    const icon = soundBtn.querySelector('i');
-                    icon.className = video.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-                });
-                
-                frag.appendChild(el);
-            });
-            
-            container.appendChild(frag);
-            
-            setupShortsObserver();
-        }
-
-        function setupShortsObserver() {
-            if (shortsObserver) shortsObserver.disconnect();
-            
-            const container = document.getElementById('shortsContainer');
-            const items = container.querySelectorAll('.short-item');
-            
-            shortsObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    if (!video) return;
-                    
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-                        if (!video.src && entry.target.dataset.src) {
-                            video.src = entry.target.dataset.src;
-                            video.load();
-                        }
-                        video.muted = true;
-                        const soundIcon = entry.target.querySelector('.short-sound-btn i');
-                        if (soundIcon) soundIcon.className = 'fa-solid fa-volume-xmark';
-                        
-                        video.play().catch(() => {});
-                        entry.target.classList.remove('paused');
-                        
-                        items.forEach(item => {
-                            if (item !== entry.target) {
-                                const v = item.querySelector('video');
-                                if (v && !v.paused) v.pause();
-                            }
-                        });
-                    } else {
-                        if (video && !video.paused) {
-                            video.pause();
-                        }
-                    }
-                });
-            }, {
-                threshold: [0, 0.6],
-                root: container
-            });
-            
-            items.forEach(item => shortsObserver.observe(item));
-        }
-
-        function pauseAllShorts() {
-            const items = document.querySelectorAll('.short-item video');
-            items.forEach(v => {
-                try { v.pause(); } catch(e) {}
-            });
-        }
-        // ================================================================
-
         const panesArr = document.querySelectorAll('.section-pane');
         const dockBtnsArr = document.querySelectorAll('.dock-tab-btn');
         let currentLanguage = 'ar';
@@ -3614,7 +3506,7 @@
                 socialSupport: "مواقع التواصل والدعم", telegramChannel: "قناة التلغرام", telegramDesc: "انضم لقناتنا على تلغرام",
                 youtubeChannel: "قناة اليوتيوب", youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
                 emailSupport: "الدعم الفني", emailSupportDesc: "تواصل مع فريق نجم الشاشات",
-                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navSettings: "الإعدادات",
+                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navClips: "مقاطع", navSettings: "الإعدادات",
                 now: "الآن", minutesAgo: "منذ", minute: "دقيقة", hour: "ساعة", day: "يوم",
                 starScreens: "نجم الشاشات", linkCopied: "تم نسخ الرابط بنجاح!",
                 shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
@@ -3634,7 +3526,7 @@
                 socialSupport: "Social Media and Support", telegramChannel: "Telegram Channel", telegramDesc: "Join our channel on Telegram",
                 youtubeChannel: "YouTube Channel", youtubeDesc: "Watch the latest videos and shows",
                 emailSupport: "Technical Support", emailSupportDesc: "Contact Star Screens Team",
-                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navSettings: "Settings",
+                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navClips: "Clips", navSettings: "Settings",
                 now: "Now", minutesAgo: "", minute: "minute", hour: "hour", day: "day",
                 starScreens: "Star Screens", linkCopied: "Link copied successfully!",
                 shareText: " Star Screens App\nBest Live Streaming Platform\n",
@@ -3647,15 +3539,7 @@
                 closeVideoPlayer();
             }
 
-            // إيقاف فيديوهات المقاطع عند مغادرة القسم
-            if (index !== 4) {
-                pauseAllShorts();
-            }
-            
-            // إيقاف تشغيل أخبار تلقائي عند مغادرة القسم
-            if (index !== 3 && newsInterval) {
-                clearInterval(newsInterval);
-            }
+            if (index !== 4) pauseAllClips();
 
             panesArr.forEach(pane => pane.classList.remove('active'));
             dockBtnsArr.forEach(btn => btn.classList.remove('active'));
@@ -3665,6 +3549,10 @@
 
             document.querySelector('.viewport-area').scrollTop = 0;
 
+            if (index !== 3 && newsInterval) {
+                clearInterval(newsInterval);
+            }
+
             if (index === 0) { 
                 if (currentCategory) closeCategory();
             } else if (index === 1) { 
@@ -3673,23 +3561,7 @@
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
             } else if (index === 4) {
-                if (!shortsLoaded) {
-                    loadShorts();
-                } else {
-                    // استئناف تشغيل أول فيديو ظاهر
-                    setTimeout(() => {
-                        const container = document.getElementById('shortsContainer');
-                        if (!container) return;
-                        const items = container.querySelectorAll('.short-item');
-                        items.forEach(item => {
-                            const r = item.getBoundingClientRect();
-                            if (r.top >= -r.height/2 && r.top < r.height/2) {
-                                const v = item.querySelector('video');
-                                if (v && v.src) v.play().catch(()=>{});
-                            }
-                        });
-                    }, 150);
-                }
+                loadClips();
             }
         }
 
@@ -4152,6 +4024,415 @@
             window.open('https://t.me/azcajfaj', '_blank');
             closeTelegramPopup();
         }
+
+        // ==================== وظائف قسم المقاطع القصيرة (مطوّرة مع دعم CORS Proxies) ====================
+        let clipsLoaded = false;
+        let clipsLoading = false;
+        let clipsData = [];
+        let clipsObserver = null;
+
+        function updateClipsStatus(text, showSpinner) {
+            const status = document.getElementById('clipsStatus');
+            const statusText = document.getElementById('clipsStatusText');
+            if (!status || !statusText) return;
+            if (!text) {
+                status.classList.remove('show');
+                return;
+            }
+            status.classList.add('show');
+            statusText.textContent = text;
+            const icon = status.querySelector('i');
+            if (icon) {
+                icon.className = showSpinner 
+                    ? 'fa-solid fa-circle-notch fa-spin' 
+                    : 'fa-solid fa-circle-info';
+            }
+        }
+
+        // دالة جلب مع تجربة عدة بروكسيات
+        async function fetchWithProxies(url, timeoutMs) {
+            timeoutMs = timeoutMs || 12000;
+            let lastError = null;
+
+            for (let i = 0; i < CORS_PROXIES.length; i++) {
+                const proxy = CORS_PROXIES[i];
+                const proxiedUrl = proxy.build(url);
+                updateClipsStatus(`جرب ${proxy.name}...`, true);
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+                    const response = await fetch(proxiedUrl, {
+                        method: 'GET',
+                        signal: controller.signal,
+                        headers: { 'Accept': 'application/json, text/plain, */*' }
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+
+                    const text = await response.text();
+                    if (!text || text.length < 2) {
+                        throw new Error('استجابة فارغة');
+                    }
+
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        // ربما يكون هناك HTML أو نص ملوث - حاول استخراج JSON
+                        const match = text.match(/[\[{][\s\S]*[\]}]/);
+                        if (match) {
+                            data = JSON.parse(match[0]);
+                        } else {
+                            throw new Error('JSON غير صالح');
+                        }
+                    }
+
+                    return { data, proxyName: proxy.name, usedUrl: proxiedUrl };
+                } catch (err) {
+                    lastError = err;
+                    console.warn(`[Proxy ${proxy.name}] failed:`, err.message);
+                    continue;
+                }
+            }
+
+            throw lastError || new Error('جميع البروكسيات فشلت');
+        }
+
+        async function loadClips() {
+            if (clipsLoading || clipsLoaded) return;
+            clipsLoading = true;
+
+            const feed = document.getElementById('clipsFeed');
+            feed.innerHTML = `
+                <div class="clips-loading">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>جاري الاتصال بالسيرفر...</span>
+                </div>`;
+
+            const base = `${CLIPS_CONFIG.host}/player_api.php?username=${encodeURIComponent(CLIPS_CONFIG.username)}&password=${encodeURIComponent(CLIPS_CONFIG.password)}`;
+
+            try {
+                // جلب الأفلام والمسلسلات بالتوازي عبر البروكسيات
+                updateClipsStatus('جاري جلب الأفلام...', true);
+                const vodResult = await fetchWithProxies(`${base}&action=get_vod_streams`, 15000).catch(err => {
+                    console.warn('VOD fetch failed:', err);
+                    return { data: null };
+                });
+
+                updateClipsStatus('جاري جلب المسلسلات...', true);
+                const seriesResult = await fetchWithProxies(`${base}&action=get_series`, 15000).catch(err => {
+                    console.warn('Series fetch failed:', err);
+                    return { data: null };
+                });
+
+                const vodRes = vodResult && Array.isArray(vodResult.data) ? vodResult.data : null;
+                const seriesRes = seriesResult && Array.isArray(seriesResult.data) ? seriesResult.data : null;
+
+                if (!vodRes && !seriesRes) {
+                    updateClipsStatus('', false);
+                    feed.innerHTML = `
+                        <div class="clips-empty">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: #ef4444;"></i>
+                            <span>تعذّر الاتصال بالسيرفر</span>
+                            <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">قد يكون السيرفر لا يدعم الطلبات من المتصفح (CORS) أو غير متاح حالياً</span>
+                            <button class="clips-retry-btn" onclick="resetClipsAndReload()">
+                                <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
+                            </button>
+                        </div>`;
+                    clipsLoading = false;
+                    return;
+                }
+
+                const items = [];
+
+                // ==== إضافة الأفلام ====
+                if (vodRes) {
+                    const movies = vodRes.slice(0, CLIPS_CONFIG.maxMovies);
+                    movies.forEach(m => {
+                        if (!m || !m.stream_id) return;
+                        const ext = m.container_extension || 'mp4';
+                        items.push({
+                            title: m.name || 'فيلم',
+                            url: `${CLIPS_CONFIG.host}/movie/${CLIPS_CONFIG.username}/${CLIPS_CONFIG.password}/${m.stream_id}.${ext}`,
+                            poster: m.stream_icon || '',
+                            type: 'movie'
+                        });
+                    });
+                }
+
+                // ==== إضافة المسلسلات (الحلقة الأولى) ====
+                if (seriesRes && seriesRes.length > 0) {
+                    const seriesList = seriesRes.slice(0, CLIPS_CONFIG.maxSeries);
+
+                    updateClipsStatus(`جاري تحميل ${seriesList.length} مسلسل...`, true);
+
+                    // جلب المعلومات بالتوازي، كل واحدة مع بروكسي
+                    const seriesPromises = seriesList.map(async (s) => {
+                        if (!s || !s.series_id) return null;
+                        try {
+                            const infoUrl = `${base}&action=get_series_info&series_id=${s.series_id}`;
+                            const infoResult = await fetchWithProxies(infoUrl, 10000);
+                            const info = infoResult.data;
+
+                            if (!info || !info.episodes) return null;
+                            const seasons = Object.keys(info.episodes);
+                            if (seasons.length === 0) return null;
+                            const firstSeason = info.episodes[seasons[0]];
+                            if (!firstSeason || firstSeason.length === 0) return null;
+                            const ep = firstSeason[0];
+                            const ext = ep.container_extension || 'mp4';
+                            const epId = ep.id || ep.episode_id;
+                            if (!epId) return null;
+                            return {
+                                title: s.name || 'مسلسل',
+                                url: `${CLIPS_CONFIG.host}/series/${CLIPS_CONFIG.username}/${CLIPS_CONFIG.password}/${epId}.${ext}`,
+                                poster: s.cover || '',
+                                type: 'series'
+                            };
+                        } catch (e) {
+                            return null;
+                        }
+                    });
+
+                    const seriesItems = await Promise.all(seriesPromises);
+                    seriesItems.forEach(item => {
+                        if (item) items.push(item);
+                    });
+                }
+
+                // خلط عشوائي
+                for (let i = items.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [items[i], items[j]] = [items[j], items[i]];
+                }
+
+                clipsData = items;
+                clipsLoaded = true;
+                clipsLoading = false;
+                updateClipsStatus('', false);
+
+                if (items.length === 0) {
+                    feed.innerHTML = `
+                        <div class="clips-empty">
+                            <i class="fa-solid fa-film" style="font-size: 2rem;"></i>
+                            <span>لا توجد مقاطع متاحة على هذا السيرفر</span>
+                        </div>`;
+                    return;
+                }
+
+                renderClipsFeed();
+
+            } catch (err) {
+                console.error('Clips load error:', err);
+                clipsLoading = false;
+                updateClipsStatus('', false);
+                feed.innerHTML = `
+                    <div class="clips-empty">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: #ef4444;"></i>
+                        <span>فشل تحميل المقاطع</span>
+                        <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">${(err && err.message) || 'خطأ غير معروف'}</span>
+                        <button class="clips-retry-btn" onclick="resetClipsAndReload()">
+                            <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
+                        </button>
+                    </div>`;
+            }
+        }
+
+        function resetClipsAndReload() {
+            clipsLoaded = false;
+            clipsLoading = false;
+            clipsData = [];
+            const feed = document.getElementById('clipsFeed');
+            feed.innerHTML = `
+                <div class="clips-loading">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>جاري تحميل المقاطع...</span>
+                </div>`;
+            loadClips();
+        }
+
+        function renderClipsFeed() {
+            const feed = document.getElementById('clipsFeed');
+            feed.innerHTML = '';
+
+            const fragment = document.createDocumentFragment();
+
+            clipsData.forEach((clip, index) => {
+                const item = document.createElement('div');
+                item.className = 'clip-item';
+                item.dataset.index = index;
+
+                const escapedTitle = (clip.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+                item.innerHTML = `
+                    <video class="clip-video" src="${clip.url}" playsinline webkit-playsinline preload="none" loop muted poster="${clip.poster || ''}"></video>
+                    <div class="clip-overlay"></div>
+                    <div class="clip-loading-badge"><i class="fa-solid fa-circle-notch fa-spin"></i><span>جاري التحميل...</span></div>
+                    <div class="clip-center-play" onclick="toggleClipPlay(this)">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                    <div class="clip-actions">
+                        <button class="clip-action-btn" onclick="toggleClipMute(this)" title="الصوت">
+                            <i class="fa-solid fa-volume-xmark"></i>
+                        </button>
+                        <button class="clip-action-btn" onclick="toggleClipPlayBtn(this)" title="تشغيل/إيقاف">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="clip-info">
+                        <div class="clip-title">${escapedTitle}</div>
+                        <div class="clip-hashtag">#نجم_الشاشات</div>
+                    </div>
+                    <div class="clip-progress"><div class="clip-progress-bar"></div></div>
+                `;
+
+                fragment.appendChild(item);
+            });
+
+            feed.appendChild(fragment);
+
+            setupClipsObserver();
+        }
+
+        function setupClipsObserver() {
+            if (clipsObserver) clipsObserver.disconnect();
+            const feed = document.getElementById('clipsFeed');
+
+            clipsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const item = entry.target;
+                    const video = item.querySelector('video');
+                    const centerPlay = item.querySelector('.clip-center-play');
+                    const playBtn = item.querySelectorAll('.clip-action-btn')[1];
+                    const loadingBadge = item.querySelector('.clip-loading-badge');
+
+                    if (!video) return;
+
+                    if (entry.isIntersecting) {
+                        video.preload = 'auto';
+                        if (loadingBadge) loadingBadge.classList.add('show');
+
+                        const playPromise = video.play();
+                        if (playPromise && playPromise.catch) {
+                            playPromise.then(() => {
+                                if (loadingBadge) loadingBadge.classList.remove('show');
+                                if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-pause';
+                            }).catch(() => {
+                                video.muted = true;
+                                video.play().then(() => {
+                                    if (loadingBadge) loadingBadge.classList.remove('show');
+                                    if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-pause';
+                                    const muteBtn = item.querySelectorAll('.clip-action-btn')[0];
+                                    if (muteBtn) muteBtn.querySelector('i').className = 'fa-solid fa-volume-xmark';
+                                }).catch(() => {
+                                    if (loadingBadge) loadingBadge.classList.remove('show');
+                                    if (centerPlay) centerPlay.classList.add('show');
+                                    if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-play';
+                                });
+                            });
+                        }
+
+                        attachClipProgress(item, video);
+
+                    } else {
+                        try { video.pause(); } catch (e) {}
+                        try { video.currentTime = 0; } catch (e) {}
+                        if (centerPlay) centerPlay.classList.remove('show');
+                        if (loadingBadge) loadingBadge.classList.remove('show');
+                    }
+                });
+            }, {
+                root: feed,
+                threshold: 0.6
+            });
+
+            document.querySelectorAll('.clip-item').forEach(item => clipsObserver.observe(item));
+        }
+
+        function attachClipProgress(item, video) {
+            const bar = item.querySelector('.clip-progress-bar');
+            if (!bar) return;
+
+            if (!video._clipProgressBound) {
+                video._clipProgressBound = true;
+                video.addEventListener('timeupdate', () => {
+                    if (video.duration && isFinite(video.duration)) {
+                        const pct = (video.currentTime / video.duration) * 100;
+                        bar.style.width = pct + '%';
+                    }
+                });
+                video.addEventListener('waiting', () => {
+                    const loadingBadge = item.querySelector('.clip-loading-badge');
+                    if (loadingBadge) loadingBadge.classList.add('show');
+                });
+                video.addEventListener('playing', () => {
+                    const loadingBadge = item.querySelector('.clip-loading-badge');
+                    if (loadingBadge) loadingBadge.classList.remove('show');
+                });
+                video.addEventListener('canplay', () => {
+                    const loadingBadge = item.querySelector('.clip-loading-badge');
+                    if (loadingBadge) loadingBadge.classList.remove('show');
+                });
+            }
+        }
+
+        function toggleClipPlay(el) {
+            const item = el.closest('.clip-item');
+            const video = item.querySelector('video');
+            const centerPlay = item.querySelector('.clip-center-play');
+            const playBtn = item.querySelectorAll('.clip-action-btn')[1];
+
+            if (video.paused) {
+                video.play().catch(() => {});
+                if (centerPlay) centerPlay.classList.remove('show');
+                if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-pause';
+            } else {
+                video.pause();
+                if (centerPlay) centerPlay.classList.add('show');
+                if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-play';
+            }
+        }
+
+        function toggleClipPlayBtn(btn) {
+            const item = btn.closest('.clip-item');
+            const video = item.querySelector('video');
+            const centerPlay = item.querySelector('.clip-center-play');
+
+            if (video.paused) {
+                video.play().catch(() => {});
+                if (centerPlay) centerPlay.classList.remove('show');
+                btn.querySelector('i').className = 'fa-solid fa-pause';
+            } else {
+                video.pause();
+                if (centerPlay) centerPlay.classList.add('show');
+                btn.querySelector('i').className = 'fa-solid fa-play';
+            }
+        }
+
+        function toggleClipMute(btn) {
+            const item = btn.closest('.clip-item');
+            const video = item.querySelector('video');
+
+            video.muted = !video.muted;
+            if (video.muted) {
+                btn.querySelector('i').className = 'fa-solid fa-volume-xmark';
+            } else {
+                btn.querySelector('i').className = 'fa-solid fa-volume-high';
+            }
+        }
+
+        function pauseAllClips() {
+            document.querySelectorAll('.clip-item video').forEach(v => {
+                try { v.pause(); } catch (e) {}
+            });
+        }
+        // ==========================================================================
 
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
