@@ -527,7 +527,6 @@
             background: #000;
         }
 
-        /* ✅ التعديل: إزالة !important للسماح للمشغل بالتمدد وملء الشاشة بدون قص الشعار */
         .video-element {
             width: 100%;
             height: 100%;
@@ -1270,6 +1269,182 @@
             background: #030712;
         }
 
+        /* ==================== قسم المقاطع القصيرة ==================== */
+        #pane-shorts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0 0 6.25rem 0;
+            margin: 0;
+            z-index: 50;
+            background: var(--bg-base);
+        }
+
+        #pane-shorts.active { display: block; }
+
+        .shorts-feed {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .shorts-feed::-webkit-scrollbar { display: none; }
+
+        .short-item {
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .short-poster {
+            position: absolute;
+            inset: 0;
+        }
+
+        .short-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(1px) brightness(0.45);
+            transform: scale(1.06);
+        }
+
+        .short-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(3, 7, 18, 0.98) 0%, rgba(3, 7, 18, 0.45) 50%, rgba(3, 7, 18, 0.85) 100%);
+            z-index: 1;
+        }
+
+        .short-play-btn {
+            position: relative;
+            z-index: 2;
+            width: 5.5rem;
+            height: 5.5rem;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.1875rem solid rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0.5rem 2rem rgba(99, 102, 241, 0.5);
+        }
+
+        .short-play-btn:active {
+            transform: scale(0.9);
+        }
+
+        .short-play-btn i {
+            margin-right: -0.25rem;
+        }
+
+        .short-info {
+            position: absolute;
+            bottom: 2rem;
+            right: 1.5rem;
+            left: 1.5rem;
+            z-index: 2;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .short-title-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            text-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.9);
+            display: block;
+        }
+
+        .short-hashtag {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #38bdf8;
+            text-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.7);
+            display: block;
+        }
+
+        .short-type-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 2;
+            background: rgba(99, 102, 241, 0.9);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 0.375rem 0.875rem;
+            border-radius: 1.25rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.025rem;
+        }
+
+        .shorts-loading, .shorts-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            gap: 0.875rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .shorts-loading i, .shorts-empty i {
+            font-size: 2.2rem;
+            color: var(--accent-primary);
+        }
+
+        .shorts-empty i {
+            color: #ef4444;
+        }
+
+        .shorts-retry-btn {
+            margin-top: 1rem;
+            padding: 0.75rem 1.75rem;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 0.5rem 1.5rem rgba(99, 102, 241, 0.4);
+            font-family: 'Alexandria', sans-serif;
+        }
+
+        .shorts-retry-btn:active {
+            transform: scale(0.96);
+        }
+        /* ==================== نهاية قسم المقاطع القصيرة ==================== */
+
         .news-feed-container {
             width: 100%;
             height: 100%;
@@ -1639,6 +1814,23 @@
             .player-controls-row {
                 gap: 0.5rem;
             }
+            .dock-tab-btn span {
+                font-size: 0.5rem;
+            }
+            .dock-tab-btn i {
+                font-size: 0.95rem;
+            }
+            .short-play-btn {
+                width: 4.5rem;
+                height: 4.5rem;
+                font-size: 1.6rem;
+            }
+            .short-title-text {
+                font-size: 1.15rem;
+            }
+            .short-hashtag {
+                font-size: 0.9rem;
+            }
         }
     </style>
     
@@ -1818,6 +2010,15 @@
                 <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
 
+            <div id="pane-shorts" class="section-pane">
+                <div class="shorts-feed" id="shortsFeed">
+                    <div class="shorts-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        <span>جاري تحميل المقاطع...</span>
+                    </div>
+                </div>
+            </div>
+
             <div id="pane-news" class="section-pane">
                 <div class="news-feed-container" id="newsFeedContainer">
                     <div class="news-navigation" id="newsNavigation"></div>
@@ -1905,10 +2106,14 @@
                 <span data-key="navSeries">مسلسلات</span>
             </button>
             <button class="dock-tab-btn" onclick="switchPane(3)">
+                <i class="fa-solid fa-clapperboard"></i>
+                <span data-key="navShorts">مقاطع قصيرة</span>
+            </button>
+            <button class="dock-tab-btn" onclick="switchPane(4)">
                 <i class="fa-solid fa-newspaper"></i>
                 <span data-key="navNews">أخبار</span>
             </button>
-            <button class="dock-tab-btn" onclick="switchPane(4)">
+            <button class="dock-tab-btn" onclick="switchPane(5)">
                 <i class="fa-solid fa-gear"></i>
                 <span data-key="navSettings">الإعدادات</span>
             </button>
@@ -2395,7 +2600,222 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        // ============ المشغل السريع المطوّر (مع إعدادات نجم الشاشات السريعة) ============
+        // ============ قسم المقاطع القصيرة - Xtream Shorts (محسّن وسريع) ============
+        const SHORTS_CONFIG = {
+            host: 'http://ts1.eagtop.lol',
+            username: 'e1uf3olh92',
+            password: 'j18aurmqt5',
+            maxItems: 60,
+            timeout: 12000
+        };
+
+        let shortsData = [];
+        let shortsLoaded = false;
+        let shortsLoading = false;
+
+        function fetchWithTimeout(url, ms) {
+            return new Promise((resolve, reject) => {
+                const controller = new AbortController();
+                const timer = setTimeout(() => {
+                    controller.abort();
+                    reject(new Error('timeout'));
+                }, ms);
+                fetch(url, { signal: controller.signal })
+                    .then(r => {
+                        clearTimeout(timer);
+                        resolve(r);
+                    })
+                    .catch(err => {
+                        clearTimeout(timer);
+                        reject(err);
+                    });
+            });
+        }
+
+        async function loadShorts() {
+            if (shortsLoading) return;
+            if (shortsLoaded && shortsData.length > 0) {
+                renderShorts();
+                return;
+            }
+            shortsLoading = true;
+
+            const feed = document.getElementById('shortsFeed');
+            if (!feed) { shortsLoading = false; return; }
+
+            feed.innerHTML = '<div class="shorts-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span>جاري تحميل المقاطع...</span></div>';
+
+            const base = `${SHORTS_CONFIG.host}/player_api.php?username=${encodeURIComponent(SHORTS_CONFIG.username)}&password=${encodeURIComponent(SHORTS_CONFIG.password)}`;
+
+            // جلب الأفلام والمسلسلات بالتوازي مع مهلة زمنية
+            const results = await Promise.allSettled([
+                fetchWithTimeout(`${base}&action=get_vod_streams`, SHORTS_CONFIG.timeout).then(r => r.json()),
+                fetchWithTimeout(`${base}&action=get_series`, SHORTS_CONFIG.timeout).then(r => r.json())
+            ]);
+
+            const items = [];
+
+            // معالجة الأفلام VOD
+            if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
+                results[0].value.forEach(m => {
+                    if (!m || !m.stream_id || !m.name) return;
+                    const ext = m.container_extension || 'mp4';
+                    items.push({
+                        type: 'movie',
+                        name: m.name,
+                        poster: m.stream_icon || '',
+                        url: `${SHORTS_CONFIG.host}/movie/${SHORTS_CONFIG.username}/${SHORTS_CONFIG.password}/${m.stream_id}.${ext}`
+                    });
+                });
+            }
+
+            // معالجة المسلسلات
+            if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
+                results[1].value.forEach(s => {
+                    if (!s || !s.series_id || !s.name) return;
+                    items.push({
+                        type: 'series',
+                        name: s.name,
+                        poster: s.cover || '',
+                        seriesId: s.series_id
+                    });
+                });
+            }
+
+            if (items.length === 0) {
+                feed.innerHTML = `
+                    <div class="shorts-empty">
+                        <i class="fa-solid fa-video-slash"></i>
+                        <span>لا توجد مقاطع متاحة حالياً</span>
+                        <button class="shorts-retry-btn" onclick="retryShorts()">إعادة المحاولة</button>
+                    </div>`;
+                shortsLoading = false;
+                return;
+            }
+
+            // خلط عشوائي
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+
+            // فضل العناصر التي تحتوي على صورة، ثم اخلط كل مجموعة
+            const withPoster = items.filter(it => it.poster);
+            const withoutPoster = items.filter(it => !it.poster);
+
+            // خلط كل مجموعة على حدة
+            for (let i = withPoster.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [withPoster[i], withPoster[j]] = [withPoster[j], withPoster[i]];
+            }
+            for (let i = withoutPoster.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [withoutPoster[i], withoutPoster[j]] = [withoutPoster[j], withoutPoster[i]];
+            }
+
+            // دمج: أولاً العناصر بصور (مخلوطة)، ثم بدون صور
+            const finalList = withPoster.concat(withoutPoster);
+
+            shortsData = finalList.slice(0, SHORTS_CONFIG.maxItems);
+
+            renderShorts();
+            shortsLoaded = true;
+            shortsLoading = false;
+        }
+
+        function retryShorts() {
+            shortsLoaded = false;
+            shortsData = [];
+            loadShorts();
+        }
+
+        function renderShorts() {
+            const feed = document.getElementById('shortsFeed');
+            if (!feed) return;
+
+            if (shortsData.length === 0) {
+                feed.innerHTML = '<div class="shorts-empty"><i class="fa-solid fa-video-slash"></i><span>لا توجد مقاطع متاحة</span></div>';
+                return;
+            }
+
+            const defaultPoster = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
+
+            const html = shortsData.map((item, i) => {
+                const poster = item.poster || defaultPoster;
+                const typeLabel = item.type === 'movie' ? 'فيلم' : 'مسلسل';
+                const safeName = String(item.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+                return `
+                    <div class="short-item">
+                        <div class="short-poster">
+                            <img src="${poster}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${defaultPoster}'">
+                        </div>
+                        <div class="short-overlay"></div>
+                        <div class="short-type-badge">${typeLabel}</div>
+                        <button class="short-play-btn" onclick="playShortItem(${i})" aria-label="تشغيل">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <div class="short-info">
+                            <div class="short-title-text">${safeName}</div>
+                            <div class="short-hashtag">#نجم_الشاشات</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            feed.innerHTML = html;
+        }
+
+        async function playShortItem(index) {
+            const item = shortsData[index];
+            if (!item) return;
+
+            if (item.type === 'movie') {
+                playChannel(encodeURIComponent(item.url), item.name);
+                return;
+            }
+
+            if (item.type === 'series') {
+                showToast('جاري تحميل الحلقة الأولى...');
+                try {
+                    const base = `${SHORTS_CONFIG.host}/player_api.php?username=${encodeURIComponent(SHORTS_CONFIG.username)}&password=${encodeURIComponent(SHORTS_CONFIG.password)}`;
+                    const res = await fetchWithTimeout(`${base}&action=get_series_info&series_id=${item.seriesId}`, SHORTS_CONFIG.timeout);
+                    const data = await res.json();
+
+                    if (!data || !data.episodes) {
+                        showToast('لا توجد حلقات متاحة لهذا المسلسل');
+                        return;
+                    }
+
+                    const seasonKeys = Object.keys(data.episodes);
+                    if (seasonKeys.length === 0) {
+                        showToast('لا توجد حلقات متاحة');
+                        return;
+                    }
+
+                    seasonKeys.sort((a, b) => parseInt(a) - parseInt(b));
+
+                    const firstSeason = data.episodes[seasonKeys[0]];
+                    if (!firstSeason || firstSeason.length === 0) {
+                        showToast('لا توجد حلقات متاحة');
+                        return;
+                    }
+
+                    const firstEp = firstSeason[0];
+                    const ext = firstEp.container_extension || 'mp4';
+                    const epUrl = `${SHORTS_CONFIG.host}/series/${SHORTS_CONFIG.username}/${SHORTS_CONFIG.password}/${firstEp.id}.${ext}`;
+
+                    playChannel(encodeURIComponent(epUrl), item.name);
+
+                } catch (err) {
+                    console.error('Series play error:', err);
+                    showToast('فشل تشغيل المسلسل');
+                }
+            }
+        }
+        // ============ نهاية قسم المقاطع القصيرة ============
+
+        // ============ المشغل السريع المطوّر ============
         let hlsPlayer = null;
         let dashPlayer = null;
         let mpegtsPlayer = null;
@@ -2408,7 +2828,6 @@
         let attempt = 0;
         let loaderTimeout = null;
 
-        // كشف نوع البث تلقائياً من الرابط
         function detectStreamType(url) {
             if (!url) return 'unknown';
             const lower = url.toLowerCase();
@@ -2441,7 +2860,6 @@
             return 'auto';
         }
 
-        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
             video.muted = false;
@@ -2460,7 +2878,6 @@
             }
         }
 
-        // تنظيف جميع المشغلات
         function destroyAllPlayers() {
             if (hlsPlayer) {
                 try { hlsPlayer.destroy(); } catch(e) {}
@@ -2501,7 +2918,6 @@
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
 
-            // إعادة تعيين object-fit للحالة الافتراضية عند فتح قناة جديدة
             video.style.objectFit = 'contain';
 
             const container = document.querySelector('.video-player-container');
@@ -2515,7 +2931,6 @@
             
             showControls();
             
-            // مؤقت لإخفاء اللودر في حال الفشل
             clearTimeout(loaderTimeout);
             loaderTimeout = setTimeout(() => {
                 loading.style.display = 'none';
@@ -2524,11 +2939,9 @@
             initializePlayer(currentVideoUrl);
         }
 
-        // مشغل HLS مع الإعدادات السريعة من نجم الشاشات
         function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
-                    // ========== إعدادات نجم الشاشات السريعة ==========
                     enableWorker: true,
                     progressive: true,
                     lowLatencyMode: false,
@@ -2540,8 +2953,6 @@
                     maxMaxBufferLength: 90,
                     maxBufferSize: 120 * 1000 * 1000,
                     maxBufferHole: 0.5,
-                    
-                    // ========== إعادة المحاولات ==========
                     manifestLoadingTimeOut: 8000,
                     manifestLoadingMaxRetry: 4,
                     manifestLoadingRetryDelay: 1000,
@@ -2551,8 +2962,6 @@
                     fragLoadingTimeOut: 12000,
                     fragLoadingMaxRetry: 5,
                     fragLoadingRetryDelay: 1000,
-                    
-                    // ========== تحسينات البث المباشر ==========
                     startFragPrefetch: true,
                     testBandwidth: true,
                     liveSyncDurationCount: 5,
@@ -2560,7 +2969,6 @@
                     nudgeOffset: 0.1,
                     nudgeMaxRetry: 5,
                     starveThreshold: 2.0,
-                    
                     xhrSetup: function(xhr, xhrUrl) {
                         xhr.withCredentials = false;
                     }
@@ -2609,7 +3017,6 @@
             }
         }
 
-        // مشغل DASH مع إعدادات سريعة
         function initDashPlayer(url, video, loading, onPlaying) {
             if (window.dashjs && dashjs.MediaPlayer) {
                 try {
@@ -2659,11 +3066,9 @@
             }
         }
 
-        // مشغل MPEG-TS / FLV مع إعدادات نجم الشاشات السريعة
         function initMpegtsPlayer(url, type, video, loading, onPlaying) {
             if (window.mpegts && mpegts.isSupported()) {
                 try {
-                    // استخدام m2ts للتي اس و flv للفلاش
                     const mpegtsType = (type === 'flv') ? 'flv' : 'm2ts';
                     
                     mpegtsPlayer = mpegts.createPlayer({
@@ -2703,7 +3108,6 @@
             }
         }
 
-        // مشغل الصيغ الأصلية (video.src مباشرة)
         function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
             video.src = url;
             video.preload = 'auto';
@@ -2781,7 +3185,6 @@
 
                 case 'auto':
                 default:
-                    // كشف تلقائي: جرّب native أولاً، ثم HLS
                     video.src = url;
                     video.preload = 'auto';
                     const tryNativeThenHls = () => {
@@ -2867,7 +3270,6 @@
                 lastTap = currentTime;
             });
 
-            // محاولة إلغاء الكتم عند أي لمسة
             const unmuteHandler = () => {
                 if (autoMuted && video.muted) {
                     video.muted = false;
@@ -2983,10 +3385,8 @@
             showControls();
         }
 
-        // ================== التعديل الجديد: تمدد الفيديو لملء الشاشة دون قص الشعار ==================
         function toggleAspectRatio() {
             const video = document.getElementById('videoPlayer');
-            // التبديل بين الوضع المملوء (الذي يزيل السواد ويتمدد) والوضع الأصلي (الذي يحافظ على النسبة)
             if (video.style.objectFit === 'fill') {
                 video.style.objectFit = 'contain';
             } else {
@@ -2994,7 +3394,6 @@
             }
             showControls();
         }
-        // ========================================================================================
 
         function goToLiveEdge() {
             const video = document.getElementById('videoPlayer');
@@ -3198,7 +3597,7 @@
                 socialSupport: "مواقع التواصل والدعم", telegramChannel: "قناة التلغرام", telegramDesc: "انضم لقناتنا على تلغرام",
                 youtubeChannel: "قناة اليوتيوب", youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
                 emailSupport: "الدعم الفني", emailSupportDesc: "تواصل مع فريق نجم الشاشات",
-                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navSettings: "الإعدادات",
+                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navShorts: "مقاطع قصيرة", navNews: "أخبار", navSettings: "الإعدادات",
                 now: "الآن", minutesAgo: "منذ", minute: "دقيقة", hour: "ساعة", day: "يوم",
                 starScreens: "نجم الشاشات", linkCopied: "تم نسخ الرابط بنجاح!",
                 shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
@@ -3218,7 +3617,7 @@
                 socialSupport: "Social Media and Support", telegramChannel: "Telegram Channel", telegramDesc: "Join our channel on Telegram",
                 youtubeChannel: "YouTube Channel", youtubeDesc: "Watch the latest videos and shows",
                 emailSupport: "Technical Support", emailSupportDesc: "Contact Star Screens Team",
-                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navSettings: "Settings",
+                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navShorts: "Short Clips", navNews: "News", navSettings: "Settings",
                 now: "Now", minutesAgo: "", minute: "minute", hour: "hour", day: "day",
                 starScreens: "Star Screens", linkCopied: "Link copied successfully!",
                 shareText: " Star Screens App\nBest Live Streaming Platform\n",
@@ -3243,7 +3642,9 @@
                 if (currentCategory) closeCategory();
             } else if (index === 1) { 
                 fetchSchedule();
-            } else if (index === 3) { 
+            } else if (index === 3) {
+                loadShorts();
+            } else if (index === 4) { 
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
             } else {
