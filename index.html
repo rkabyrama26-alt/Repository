@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="referrer" content="no-referrer-when-downgrade">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>تطبيق احترافي بملء الشاشة</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="//shd-gcp-live.edgenextcdn.net">
     <link rel="dns-prefetch" href="//shd-amg-fast.edgenextcdn.net">
-    <link rel="dns-prefetch" href="//shd-gcp-live.lg.mncdn.com">
-    <link rel="dns-prefetch" href="//live.alarabiya.net">
-    <link rel="dns-prefetch" href="//win.holol.com">
-    <link rel="dns-prefetch" href="//live.kwikmotion.com">
     <link rel="preconnect" href="https://shd-gcp-live.edgenextcdn.net" crossorigin>
     <link rel="preconnect" href="https://shd-amg-fast.edgenextcdn.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=block" rel="stylesheet">
@@ -1648,8 +1643,58 @@
     </style>
     
     <script>
+        // ============ حماية عامة من الأخطاء (مهم لـ Sketchware WebView) ============
+        window.addEventListener('error', function(e) {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            return true;
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        });
+
+        // ============ Helpers آمنة للـ Fullscreen و Orientation ============
+        function safeRequestFullscreen(el) {
+            return new Promise(function(resolve, reject){
+                try {
+                    var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+                    if (!fn) return reject(new Error('no fullscreen'));
+                    var r = fn.call(el);
+                    if (r && r.then) r.then(resolve).catch(reject);
+                    else resolve();
+                } catch(e) { reject(e); }
+            });
+        }
+        function safeExitFullscreen() {
+            return new Promise(function(resolve){
+                try {
+                    var fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+                    if (!fn) return resolve();
+                    var r = fn.call(document);
+                    if (r && r.then) r.then(resolve).catch(resolve);
+                    else resolve();
+                } catch(e) { resolve(); }
+            });
+        }
+        function safeLockOrientation(mode) {
+            try {
+                if (screen && screen.orientation && typeof screen.orientation.lock === 'function') {
+                    var p = screen.orientation.lock(mode);
+                    if (p && p.catch) p.catch(function(){});
+                }
+            } catch(e) {}
+        }
+        function safeUnlockOrientation() {
+            try {
+                if (screen && screen.orientation && typeof screen.orientation.unlock === 'function') {
+                    screen.orientation.unlock();
+                }
+            } catch(e) {}
+        }
+
         if (document.fonts) {
             document.fonts.ready.then(function () {
+                document.documentElement.classList.add('fonts-loaded');
+            }).catch(function(){
                 document.documentElement.classList.add('fonts-loaded');
             });
         } else {
@@ -1923,7 +1968,7 @@
 
     <div class="video-modal" id="videoModal">
         <div class="video-player-container">
-            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
+            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" autoplay poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
                 <button class="player-back-btn" onclick="closeVideoPlayer()">
@@ -2400,7 +2445,7 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        // ============ المشغل السريع المطوّر (نسخة احترافية - محسّنة لـ WebView) ============
+        // ============ المشغل السريع المطوّر (نسخة متوافقة مع Sketchware) ============
         let hlsPlayer = null;
         let dashPlayer = null;
         let mpegtsPlayer = null;
@@ -2412,19 +2457,9 @@
         let playingStarted = false;
         let loaderTimeout = null;
         let silentRetryTimer = null;
-        let webviewDetected = false;
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
 
-        // كشف بيئة WebView
-        try {
-            const ua = navigator.userAgent || '';
-            webviewDetected = /(wv\)|WebView|Android.*Version\/[\d.]+.*Chrome)/i.test(ua) && !/Chrome\/[6-9]\d\./.test(ua) === false;
-            // كشف أدق: WebView لا يحتوي على "Chrome" كمنفصل بكامل الصيغة مثل المتصفح
-            if (/; wv\)/i.test(ua) || /Version\/4\.0/i.test(ua)) {
-                webviewDetected = true;
-            }
-        } catch(e) {}
-
-        // كشف نوع البث تلقائياً من الرابط
         function detectStreamType(url) {
             if (!url) return 'unknown';
             const lower = url.toLowerCase();
@@ -2457,7 +2492,7 @@
             return 'auto';
         }
 
-        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي
+        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي - صامتة
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
             video.muted = false;
@@ -2469,14 +2504,16 @@
                 }).catch(() => {
                     autoMuted = true;
                     video.muted = true;
-                    video.play().then(() => {
-                        if (typeof onPlaying === 'function') onPlaying();
-                    }).catch(() => {});
+                    const p2 = video.play();
+                    if (p2 && p2.then) {
+                        p2.then(() => {
+                            if (typeof onPlaying === 'function') onPlaying();
+                        }).catch(() => {});
+                    }
                 });
             }
         }
 
-        // تنظيف جميع المشغلات
         function destroyAllPlayers() {
             if (hlsPlayer) {
                 try { hlsPlayer.destroy(); } catch(e) {}
@@ -2505,10 +2542,17 @@
         function destroyHls() { destroyAllPlayers(); }
 
         function playChannel(encodedUrl, name) {
-            const url = decodeURIComponent(encodedUrl);
+            let url = decodeURIComponent(encodedUrl);
+            
+            // ترقية HTTP إلى HTTPS إذا كانت الصفحة HTTPS (لتجاوز Mixed Content في WebView)
+            if (location.protocol === 'https:' && url.indexOf('http://') === 0) {
+                url = 'https://' + url.substring(7);
+            }
+            
             currentVideoUrl = url;
             currentStreamType = detectStreamType(url);
             playingStarted = false;
+            retryCount = 0;
             
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
@@ -2522,69 +2566,35 @@
 
             video.style.objectFit = 'contain';
 
+            // محاولة تشغيل Fullscreen بلطف (لا يكسر WebView)
             const container = document.querySelector('.video-player-container');
-            if (container.requestFullscreen) {
-                container.requestFullscreen().then(() => {
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(() => {});
-                    }
-                }).catch(() => {});
-            }
+            safeRequestFullscreen(container).then(function(){
+                safeLockOrientation('landscape');
+            }).catch(function(){});
             
             showControls();
             
             clearTimeout(loaderTimeout);
             loaderTimeout = setTimeout(() => {
                 loading.style.display = 'none';
-            }, 8000);
+            }, 10000);
             
             initializePlayer(currentVideoUrl);
         }
 
-        // ===== HLS Loader مخصص لتجاوز قيود WebView =====
-        function createWebViewSafeLoader() {
-            if (!window.Hls || !Hls.DefaultConfig || !Hls.DefaultConfig.loader) return null;
-            
-            const BaseLoader = Hls.DefaultConfig.loader;
-            
-            function CustomLoader(config) {
-                BaseLoader.call(this, config);
-                const originalLoad = this.load.bind(this);
-                this.load = function(context, config, callbacks) {
-                    const originalXhrSetup = config && config.xhrSetup;
-                    const newConfig = Object.assign({}, config, {
-                        xhrSetup: function(xhr, url) {
-                            try {
-                                // بعض السيرفرات تحتاج هيدرات محددة
-                                xhr.setRequestHeader('Accept', '*/*');
-                                xhr.setRequestHeader('Accept-Language', 'ar,en;q=0.9');
-                            } catch(e) {}
-                            if (typeof originalXhrSetup === 'function') {
-                                try { originalXhrSetup(xhr, url); } catch(e) {}
-                            }
-                        }
-                    });
-                    return originalLoad(context, newConfig, callbacks);
-                };
-            }
-            
-            CustomLoader.prototype = Object.create(BaseLoader.prototype);
-            CustomLoader.prototype.constructor = CustomLoader;
-            
-            return CustomLoader;
-        }
-
-        // مشغل HLS احترافي - محسّن لـ WebView
+        // HLS - نسخة متوافقة مع WebView (بدون Worker)
         function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
-                    enableWorker: true,
-                    progressive: false,
+                    // ===== إعدادات WebView =====
+                    enableWorker: false,               // ⚠️ مهم: Worker لا يعمل جيداً في WebView
+                    progressive: true,
                     lowLatencyMode: false,
                     
-                    startLevel: -1,
-                    testBandwidth: true,
-                    abrEwmaDefaultEstimate: 1200000,
+                    // ===== بدء سريع =====
+                    startLevel: -1,                    // ABR يقرر تلقائياً
+                    testBandwidth: false,              // نعطله للبدء الأسرع في WebView
+                    abrEwmaDefaultEstimate: 1000000,
                     abrEwmaFastLive: 3.0,
                     abrEwmaSlowLive: 9.0,
                     abrEwmaFastVoD: 3.0,
@@ -2596,10 +2606,12 @@
                     capLevelOnFPSDrop: true,
                     minAutoBitrate: 0,
                     
+                    // ===== تبديل سريع =====
                     maxStarvationDelay: 4,
                     maxLoadingDelay: 4,
                     
-                    backBufferLength: 20,
+                    // ===== Buffer =====
+                    backBufferLength: 30,
                     maxBufferLength: 30,
                     maxMaxBufferLength: 60,
                     maxBufferSize: 60 * 1000 * 1000,
@@ -2609,92 +2621,82 @@
                     nudgeMaxRetry: 5,
                     maxFragLookUpTolerance: 0.25,
                     
+                    // ===== Live =====
                     liveSyncDurationCount: 3,
                     liveMaxLatencyDurationCount: 10,
                     liveDurationInfinity: false,
                     liveBackBufferLength: 30,
                     
+                    // ===== تحميل مسبق =====
                     startFragPrefetch: true,
                     
+                    // ===== إعادة محاولة =====
                     manifestLoadingTimeOut: 15000,
-                    manifestLoadingMaxRetry: 6,
+                    manifestLoadingMaxRetry: 8,
                     manifestLoadingRetryDelay: 500,
                     manifestLoadingMaxRetryTimeout: 64000,
                     levelLoadingTimeOut: 15000,
-                    levelLoadingMaxRetry: 6,
+                    levelLoadingMaxRetry: 8,
                     levelLoadingRetryDelay: 500,
                     levelLoadingMaxRetryTimeout: 64000,
                     fragLoadingTimeOut: 25000,
-                    fragLoadingMaxRetry: 6,
+                    fragLoadingMaxRetry: 8,
                     fragLoadingRetryDelay: 500,
                     fragLoadingMaxRetryTimeout: 64000,
-                    appendErrorMaxRetry: 3,
+                    appendErrorMaxRetry: 5,
                     
+                    // ===== مراقبة =====
                     fpsDroppedMonitoringPeriod: 5000,
                     fpsDroppedMonitoringThreshold: 0.2,
                     stretchShortVideoTrack: false,
                     forceKeyFrameOnDiscontinuity: true,
                     
-                    // مهم جداً لـ WebView: تجاوز CORS وتحسين الهيدرات
-                    xhrSetup: function(xhr, url) {
-                        try {
-                            xhr.withCredentials = false;
-                        } catch(e) {}
-                    },
-                    
-                    fetchSetup: function(context, initParams) {
-                        // بعض السيرفرات تحجب الطلبات بدون Referer
-                        initParams.credentials = 'omit';
-                        initParams.mode = 'cors';
-                        return new Request(context.url, initParams);
+                    // ===== CORS =====
+                    xhrSetup: function(xhr) {
+                        try { xhr.withCredentials = false; } catch(e) {}
                     }
                 };
 
-                // استخدام CustomLoader إذا كان ممكناً
                 try {
-                    const CustomLoader = createWebViewSafeLoader();
-                    if (CustomLoader) {
-                        hlsConfig.loader = CustomLoader;
-                    }
-                } catch(e) {}
+                    hlsPlayer = new Hls(hlsConfig);
+                    hlsPlayer.attachMedia(video);
+                    hlsPlayer.loadSource(url);
 
-                hlsPlayer = new Hls(hlsConfig);
-                hlsPlayer.attachMedia(video);
-                hlsPlayer.loadSource(url);
+                    hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                        tryPlayVideo(onPlaying);
+                    });
 
-                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    tryPlayVideo(onPlaying);
-                });
+                    hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
 
-                hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
-
-                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                if (hlsPlayer.currentLevel > 0) {
-                                    hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
-                                }
-                                try { hlsPlayer.startLoad(); } catch(e) {}
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                try { hlsPlayer.recoverMediaError(); } catch(e) {}
-                                break;
-                            default:
-                                clearTimeout(silentRetryTimer);
-                                silentRetryTimer = setTimeout(() => {
-                                    if (hlsPlayer && currentVideoUrl === url) {
-                                        try {
-                                            hlsPlayer.destroy();
-                                            hlsPlayer = null;
-                                            initializePlayer(url);
-                                        } catch(e) {}
-                                    }
-                                }, 1500);
-                                break;
+                    hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    try { hlsPlayer.startLoad(); } catch(e) {}
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    try { hlsPlayer.recoverMediaError(); } catch(e) {}
+                                    break;
+                                default:
+                                    clearTimeout(silentRetryTimer);
+                                    silentRetryTimer = setTimeout(() => {
+                                        if (retryCount < MAX_RETRIES && currentVideoUrl === url) {
+                                            retryCount++;
+                                            try {
+                                                if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+                                                initializePlayer(url);
+                                            } catch(e) {}
+                                        } else {
+                                            loading.style.display = 'none';
+                                        }
+                                    }, 1500);
+                                    break;
+                            }
                         }
-                    }
-                });
+                    });
+                } catch(e) {
+                    loading.style.display = 'none';
+                }
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.preload = 'auto';
@@ -2706,7 +2708,7 @@
             }
         }
 
-        // مشغل DASH احترافي - محسّن لـ WebView
+        // DASH - نسخة متوافقة
         function initDashPlayer(url, video, loading, onPlaying) {
             if (window.dashjs && dashjs.MediaPlayer) {
                 try {
@@ -2728,7 +2730,7 @@
                             stableBufferTime: 12,
                             retryParameters: {
                                 timeout: 15000,
-                                maxAttempts: 6,
+                                maxAttempts: 8,
                                 baseDelay: 500,
                                 backoffFactor: 1.5
                             },
@@ -2753,7 +2755,7 @@
                             enabled: true,
                             initialBitrate: { audio: -1, video: -1 },
                             autoSwitchBitrate: { audio: true, video: true },
-                            defaultBandwidthEstimate: 1200000,
+                            defaultBandwidthEstimate: 1500000,
                             switchInterval: 8,
                             bandwidthUpgradeTarget: 0.85,
                             bandwidthDowngradeTarget: 0.95
@@ -2766,10 +2768,10 @@
                     dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => {
                         clearTimeout(silentRetryTimer);
                         silentRetryTimer = setTimeout(() => {
-                            if (dashPlayer && currentVideoUrl === url) {
+                            if (retryCount < MAX_RETRIES && currentVideoUrl === url) {
+                                retryCount++;
                                 try {
-                                    dashPlayer.reset();
-                                    dashPlayer = null;
+                                    if (dashPlayer) { dashPlayer.reset(); dashPlayer = null; }
                                     initializePlayer(url);
                                 } catch(e) {}
                             }
@@ -2783,7 +2785,7 @@
             }
         }
 
-        // مشغل MPEG-TS / FLV احترافي - محسّن لـ WebView
+        // MPEG-TS / FLV - نسخة متوافقة (بدون Worker)
         function initMpegtsPlayer(url, type, video, loading, onPlaying) {
             if (window.mpegts && mpegts.isSupported()) {
                 try {
@@ -2794,7 +2796,7 @@
                         isLive: true,
                         url: url
                     }, {
-                        enableWorker: true,
+                        enableWorker: false,             // ⚠️ مهم: بدون Worker للتوافق مع WebView
                         enableStashBuffer: false,
                         stashInitialSize: 128 * 1024,
                         liveBufferLatencyChasing: true,
@@ -2812,10 +2814,10 @@
                     mpegtsPlayer.on(mpegts.Events.ERROR, () => {
                         clearTimeout(silentRetryTimer);
                         silentRetryTimer = setTimeout(() => {
-                            if (mpegtsPlayer && currentVideoUrl === url) {
+                            if (retryCount < MAX_RETRIES && currentVideoUrl === url) {
+                                retryCount++;
                                 try {
-                                    mpegtsPlayer.destroy();
-                                    mpegtsPlayer = null;
+                                    if (mpegtsPlayer) { mpegtsPlayer.destroy(); mpegtsPlayer = null; }
                                     initializePlayer(url);
                                 } catch(e) {}
                             }
@@ -2834,20 +2836,25 @@
             }
         }
 
-        // مشغل الصيغ الأصلية
+        // Native player
         function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
-            video.src = url;
-            video.preload = 'auto';
-            video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
-            video.addEventListener('playing', onPlaying, { once: true });
-            video.addEventListener('error', () => {
-                if (typeof fallbackFn === 'function') {
-                    fallbackFn();
-                } else {
-                    loading.style.display = 'none';
-                }
-            }, { once: true });
-            tryPlayVideo(onPlaying);
+            try {
+                video.src = url;
+                video.preload = 'auto';
+                video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
+                video.addEventListener('playing', onPlaying, { once: true });
+                video.addEventListener('error', () => {
+                    if (typeof fallbackFn === 'function') {
+                        fallbackFn();
+                    } else {
+                        loading.style.display = 'none';
+                    }
+                }, { once: true });
+                tryPlayVideo(onPlaying);
+            } catch(e) {
+                if (typeof fallbackFn === 'function') fallbackFn();
+                else loading.style.display = 'none';
+            }
         }
 
         function initializePlayer(url) {
@@ -2910,36 +2917,40 @@
 
                 case 'auto':
                 default:
-                    // في WebView: أعط الأولوية لـ Hls.js لأن التشغيل الأصلي غير موثوق
-                    if (webviewDetected || url.toLowerCase().includes('.m3u8') || url.toLowerCase().includes('m3u8')) {
+                    // جرّب HLS أولاً إذا كان الرابط يحتوي على m3u8 أو ما شابه
+                    if (url.indexOf('.m3u8') !== -1 || url.indexOf('playlist') !== -1 || url.indexOf('index') !== -1) {
                         initHlsPlayer(url, video, loading, onPlaying);
                     } else {
-                        video.src = url;
-                        video.preload = 'auto';
-                        const tryNativeThenHls = () => {
-                            const nativePlay = video.play();
-                            if (nativePlay && nativePlay.then) {
-                                nativePlay.then(onPlaying).catch(() => {
-                                    try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                        try {
+                            video.src = url;
+                            video.preload = 'auto';
+                            const tryNativeThenHls = () => {
+                                const nativePlay = video.play();
+                                if (nativePlay && nativePlay.then) {
+                                    nativePlay.then(onPlaying).catch(() => {
+                                        try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                                        initHlsPlayer(url, video, loading, onPlaying);
+                                    });
+                                } else {
                                     initHlsPlayer(url, video, loading, onPlaying);
-                                });
-                            } else {
-                                initHlsPlayer(url, video, loading, onPlaying);
-                            }
-                        };
-                        
-                        video.addEventListener('loadedmetadata', tryNativeThenHls, { once: true });
-                        video.addEventListener('error', () => {
-                            try { video.removeAttribute('src'); video.load(); } catch(e) {}
-                            initHlsPlayer(url, video, loading, onPlaying);
-                        }, { once: true });
-                        
-                        setTimeout(() => {
-                            if (video.readyState === 0 && loading.style.display !== 'none') {
+                                }
+                            };
+                            
+                            video.addEventListener('loadedmetadata', tryNativeThenHls, { once: true });
+                            video.addEventListener('error', () => {
                                 try { video.removeAttribute('src'); video.load(); } catch(e) {}
                                 initHlsPlayer(url, video, loading, onPlaying);
-                            }
-                        }, 3000);
+                            }, { once: true });
+                            
+                            setTimeout(() => {
+                                if (video.readyState === 0 && loading.style.display !== 'none') {
+                                    try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                                    initHlsPlayer(url, video, loading, onPlaying);
+                                }
+                            }, 3500);
+                        } catch(e) {
+                            initHlsPlayer(url, video, loading, onPlaying);
+                        }
                     }
                     break;
             }
@@ -3040,7 +3051,8 @@
             const centerPlay = document.getElementById('centerPlayBtn');
             
             if (video.paused) {
-                video.play();
+                const p = video.play();
+                if (p && p.catch) p.catch(()=>{});
                 if (mpegtsPlayer) { try { mpegtsPlayer.play(); } catch(e){} }
                 isPlaying = true;
                 centerPlay.classList.remove('show');
@@ -3101,20 +3113,16 @@
             const container = document.querySelector('.video-player-container');
             const icon = document.getElementById('fullscreenIcon');
             
-            if (!document.fullscreenElement) {
-                container.requestFullscreen().then(() => {
-                    icon.className = 'fa-solid fa-compress';
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(() => {});
-                    }
-                }).catch(() => {});
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                safeRequestFullscreen(container).then(() => {
+                    if (icon) icon.className = 'fa-solid fa-compress';
+                    safeLockOrientation('landscape');
+                }).catch(()=>{});
             } else {
-                document.exitFullscreen().then(() => {
-                    icon.className = 'fa-solid fa-expand';
-                    if (screen.orientation && screen.orientation.unlock) {
-                        screen.orientation.unlock();
-                    }
-                }).catch(() => {});
+                safeExitFullscreen().then(() => {
+                    if (icon) icon.className = 'fa-solid fa-expand';
+                    safeUnlockOrientation();
+                });
             }
             showControls();
         }
@@ -3272,13 +3280,9 @@
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
 
-            if (document.fullscreenElement) {
-                document.exitFullscreen().then(() => {
-                    if (screen.orientation && screen.orientation.unlock) {
-                        screen.orientation.unlock();
-                    }
-                }).catch(() => {});
-            }
+            safeExitFullscreen().then(function(){
+                safeUnlockOrientation();
+            });
             
             try { 
                 video.pause(); 
@@ -3848,13 +3852,16 @@
                     icon.className = document.fullscreenElement ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
                 }
                 if (document.fullscreenElement) {
-                    if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(() => {});
-                    }
+                    safeLockOrientation('landscape');
                 } else {
-                    if (screen.orientation && screen.orientation.unlock) {
-                        screen.orientation.unlock();
-                    }
+                    safeUnlockOrientation();
+                }
+            });
+
+            document.addEventListener('webkitfullscreenchange', () => {
+                const icon = document.getElementById('fullscreenIcon');
+                if (icon) {
+                    icon.className = (document.webkitFullscreenElement) ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
                 }
             });
         });
