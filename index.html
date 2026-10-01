@@ -912,17 +912,17 @@
             height: 3.5rem;
             border-radius: 1.75rem; 
             position: relative;
-            margin: 0 0.0625rem;
+            margin: 0 0.125rem;
         }
 
         .dock-tab-btn i {
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             margin-bottom: 0.1875rem;
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
         }
 
         .dock-tab-btn span {
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             font-weight: 700;
             transition: opacity 0.3s ease;
             color: var(--text-muted);
@@ -1268,309 +1268,6 @@
             display: block;
             background: #030712;
         }
-
-        /* ==================== قسم المقاطع القصيرة ==================== */
-        #pane-clips {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            z-index: 50;
-            background: #000;
-        }
-
-        #pane-clips.active {
-            display: block;
-            animation: none;
-            opacity: 1;
-            transform: none;
-        }
-
-        .clips-feed {
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            background: #000;
-            position: relative;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .clips-feed::-webkit-scrollbar { display: none; }
-
-        .clip-item {
-            width: 100%;
-            height: 100%;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            position: relative;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .clip-video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #000;
-        }
-
-        .clip-overlay {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 35%, transparent 65%, rgba(0,0,0,0.35) 100%);
-            z-index: 2;
-        }
-
-        .clip-info {
-            position: absolute;
-            bottom: 6.5rem;
-            right: 1rem;
-            left: 4.5rem;
-            color: #fff;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .clip-title {
-            font-size: 1rem;
-            font-weight: 800;
-            margin-bottom: 0.375rem;
-            line-height: 1.4;
-            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.9);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .clip-hashtag {
-            color: #38bdf8;
-            font-size: 0.88rem;
-            font-weight: 700;
-            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.9);
-            letter-spacing: 0.0125rem;
-        }
-
-        .clip-actions {
-            position: absolute;
-            bottom: 7rem;
-            left: 0.875rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.875rem;
-            z-index: 6;
-        }
-
-        .clip-action-btn {
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 0.0625rem solid rgba(255,255,255,0.15);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .clip-action-btn:active {
-            transform: scale(0.9);
-            background: rgba(99, 102, 241, 0.6);
-        }
-
-        .clip-action-btn i {
-            font-size: 1.05rem;
-        }
-
-        .clip-center-play {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 4.5rem;
-            height: 4.5rem;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(10px);
-            border: 0.125rem solid rgba(255,255,255,0.25);
-            color: #fff;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 6;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .clip-center-play.show { display: flex; }
-        .clip-center-play:active { transform: translate(-50%, -50%) scale(0.9); }
-        .clip-center-play i { font-size: 1.8rem; margin-right: -0.25rem; }
-
-        .clip-loading-badge {
-            position: absolute;
-            top: 3rem;
-            right: 1rem;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 0.75rem;
-            padding: 0.375rem 0.75rem;
-            color: #fff;
-            font-size: 0.7rem;
-            font-weight: 700;
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 7;
-        }
-
-        .clip-loading-badge.show { display: flex; }
-
-        .clip-loading-badge i {
-            font-size: 0.8rem;
-            color: var(--accent-secondary);
-        }
-
-        .clips-loading, .clips-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #fff;
-            gap: 1rem;
-            font-size: 0.95rem;
-            text-align: center;
-            padding: 1.25rem;
-        }
-
-        .clips-loading i { font-size: 2rem; color: var(--accent-primary); }
-
-        .clip-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 0.1875rem;
-            background: rgba(255,255,255,0.1);
-            z-index: 7;
-        }
-
-        .clip-progress-bar {
-            height: 100%;
-            background: var(--accent-secondary);
-            width: 0%;
-            transition: width 0.15s linear;
-            box-shadow: 0 0 0.625rem rgba(56, 189, 248, 0.7);
-        }
-
-        .clips-top-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem 1.25rem;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
-            z-index: 8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        .clips-top-title {
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 800;
-            letter-spacing: 0.0125rem;
-            text-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .clips-top-title i {
-            color: var(--accent-secondary);
-            font-size: 1rem;
-        }
-
-        .clips-status {
-            position: absolute;
-            top: 3.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 1rem;
-            font-size: 0.72rem;
-            font-weight: 700;
-            z-index: 9;
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-            pointer-events: none;
-            box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.5);
-            max-width: 90%;
-            text-align: center;
-        }
-
-        .clips-status.show { display: flex; }
-        .clips-status i { font-size: 0.8rem; color: var(--accent-secondary); }
-
-        .clips-retry-btn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #6366f1, #38bdf8);
-            color: #fff;
-            border: none;
-            border-radius: 1rem;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Alexandria', sans-serif;
-            pointer-events: all;
-            box-shadow: 0 0.5rem 1.5rem rgba(99, 102, 241, 0.4);
-        }
-
-        .clips-retry-btn:active { transform: scale(0.95); }
-
-        .clips-debug {
-            font-size: 0.65rem;
-            color: #64748b;
-            margin-top: 0.75rem;
-            max-width: 320px;
-            line-height: 1.6;
-            font-family: monospace;
-            direction: ltr;
-            text-align: left;
-            background: rgba(0,0,0,0.3);
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            word-break: break-all;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        /* ======================================================== */
 
         .news-feed-container {
             width: 100%;
@@ -2127,27 +1824,6 @@
                 </div>
             </div>
 
-            <!-- ==================== قسم المقاطع القصيرة (جديد) ==================== -->
-            <div id="pane-clips" class="section-pane">
-                <div class="clips-top-bar">
-                    <div class="clips-top-title">
-                        <i class="fa-solid fa-clapperboard"></i>
-                        <span>مقاطع قصيرة</span>
-                    </div>
-                </div>
-                <div class="clips-status" id="clipsStatus">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i>
-                    <span id="clipsStatusText">جاري التحميل...</span>
-                </div>
-                <div class="clips-feed" id="clipsFeed">
-                    <div class="clips-loading">
-                        <i class="fa-solid fa-circle-notch fa-spin"></i>
-                        <span>جاري تحميل المقاطع...</span>
-                    </div>
-                </div>
-            </div>
-            <!-- ==================================================================== -->
-
             <div id="pane-settings" class="section-pane">
                 
                 <div class="stack-list">
@@ -2231,13 +1907,7 @@
                 <i class="fa-solid fa-newspaper"></i>
                 <span data-key="navNews">أخبار</span>
             </button>
-            <!-- ==================== زر المقاطع القصيرة (جديد) ==================== -->
             <button class="dock-tab-btn" onclick="switchPane(4)">
-                <i class="fa-solid fa-clapperboard"></i>
-                <span data-key="navClips">مقاطع</span>
-            </button>
-            <!-- ==================================================================== -->
-            <button class="dock-tab-btn" onclick="switchPane(5)">
                 <i class="fa-solid fa-gear"></i>
                 <span data-key="navSettings">الإعدادات</span>
             </button>
@@ -2541,25 +2211,6 @@
             password: 'QDXDbuLzFDYaYbD',
             maxChannels: 700
         };
-
-        // ==================== إعدادات سيرفر المقاطع القصيرة (جديد) ====================
-        const CLIPS_CONFIG = {
-            host: 'http://ts1.eagtop.lol',
-            username: 'e1uf3olh92',
-            password: 'j18aurmqt5',
-            maxMovies: 100,
-            maxSeries: 25
-        };
-
-        // بروكسيات CORS المتاحة
-        const CORS_PROXIES = [
-            { name: 'corsproxy.io', build: (url) => 'https://corsproxy.io/?' + encodeURIComponent(url) },
-            { name: 'allorigins.win', build: (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) },
-            { name: 'cors.eu.org', build: (url) => 'https://cors.eu.org/' + url },
-            { name: 'whateverorigin', build: (url) => 'https://www.whateverorigin.org/get?url=' + encodeURIComponent(url) },
-            { name: 'cors-anywhere', build: (url) => 'https://cors-anywhere.herokuapp.com/' + url }
-        ];
-        // ============================================================================
         
         let xtreamCategories = {};
         let xtreamLoaded = false;
@@ -2743,7 +2394,7 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        // ============ المشغل السريع المطوّر ============
+        // ============ المشغل السريع المطوّر (نسخة احترافية - بدون أي رسائل) ============
         let hlsPlayer = null;
         let dashPlayer = null;
         let mpegtsPlayer = null;
@@ -2753,9 +2404,10 @@
         let isPlaying = false;
         let autoMuted = false;
         let playingStarted = false;
-        let attempt = 0;
         let loaderTimeout = null;
+        let silentRetryTimer = null;
 
+        // كشف نوع البث تلقائياً من الرابط
         function detectStreamType(url) {
             if (!url) return 'unknown';
             const lower = url.toLowerCase();
@@ -2788,6 +2440,7 @@
             return 'auto';
         }
 
+        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي - بصمت تام
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
             video.muted = false;
@@ -2806,6 +2459,7 @@
             }
         }
 
+        // تنظيف جميع المشغلات
         function destroyAllPlayers() {
             if (hlsPlayer) {
                 try { hlsPlayer.destroy(); } catch(e) {}
@@ -2824,6 +2478,10 @@
                 } catch(e) {}
                 mpegtsPlayer = null;
             }
+            if (silentRetryTimer) {
+                clearTimeout(silentRetryTimer);
+                silentRetryTimer = null;
+            }
             playingStarted = false;
         }
 
@@ -2833,7 +2491,6 @@
             const url = decodeURIComponent(encodedUrl);
             currentVideoUrl = url;
             currentStreamType = detectStreamType(url);
-            attempt = 0;
             playingStarted = false;
             
             const video = document.getElementById('videoPlayer');
@@ -2852,9 +2509,9 @@
             if (container.requestFullscreen) {
                 container.requestFullscreen().then(() => {
                     if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(err => console.log('Orientation lock failed:', err));
+                        screen.orientation.lock('landscape').catch(() => {});
                     }
-                }).catch(err => console.log('Fullscreen request failed:', err));
+                }).catch(() => {});
             }
             
             showControls();
@@ -2867,37 +2524,77 @@
             initializePlayer(currentVideoUrl);
         }
 
+        // مشغل HLS احترافي - بدء فوري + ABR ذكي + صامت تماماً
         function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
+                    // ===== أداء عالي =====
                     enableWorker: true,
                     progressive: true,
                     lowLatencyMode: false,
-                    startLevel: 0,
-                    abrEwmaDefaultEstimate: 1000000,
-                    capLevelToPlayerSize: true,
+                    
+                    // ===== بدء فوري فائق السرعة =====
+                    startLevel: 0,                          // ابدأ من أقل جودة = تشغيل فوري
+                    testBandwidth: true,                    // اختبر السرعة الحقيقية أثناء التحميل
+                    abrEwmaDefaultEstimate: 1500000,        // تقدير أولي 1.5Mbps
+                    abrEwmaFastLive: 3.0,
+                    abrEwmaSlowLive: 9.0,
+                    abrEwmaFastVoD: 3.0,
+                    abrEwmaSlowVoD: 9.0,
+                    abrBandWidthFactor: 0.95,               // تسامح في التخفيض
+                    abrBandWidthUpFactor: 0.7,              // ترقية سريعة عند تحسّن الشبكة
+                    abrMaxWithRealBitrate: true,
+                    capLevelToPlayerSize: true,             // لا تحمّل جودة أعلى من حجم الشاشة
+                    capLevelOnFPSDrop: true,
+                    minAutoBitrate: 0,
+                    
+                    // ===== تبديل سريع للجودات =====
+                    maxStarvationDelay: 4,
+                    maxLoadingDelay: 4,
+                    
+                    // ===== تخزين مؤقت محسّن =====
                     backBufferLength: 30,
-                    maxBufferLength: 60,
-                    maxMaxBufferLength: 90,
-                    maxBufferSize: 120 * 1000 * 1000,
-                    maxBufferHole: 0.5,
-                    manifestLoadingTimeOut: 8000,
-                    manifestLoadingMaxRetry: 4,
-                    manifestLoadingRetryDelay: 1000,
-                    levelLoadingTimeOut: 8000,
-                    levelLoadingMaxRetry: 4,
-                    levelLoadingRetryDelay: 1000,
-                    fragLoadingTimeOut: 12000,
-                    fragLoadingMaxRetry: 5,
-                    fragLoadingRetryDelay: 1000,
-                    startFragPrefetch: true,
-                    testBandwidth: true,
-                    liveSyncDurationCount: 5,
-                    liveMaxLatencyDurationCount: 10,
+                    maxBufferLength: 30,
+                    maxMaxBufferLength: 60,
+                    maxBufferSize: 60 * 1000 * 1000,
+                    maxBufferHole: 0.3,
+                    highBufferWatchdogPeriod: 2,
                     nudgeOffset: 0.1,
                     nudgeMaxRetry: 5,
-                    starveThreshold: 2.0,
-                    xhrSetup: function(xhr, xhrUrl) {
+                    maxFragLookUpTolerance: 0.25,
+                    
+                    // ===== بث مباشر فوري =====
+                    liveSyncDurationCount: 3,
+                    liveMaxLatencyDurationCount: 8,
+                    liveDurationInfinity: false,
+                    liveBackBufferLength: 30,
+                    
+                    // ===== تحميل مسبق =====
+                    startFragPrefetch: true,
+                    
+                    // ===== إعادة محاولة صامتة تماماً =====
+                    manifestLoadingTimeOut: 10000,
+                    manifestLoadingMaxRetry: 6,
+                    manifestLoadingRetryDelay: 500,
+                    manifestLoadingMaxRetryTimeout: 64000,
+                    levelLoadingTimeOut: 10000,
+                    levelLoadingMaxRetry: 6,
+                    levelLoadingRetryDelay: 500,
+                    levelLoadingMaxRetryTimeout: 64000,
+                    fragLoadingTimeOut: 20000,
+                    fragLoadingMaxRetry: 6,
+                    fragLoadingRetryDelay: 500,
+                    fragLoadingMaxRetryTimeout: 64000,
+                    appendErrorMaxRetry: 3,
+                    
+                    // ===== مراقبة الأداء =====
+                    fpsDroppedMonitoringPeriod: 5000,
+                    fpsDroppedMonitoringThreshold: 0.2,
+                    stretchShortVideoTrack: false,
+                    forceKeyFrameOnDiscontinuity: true,
+                    
+                    // ===== CORS =====
+                    xhrSetup: function(xhr) {
                         xhr.withCredentials = false;
                     }
                 };
@@ -2910,24 +2607,35 @@
                     tryPlayVideo(onPlaying);
                 });
 
+                // استماع لتغير الجودة تلقائياً (لا رسالة - فقط مراقبة)
+                hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
+
                 hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
+                                // تخفيض الجودة فوراً في حال مشاكل الشبكة
                                 if (hlsPlayer.currentLevel > 0) {
                                     hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
                                 }
-                                try { hlsPlayer.startLoad(); } catch(e) {
-                                    loading.style.display = 'none';
-                                }
+                                // إعادة محاولة صامتة
+                                try { hlsPlayer.startLoad(); } catch(e) {}
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
-                                try { hlsPlayer.recoverMediaError(); } catch(e) {
-                                    loading.style.display = 'none';
-                                }
+                                try { hlsPlayer.recoverMediaError(); } catch(e) {}
                                 break;
                             default:
-                                loading.style.display = 'none';
+                                // إعادة محاولة صامتة بعد تأخير بسيط
+                                clearTimeout(silentRetryTimer);
+                                silentRetryTimer = setTimeout(() => {
+                                    if (hlsPlayer && currentVideoUrl === url) {
+                                        try {
+                                            hlsPlayer.destroy();
+                                            hlsPlayer = null;
+                                            initializePlayer(url);
+                                        } catch(e) {}
+                                    }
+                                }, 1500);
                                 break;
                         }
                     }
@@ -2937,14 +2645,13 @@
                 video.preload = 'auto';
                 video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
                 video.addEventListener('playing', onPlaying, { once: true });
-                video.addEventListener('error', () => { loading.style.display = 'none'; }, { once: true });
                 tryPlayVideo(onPlaying);
             } else {
                 loading.style.display = 'none';
-                showToast('متصفحك لا يدعم HLS');
             }
         }
 
+        // مشغل DASH احترافي - بدء فوري + ABR ذكي + صامت تماماً
         function initDashPlayer(url, video, loading, onPlaying) {
             if (window.dashjs && dashjs.MediaPlayer) {
                 try {
@@ -2952,19 +2659,39 @@
                     dashPlayer.updateSettings({
                         streaming: {
                             lowLatencyMode: false,
-                            rebufferingGoal: 8,
-                            bufferingGoal: 45,
-                            bufferBehind: 45,
-                            retryParameters: { timeout: 12000, maxAttempts: 6, baseDelay: 1000, backoffFactor: 2 },
+                            rebufferingGoal: 4,
+                            bufferingGoal: 30,
+                            bufferBehind: 20,
+                            bufferToKeep: 20,
+                            bufferTimeAtTopQuality: 30,
+                            bufferTimeAtTopQualityLongForm: 40,
+                            longFormContentDurationThreshold: 600,
+                            fastSwitchEnabled: true,
+                            jumpGaps: true,
+                            jumpLargeGaps: true,
+                            smallGapLimit: 1.5,
+                            stableBufferTime: 12,
+                            retryParameters: {
+                                timeout: 10000,
+                                maxAttempts: 6,
+                                baseDelay: 500,
+                                backoffFactor: 1.5
+                            },
                             liveDelay: 3,
                             liveCatchup: {
-                                maxDrift: 1.5,
-                                playbackRate: 0.5
+                                maxDrift: 1.2,
+                                playbackRate: 0.5,
+                                latencyTarget: 3
                             },
-                            buffer: {
-                                fastSwitchEnabled: true,
-                                bufferTimeAtTopQuality: 45,
-                                bufferToKeep: 45
+                            abr: {
+                                ABRStrategy: 'abrDynamic',
+                                bandwidthSafetyFactor: 0.9,
+                                additionalAbrRules: {
+                                    insufficientBufferRule: true,
+                                    switchHistoryRule: true,
+                                    droppedFramesRule: true,
+                                    abandonRequestsRule: true
+                                }
                             }
                         },
                         abr: {
@@ -2972,7 +2699,7 @@
                             initialBitrate: { audio: -1, video: -1 },
                             autoSwitchBitrate: { audio: true, video: true },
                             defaultBandwidthEstimate: 1500000,
-                            switchInterval: 10,
+                            switchInterval: 8,
                             bandwidthUpgradeTarget: 0.85,
                             bandwidthDowngradeTarget: 0.95
                         }
@@ -2982,18 +2709,27 @@
                     dashPlayer.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, onPlaying);
                     dashPlayer.on(dashjs.MediaPlayer.events.CAN_PLAY, onPlaying);
                     dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => {
-                        loading.style.display = 'none';
+                        // إعادة محاولة صامتة
+                        clearTimeout(silentRetryTimer);
+                        silentRetryTimer = setTimeout(() => {
+                            if (dashPlayer && currentVideoUrl === url) {
+                                try {
+                                    dashPlayer.reset();
+                                    dashPlayer = null;
+                                    initializePlayer(url);
+                                } catch(e) {}
+                            }
+                        }, 1500);
                     });
                 } catch(e) {
-                    console.warn('DASH init error:', e);
                     loading.style.display = 'none';
                 }
             } else {
                 loading.style.display = 'none';
-                showToast('متصفحك لا يدعم DASH');
             }
         }
 
+        // مشغل MPEG-TS / FLV احترافي - بدء فوري + صامت تماماً
         function initMpegtsPlayer(url, type, video, loading, onPlaying) {
             if (window.mpegts && mpegts.isSupported()) {
                 try {
@@ -3005,21 +2741,32 @@
                         url: url
                     }, {
                         enableWorker: true,
-                        enableStashBuffer: true,
-                        stashInitialSize: 256 * 1024,
-                        liveBufferLatencyChasing: false,
+                        enableStashBuffer: false,        // تعطيل stash لتشغيل أسرع
+                        stashInitialSize: 128 * 1024,
+                        liveBufferLatencyChasing: true,  // مطاردة البث المباشر تلقائياً
                         liveBufferLatencyMaxLatency: 5.0,
                         liveBufferLatencyMinRemain: 2.0,
                         autoCleanupSourceBuffer: true,
                         autoCleanupMaxBackwardDuration: 40,
                         autoCleanupMinBackwardDuration: 30,
-                        lazyLoad: false
+                        lazyLoad: false,
+                        lazyLoadMaxDuration: 0,
+                        reuseRedirectedURL: true
                     });
                     
                     mpegtsPlayer.attachMediaElement(video);
-                    mpegtsPlayer.on(mpegts.Events.ERROR, (type, info) => {
-                        console.warn('mpegts error:', type, info);
-                        loading.style.display = 'none';
+                    mpegtsPlayer.on(mpegts.Events.ERROR, () => {
+                        // إعادة محاولة صامتة
+                        clearTimeout(silentRetryTimer);
+                        silentRetryTimer = setTimeout(() => {
+                            if (mpegtsPlayer && currentVideoUrl === url) {
+                                try {
+                                    mpegtsPlayer.destroy();
+                                    mpegtsPlayer = null;
+                                    initializePlayer(url);
+                                } catch(e) {}
+                            }
+                        }, 1500);
                     });
                     
                     mpegtsPlayer.on(mpegts.Events.MEDIA_INFO, onPlaying);
@@ -3027,15 +2774,14 @@
                     mpegtsPlayer.load();
                     tryPlayVideo(onPlaying);
                 } catch(e) {
-                    console.warn('mpegts init error:', e);
                     loading.style.display = 'none';
                 }
             } else {
                 loading.style.display = 'none';
-                showToast('متصفحك لا يدعم هذه الصيغة');
             }
         }
 
+        // مشغل الصيغ الأصلية (video.src مباشرة)
         function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
             video.src = url;
             video.preload = 'auto';
@@ -3098,7 +2844,6 @@
                             initMpegtsPlayer(url, 'mpegts', video, loading, onPlaying);
                         } else {
                             loading.style.display = 'none';
-                            showToast('تعذّر تشغيل هذا الملف');
                         }
                     });
                     break;
@@ -3107,7 +2852,6 @@
                 case 'rtsp':
                 case 'rtp':
                 case 'udp':
-                    console.warn('Protocol not natively supported in browser:', type);
                     initHlsPlayer(url, video, loading, onPlaying);
                     break;
 
@@ -3166,6 +2910,12 @@
                 playingStarted = true;
                 clearTimeout(loaderTimeout);
                 document.getElementById('playerLoading').style.display = 'none';
+            });
+
+            // إخفاء اللودر عند التوقف المفاجئ بعد نجاح التشغيل
+            video.addEventListener('waiting', () => {
+                if (!playingStarted) return;
+                // لا نُظهر أي رسالة - فقط نسمح للمشغل بالتعامل
             });
 
             progressContainer.addEventListener('click', (e) => {
@@ -3299,16 +3049,16 @@
                 container.requestFullscreen().then(() => {
                     icon.className = 'fa-solid fa-compress';
                     if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(err => console.log(err));
+                        screen.orientation.lock('landscape').catch(() => {});
                     }
-                }).catch(err => console.log(err));
+                }).catch(() => {});
             } else {
                 document.exitFullscreen().then(() => {
                     icon.className = 'fa-solid fa-expand';
                     if (screen.orientation && screen.orientation.unlock) {
                         screen.orientation.unlock();
                     }
-                }).catch(err => console.log(err));
+                }).catch(() => {});
             }
             showControls();
         }
@@ -3350,7 +3100,6 @@
                 autoDiv.onclick = () => {
                     hlsPlayer.currentLevel = -1;
                     closePopups();
-                    showToast('تم تعيين الجودة على التلقائي');
                 };
                 optionsContainer.appendChild(autoDiv);
 
@@ -3362,7 +3111,6 @@
                     div.onclick = () => {
                         hlsPlayer.currentLevel = index;
                         closePopups();
-                        showToast(`الجودة: ${height}p`);
                     };
                     optionsContainer.appendChild(div);
                 });
@@ -3377,7 +3125,6 @@
                         autoDiv.onclick = () => {
                             dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: true } } } });
                             closePopups();
-                            showToast('تم تعيين الجودة على التلقائي');
                         };
                         optionsContainer.appendChild(autoDiv);
 
@@ -3390,7 +3137,6 @@
                                 dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: false } } } });
                                 dashPlayer.setQualityFor('video', index, true);
                                 closePopups();
-                                showToast(`الجودة: ${height}p`);
                             };
                             optionsContainer.appendChild(div);
                         });
@@ -3429,7 +3175,6 @@
                             div.onclick = () => {
                                 dashPlayer.setCurrentTrack(track);
                                 closePopups();
-                                showToast(label);
                             };
                             optionsContainer.appendChild(div);
                         });
@@ -3451,7 +3196,6 @@
                         Array.from(video.audioTracks).forEach(t => t.enabled = false);
                         track.enabled = true;
                         closePopups();
-                        showToast(`${track.label || 'تعليق ' + (index + 1)}`);
                     };
                     optionsContainer.appendChild(div);
                 });
@@ -3477,7 +3221,7 @@
                     if (screen.orientation && screen.orientation.unlock) {
                         screen.orientation.unlock();
                     }
-                }).catch(err => console.log('Exit fullscreen failed:', err));
+                }).catch(() => {});
             }
             
             try { 
@@ -3525,7 +3269,7 @@
                 socialSupport: "مواقع التواصل والدعم", telegramChannel: "قناة التلغرام", telegramDesc: "انضم لقناتنا على تلغرام",
                 youtubeChannel: "قناة اليوتيوب", youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
                 emailSupport: "الدعم الفني", emailSupportDesc: "تواصل مع فريق نجم الشاشات",
-                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navClips: "مقاطع", navSettings: "الإعدادات",
+                navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navSettings: "الإعدادات",
                 now: "الآن", minutesAgo: "منذ", minute: "دقيقة", hour: "ساعة", day: "يوم",
                 starScreens: "نجم الشاشات", linkCopied: "تم نسخ الرابط بنجاح!",
                 shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
@@ -3545,7 +3289,7 @@
                 socialSupport: "Social Media and Support", telegramChannel: "Telegram Channel", telegramDesc: "Join our channel on Telegram",
                 youtubeChannel: "YouTube Channel", youtubeDesc: "Watch the latest videos and shows",
                 emailSupport: "Technical Support", emailSupportDesc: "Contact Star Screens Team",
-                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navClips: "Clips", navSettings: "Settings",
+                navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navSettings: "Settings",
                 now: "Now", minutesAgo: "", minute: "minute", hour: "hour", day: "day",
                 starScreens: "Star Screens", linkCopied: "Link copied successfully!",
                 shareText: " Star Screens App\nBest Live Streaming Platform\n",
@@ -3558,8 +3302,6 @@
                 closeVideoPlayer();
             }
 
-            if (index !== 4) pauseAllClips();
-
             panesArr.forEach(pane => pane.classList.remove('active'));
             dockBtnsArr.forEach(btn => btn.classList.remove('active'));
 
@@ -3568,10 +3310,6 @@
 
             document.querySelector('.viewport-area').scrollTop = 0;
 
-            if (index !== 3 && newsInterval) {
-                clearInterval(newsInterval);
-            }
-
             if (index === 0) { 
                 if (currentCategory) closeCategory();
             } else if (index === 1) { 
@@ -3579,8 +3317,8 @@
             } else if (index === 3) { 
                 if (newsData.length === 0) fetchNews();
                 else startNewsAutoScroll();
-            } else if (index === 4) {
-                loadClips();
+            } else {
+                if (newsInterval) clearInterval(newsInterval);
             }
         }
 
@@ -3601,7 +3339,6 @@
                 }
                 return text;
             } catch (error) {
-                console.warn("Translation failed, using original text.");
                 return text;
             }
         }
@@ -3672,7 +3409,6 @@
                 
                 renderNewsSlides();
             } catch (error) {
-                console.error("Fetch news error:", error);
                 newsData = [
                     {
                         title: "أخبار رياضية عاجلة",
@@ -3811,7 +3547,7 @@
                         text: getShareTextShort(), url: appUrl
                     });
                     closeShareSheet();
-                } catch (err) { if (err.name !== 'AbortError') console.log('Share failed:', err); }
+                } catch (err) { }
             } else {
                 copyLink();
                 showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط' : 'Link copied');
@@ -4044,494 +3780,6 @@
             closeTelegramPopup();
         }
 
-        // ==================== وظائف قسم المقاطع القصيرة (نسخة محسّنة جداً) ====================
-        let clipsLoaded = false;
-        let clipsLoading = false;
-        let clipsData = [];
-        let clipsObserver = null;
-        let clipsDebugLog = [];
-
-        function logClips(msg) {
-            const time = new Date().toLocaleTimeString('ar-SA');
-            clipsDebugLog.push(`[${time}] ${msg}`);
-            if (clipsDebugLog.length > 20) clipsDebugLog.shift();
-            console.log('[CLIPS]', msg);
-        }
-
-        function updateClipsStatus(text, showSpinner) {
-            const status = document.getElementById('clipsStatus');
-            const statusText = document.getElementById('clipsStatusText');
-            if (!status || !statusText) return;
-            if (!text) {
-                status.classList.remove('show');
-                return;
-            }
-            status.classList.add('show');
-            statusText.textContent = text;
-            const icon = status.querySelector('i');
-            if (icon) {
-                icon.className = showSpinner 
-                    ? 'fa-solid fa-circle-notch fa-spin' 
-                    : 'fa-solid fa-circle-info';
-            }
-        }
-
-        // توليد قائمة عناوين URL بديلة للسيرفر
-        function buildUrlVariants(endpoint) {
-            const base = `${CLIPS_CONFIG.host}/player_api.php?username=${encodeURIComponent(CLIPS_CONFIG.username)}&password=${encodeURIComponent(CLIPS_CONFIG.password)}&action=${endpoint}`;
-            const variants = [base];
-
-            // نسخة HTTPS إذا كان الرابط الأساسي HTTP
-            if (base.startsWith('http://')) {
-                variants.push(base.replace('http://', 'https://'));
-            }
-
-            // بدون /player_api.php (بعض السيرفرات تقبل /panel_api.php)
-            const panelVariant = base.replace('/player_api.php', '/panel_api.php');
-            variants.push(panelVariant);
-
-            return variants;
-        }
-
-        // محاولة جلب JSON واحدة
-        async function tryFetchJson(url, timeoutMs) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-            try {
-                const response = await fetch(url, {
-                    signal: controller.signal,
-                    credentials: 'omit',
-                    mode: 'cors',
-                    cache: 'no-cache'
-                });
-                clearTimeout(timer);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const text = await response.text();
-                if (!text || text.length < 2) {
-                    throw new Error('استجابة فارغة');
-                }
-
-                // محاولة استخراج JSON
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    const match = text.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-                    if (match) {
-                        data = JSON.parse(match[1]);
-                    } else {
-                        throw new Error('JSON غير صالح');
-                    }
-                }
-
-                return data;
-            } catch (err) {
-                clearTimeout(timer);
-                throw err;
-            }
-        }
-
-        // دالة الجلب الشاملة مع تجربة جميع الطرق
-        async function fetchClipsAPI(endpoint) {
-            const urlVariants = buildUrlVariants(endpoint);
-            const attempts = [];
-
-            // 1) محاولات مباشرة أولاً (الأسرع)
-            urlVariants.forEach((u, i) => {
-                attempts.push({ label: i === 0 ? 'اتصال مباشر' : 'HTTPS', url: u, timeout: 12000 });
-            });
-
-            // 2) ثم البروكسيات لكل متغير
-            for (const u of urlVariants) {
-                for (const proxy of CORS_PROXIES) {
-                    attempts.push({ 
-                        label: proxy.name, 
-                        url: proxy.build(u), 
-                        timeout: 10000 
-                    });
-                }
-            }
-
-            let lastError = null;
-            for (let i = 0; i < attempts.length; i++) {
-                const attempt = attempts[i];
-                const progress = `(${i+1}/${attempts.length})`;
-                updateClipsStatus(`${attempt.label} ${progress}`, true);
-                logClips(`محاولة ${attempt.label}: ${attempt.url.substring(0, 80)}...`);
-
-                try {
-                    const data = await tryFetchJson(attempt.url, attempt.timeout);
-                    
-                    // التحقق من صحة البيانات
-                    if (Array.isArray(data)) {
-                        logClips(`✅ نجح ${attempt.label} - عناصر: ${data.length}`);
-                        return data;
-                    } else if (data && typeof data === 'object') {
-                        // بعض البروكسيات ترجع {contents: "..."} 
-                        if (typeof data.contents === 'string') {
-                            try {
-                                const parsed = JSON.parse(data.contents);
-                                if (Array.isArray(parsed)) {
-                                    logClips(`✅ نجح ${attempt.label} (contents) - عناصر: ${parsed.length}`);
-                                    return parsed;
-                                }
-                            } catch (e) {}
-                        }
-                        logClips(`⚠️ ${attempt.label} رجع كائن غير متوقع`);
-                    } else {
-                        logClips(`⚠️ ${attempt.label} رجع نوع غير متوقع: ${typeof data}`);
-                    }
-                } catch (err) {
-                    logClips(`❌ فشل ${attempt.label}: ${err.message}`);
-                    lastError = err;
-                }
-            }
-
-            throw lastError || new Error('فشلت جميع المحاولات');
-        }
-
-        async function loadClips() {
-            if (clipsLoading || clipsLoaded) return;
-            clipsLoading = true;
-            clipsDebugLog = [];
-
-            logClips('🚀 بدء تحميل المقاطع');
-
-            const feed = document.getElementById('clipsFeed');
-            feed.innerHTML = `
-                <div class="clips-loading">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i>
-                    <span>جاري الاتصال بالسيرفر...</span>
-                </div>`;
-
-            try {
-                // ==== جلب الأفلام ====
-                updateClipsStatus('جاري جلب الأفلام...', true);
-                const vodRes = await fetchClipsAPI('get_vod_streams').catch(err => {
-                    logClips(`فشل جلب الأفلام: ${err.message}`);
-                    return null;
-                });
-
-                // ==== جلب المسلسلات ====
-                updateClipsStatus('جاري جلب المسلسلات...', true);
-                const seriesRes = await fetchClipsAPI('get_series').catch(err => {
-                    logClips(`فشل جلب المسلسلات: ${err.message}`);
-                    return null;
-                });
-
-                logClips(`نتيجة الأفلام: ${vodRes ? vodRes.length : 'لا شيء'}`);
-                logClips(`نتيجة المسلسلات: ${seriesRes ? seriesRes.length : 'لا شيء'}`);
-
-                if ((!vodRes || vodRes.length === 0) && (!seriesRes || seriesRes.length === 0)) {
-                    updateClipsStatus('', false);
-                    const debugText = clipsDebugLog.slice(-6).join('\n');
-                    feed.innerHTML = `
-                        <div class="clips-empty">
-                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: #ef4444;"></i>
-                            <span>تعذّر الاتصال بالسيرفر</span>
-                            <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">
-                                قد يكون السيرفر لا يدعم CORS أو غير متاح حالياً
-                            </span>
-                            <div class="clips-debug">${debugText || 'لا توجد تفاصيل'}</div>
-                            <button class="clips-retry-btn" onclick="resetClipsAndReload()">
-                                <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
-                            </button>
-                        </div>`;
-                    clipsLoading = false;
-                    return;
-                }
-
-                const items = [];
-
-                // ==== إضافة الأفلام ====
-                if (Array.isArray(vodRes) && vodRes.length > 0) {
-                    const movies = vodRes.slice(0, CLIPS_CONFIG.maxMovies);
-                    movies.forEach(m => {
-                        if (!m || !m.stream_id) return;
-                        const ext = m.container_extension || 'mp4';
-                        items.push({
-                            title: m.name || 'فيلم',
-                            url: `${CLIPS_CONFIG.host}/movie/${CLIPS_CONFIG.username}/${CLIPS_CONFIG.password}/${m.stream_id}.${ext}`,
-                            poster: m.stream_icon || '',
-                            type: 'movie'
-                        });
-                    });
-                }
-
-                // ==== إضافة المسلسلات (الحلقة الأولى) ====
-                if (Array.isArray(seriesRes) && seriesRes.length > 0) {
-                    const seriesList = seriesRes.slice(0, CLIPS_CONFIG.maxSeries);
-
-                    updateClipsStatus(`جلب حلقات ${seriesList.length} مسلسل...`, true);
-
-                    const seriesPromises = seriesList.map(async (s) => {
-                        if (!s || !s.series_id) return null;
-                        try {
-                            const infoData = await fetchClipsAPI(`get_series_info&series_id=${s.series_id}`);
-                            if (!infoData || !infoData.episodes) return null;
-
-                            const seasons = Object.keys(infoData.episodes);
-                            if (seasons.length === 0) return null;
-                            const firstSeason = infoData.episodes[seasons[0]];
-                            if (!firstSeason || firstSeason.length === 0) return null;
-                            const ep = firstSeason[0];
-                            const ext = ep.container_extension || 'mp4';
-                            const epId = ep.id || ep.episode_id;
-                            if (!epId) return null;
-
-                            return {
-                                title: s.name || 'مسلسل',
-                                url: `${CLIPS_CONFIG.host}/series/${CLIPS_CONFIG.username}/${CLIPS_CONFIG.password}/${epId}.${ext}`,
-                                poster: s.cover || '',
-                                type: 'series'
-                            };
-                        } catch (e) {
-                            return null;
-                        }
-                    });
-
-                    const seriesItems = await Promise.all(seriesPromises);
-                    seriesItems.forEach(item => {
-                        if (item) items.push(item);
-                    });
-                }
-
-                // خلط عشوائي
-                for (let i = items.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [items[i], items[j]] = [items[j], items[i]];
-                }
-
-                logClips(`✅ تم تجميع ${items.length} مقطع`);
-
-                clipsData = items;
-                clipsLoaded = true;
-                clipsLoading = false;
-                updateClipsStatus('', false);
-
-                if (items.length === 0) {
-                    feed.innerHTML = `
-                        <div class="clips-empty">
-                            <i class="fa-solid fa-film" style="font-size: 2rem;"></i>
-                            <span>لا توجد مقاطع متاحة على هذا السيرفر</span>
-                        </div>`;
-                    return;
-                }
-
-                renderClipsFeed();
-
-            } catch (err) {
-                logClips(`❌ خطأ عام: ${err.message}`);
-                clipsLoading = false;
-                updateClipsStatus('', false);
-                const debugText = clipsDebugLog.slice(-6).join('\n');
-                feed.innerHTML = `
-                    <div class="clips-empty">
-                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: #ef4444;"></i>
-                        <span>فشل تحميل المقاطع</span>
-                        <span style="font-size: 0.75rem; color: #94a3b8; max-width: 280px;">${(err && err.message) || 'خطأ غير معروف'}</span>
-                        <div class="clips-debug">${debugText}</div>
-                        <button class="clips-retry-btn" onclick="resetClipsAndReload()">
-                            <i class="fa-solid fa-rotate-right"></i> إعادة المحاولة
-                        </button>
-                    </div>`;
-            }
-        }
-
-        function resetClipsAndReload() {
-            clipsLoaded = false;
-            clipsLoading = false;
-            clipsData = [];
-            const feed = document.getElementById('clipsFeed');
-            feed.innerHTML = `
-                <div class="clips-loading">
-                    <i class="fa-solid fa-circle-notch fa-spin"></i>
-                    <span>جاري تحميل المقاطع...</span>
-                </div>`;
-            loadClips();
-        }
-
-        function renderClipsFeed() {
-            const feed = document.getElementById('clipsFeed');
-            feed.innerHTML = '';
-
-            const fragment = document.createDocumentFragment();
-
-            clipsData.forEach((clip, index) => {
-                const item = document.createElement('div');
-                item.className = 'clip-item';
-                item.dataset.index = index;
-
-                const escapedTitle = (clip.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-                item.innerHTML = `
-                    <video class="clip-video" src="${clip.url}" playsinline webkit-playsinline preload="none" loop muted poster="${clip.poster || ''}"></video>
-                    <div class="clip-overlay"></div>
-                    <div class="clip-loading-badge"><i class="fa-solid fa-circle-notch fa-spin"></i><span>جاري التحميل...</span></div>
-                    <div class="clip-center-play" onclick="toggleClipPlay(this)">
-                        <i class="fa-solid fa-play"></i>
-                    </div>
-                    <div class="clip-actions">
-                        <button class="clip-action-btn" onclick="toggleClipMute(this)" title="الصوت">
-                            <i class="fa-solid fa-volume-xmark"></i>
-                        </button>
-                        <button class="clip-action-btn" onclick="toggleClipPlayBtn(this)" title="تشغيل/إيقاف">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="clip-info">
-                        <div class="clip-title">${escapedTitle}</div>
-                        <div class="clip-hashtag">#نجم_الشاشات</div>
-                    </div>
-                    <div class="clip-progress"><div class="clip-progress-bar"></div></div>
-                `;
-
-                fragment.appendChild(item);
-            });
-
-            feed.appendChild(fragment);
-
-            setupClipsObserver();
-        }
-
-        function setupClipsObserver() {
-            if (clipsObserver) clipsObserver.disconnect();
-            const feed = document.getElementById('clipsFeed');
-
-            clipsObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const item = entry.target;
-                    const video = item.querySelector('video');
-                    const centerPlay = item.querySelector('.clip-center-play');
-                    const playBtn = item.querySelectorAll('.clip-action-btn')[1];
-                    const loadingBadge = item.querySelector('.clip-loading-badge');
-
-                    if (!video) return;
-
-                    if (entry.isIntersecting) {
-                        video.preload = 'auto';
-                        if (loadingBadge) loadingBadge.classList.add('show');
-
-                        const playPromise = video.play();
-                        if (playPromise && playPromise.catch) {
-                            playPromise.then(() => {
-                                if (loadingBadge) loadingBadge.classList.remove('show');
-                                if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-pause';
-                            }).catch(() => {
-                                video.muted = true;
-                                video.play().then(() => {
-                                    if (loadingBadge) loadingBadge.classList.remove('show');
-                                    if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-pause';
-                                    const muteBtn = item.querySelectorAll('.clip-action-btn')[0];
-                                    if (muteBtn) muteBtn.querySelector('i').className = 'fa-solid fa-volume-xmark';
-                                }).catch(() => {
-                                    if (loadingBadge) loadingBadge.classList.remove('show');
-                                    if (centerPlay) centerPlay.classList.add('show');
-                                    if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-play';
-                                });
-                            });
-                        }
-
-                        attachClipProgress(item, video);
-                    } else {
-                        try { video.pause(); } catch (e) {}
-                        try { video.currentTime = 0; } catch (e) {}
-                        if (centerPlay) centerPlay.classList.remove('show');
-                        if (loadingBadge) loadingBadge.classList.remove('show');
-                    }
-                });
-            }, {
-                root: feed,
-                threshold: 0.6
-            });
-
-            document.querySelectorAll('.clip-item').forEach(item => clipsObserver.observe(item));
-        }
-
-        function attachClipProgress(item, video) {
-            const bar = item.querySelector('.clip-progress-bar');
-            if (!bar) return;
-
-            if (!video._clipProgressBound) {
-                video._clipProgressBound = true;
-                video.addEventListener('timeupdate', () => {
-                    if (video.duration && isFinite(video.duration)) {
-                        const pct = (video.currentTime / video.duration) * 100;
-                        bar.style.width = pct + '%';
-                    }
-                });
-                video.addEventListener('waiting', () => {
-                    const loadingBadge = item.querySelector('.clip-loading-badge');
-                    if (loadingBadge) loadingBadge.classList.add('show');
-                });
-                video.addEventListener('playing', () => {
-                    const loadingBadge = item.querySelector('.clip-loading-badge');
-                    if (loadingBadge) loadingBadge.classList.remove('show');
-                });
-                video.addEventListener('canplay', () => {
-                    const loadingBadge = item.querySelector('.clip-loading-badge');
-                    if (loadingBadge) loadingBadge.classList.remove('show');
-                });
-            }
-        }
-
-        function toggleClipPlay(el) {
-            const item = el.closest('.clip-item');
-            const video = item.querySelector('video');
-            const centerPlay = item.querySelector('.clip-center-play');
-            const playBtn = item.querySelectorAll('.clip-action-btn')[1];
-
-            if (video.paused) {
-                video.play().catch(() => {});
-                if (centerPlay) centerPlay.classList.remove('show');
-                if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-pause';
-            } else {
-                video.pause();
-                if (centerPlay) centerPlay.classList.add('show');
-                if (playBtn) playBtn.querySelector('i').className = 'fa-solid fa-play';
-            }
-        }
-
-        function toggleClipPlayBtn(btn) {
-            const item = btn.closest('.clip-item');
-            const video = item.querySelector('video');
-            const centerPlay = item.querySelector('.clip-center-play');
-
-            if (video.paused) {
-                video.play().catch(() => {});
-                if (centerPlay) centerPlay.classList.remove('show');
-                btn.querySelector('i').className = 'fa-solid fa-pause';
-            } else {
-                video.pause();
-                if (centerPlay) centerPlay.classList.add('show');
-                btn.querySelector('i').className = 'fa-solid fa-play';
-            }
-        }
-
-        function toggleClipMute(btn) {
-            const item = btn.closest('.clip-item');
-            const video = item.querySelector('video');
-
-            video.muted = !video.muted;
-            if (video.muted) {
-                btn.querySelector('i').className = 'fa-solid fa-volume-xmark';
-            } else {
-                btn.querySelector('i').className = 'fa-solid fa-volume-high';
-            }
-        }
-
-        function pauseAllClips() {
-            document.querySelectorAll('.clip-item video').forEach(v => {
-                try { v.pause(); } catch (e) {}
-            });
-        }
-        // ==========================================================================
-
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
             initTelegramPopup();
@@ -4545,7 +3793,7 @@
                 }
                 if (document.fullscreenElement) {
                     if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(err => console.log(err));
+                        screen.orientation.lock('landscape').catch(() => {});
                     }
                 } else {
                     if (screen.orientation && screen.orientation.unlock) {
