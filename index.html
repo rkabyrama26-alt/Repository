@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>تطبيق احترافي بملء الشاشة</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1643,58 +1642,8 @@
     </style>
     
     <script>
-        // ============ حماية عامة من الأخطاء (مهم لـ Sketchware WebView) ============
-        window.addEventListener('error', function(e) {
-            if (e && typeof e.preventDefault === 'function') e.preventDefault();
-            return true;
-        }, true);
-        window.addEventListener('unhandledrejection', function(e) {
-            if (e && typeof e.preventDefault === 'function') e.preventDefault();
-        });
-
-        // ============ Helpers آمنة للـ Fullscreen و Orientation ============
-        function safeRequestFullscreen(el) {
-            return new Promise(function(resolve, reject){
-                try {
-                    var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-                    if (!fn) return reject(new Error('no fullscreen'));
-                    var r = fn.call(el);
-                    if (r && r.then) r.then(resolve).catch(reject);
-                    else resolve();
-                } catch(e) { reject(e); }
-            });
-        }
-        function safeExitFullscreen() {
-            return new Promise(function(resolve){
-                try {
-                    var fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-                    if (!fn) return resolve();
-                    var r = fn.call(document);
-                    if (r && r.then) r.then(resolve).catch(resolve);
-                    else resolve();
-                } catch(e) { resolve(); }
-            });
-        }
-        function safeLockOrientation(mode) {
-            try {
-                if (screen && screen.orientation && typeof screen.orientation.lock === 'function') {
-                    var p = screen.orientation.lock(mode);
-                    if (p && p.catch) p.catch(function(){});
-                }
-            } catch(e) {}
-        }
-        function safeUnlockOrientation() {
-            try {
-                if (screen && screen.orientation && typeof screen.orientation.unlock === 'function') {
-                    screen.orientation.unlock();
-                }
-            } catch(e) {}
-        }
-
         if (document.fonts) {
             document.fonts.ready.then(function () {
-                document.documentElement.classList.add('fonts-loaded');
-            }).catch(function(){
                 document.documentElement.classList.add('fonts-loaded');
             });
         } else {
@@ -1968,7 +1917,7 @@
 
     <div class="video-modal" id="videoModal">
         <div class="video-player-container">
-            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" autoplay poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
+            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
                 <button class="player-back-btn" onclick="closeVideoPlayer()">
@@ -2445,7 +2394,7 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        // ============ المشغل السريع المطوّر (نسخة متوافقة مع Sketchware) ============
+        // ============ المشغل السريع المطوّر (نسخة احترافية - بدون أي رسائل) ============
         let hlsPlayer = null;
         let dashPlayer = null;
         let mpegtsPlayer = null;
@@ -2457,9 +2406,8 @@
         let playingStarted = false;
         let loaderTimeout = null;
         let silentRetryTimer = null;
-        let retryCount = 0;
-        const MAX_RETRIES = 3;
 
+        // كشف نوع البث تلقائياً من الرابط
         function detectStreamType(url) {
             if (!url) return 'unknown';
             const lower = url.toLowerCase();
@@ -2492,7 +2440,7 @@
             return 'auto';
         }
 
-        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي - صامتة
+        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي - بصمت تام
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
             video.muted = false;
@@ -2504,16 +2452,14 @@
                 }).catch(() => {
                     autoMuted = true;
                     video.muted = true;
-                    const p2 = video.play();
-                    if (p2 && p2.then) {
-                        p2.then(() => {
-                            if (typeof onPlaying === 'function') onPlaying();
-                        }).catch(() => {});
-                    }
+                    video.play().then(() => {
+                        if (typeof onPlaying === 'function') onPlaying();
+                    }).catch(() => {});
                 });
             }
         }
 
+        // تنظيف جميع المشغلات
         function destroyAllPlayers() {
             if (hlsPlayer) {
                 try { hlsPlayer.destroy(); } catch(e) {}
@@ -2542,17 +2488,10 @@
         function destroyHls() { destroyAllPlayers(); }
 
         function playChannel(encodedUrl, name) {
-            let url = decodeURIComponent(encodedUrl);
-            
-            // ترقية HTTP إلى HTTPS إذا كانت الصفحة HTTPS (لتجاوز Mixed Content في WebView)
-            if (location.protocol === 'https:' && url.indexOf('http://') === 0) {
-                url = 'https://' + url.substring(7);
-            }
-            
+            const url = decodeURIComponent(encodedUrl);
             currentVideoUrl = url;
             currentStreamType = detectStreamType(url);
             playingStarted = false;
-            retryCount = 0;
             
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
@@ -2566,86 +2505,89 @@
 
             video.style.objectFit = 'contain';
 
-            // محاولة تشغيل Fullscreen بلطف (لا يكسر WebView)
             const container = document.querySelector('.video-player-container');
-            safeRequestFullscreen(container).then(function(){
-                safeLockOrientation('landscape');
-            }).catch(function(){});
+            if (container.requestFullscreen) {
+                container.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                }).catch(() => {});
+            }
             
             showControls();
             
             clearTimeout(loaderTimeout);
             loaderTimeout = setTimeout(() => {
                 loading.style.display = 'none';
-            }, 10000);
+            }, 8000);
             
             initializePlayer(currentVideoUrl);
         }
 
-        // HLS - نسخة متوافقة مع WebView (بدون Worker)
+        // مشغل HLS احترافي - بدء فوري + ABR ذكي + صامت تماماً
         function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
-                    // ===== إعدادات WebView =====
-                    enableWorker: false,               // ⚠️ مهم: Worker لا يعمل جيداً في WebView
+                    // ===== أداء عالي =====
+                    enableWorker: true,
                     progressive: true,
                     lowLatencyMode: false,
                     
-                    // ===== بدء سريع =====
-                    startLevel: -1,                    // ABR يقرر تلقائياً
-                    testBandwidth: false,              // نعطله للبدء الأسرع في WebView
-                    abrEwmaDefaultEstimate: 1000000,
+                    // ===== بدء فوري فائق السرعة =====
+                    startLevel: 0,                          // ابدأ من أقل جودة = تشغيل فوري
+                    testBandwidth: true,                    // اختبر السرعة الحقيقية أثناء التحميل
+                    abrEwmaDefaultEstimate: 1500000,        // تقدير أولي 1.5Mbps
                     abrEwmaFastLive: 3.0,
                     abrEwmaSlowLive: 9.0,
                     abrEwmaFastVoD: 3.0,
                     abrEwmaSlowVoD: 9.0,
-                    abrBandWidthFactor: 0.95,
-                    abrBandWidthUpFactor: 0.7,
+                    abrBandWidthFactor: 0.95,               // تسامح في التخفيض
+                    abrBandWidthUpFactor: 0.7,              // ترقية سريعة عند تحسّن الشبكة
                     abrMaxWithRealBitrate: true,
-                    capLevelToPlayerSize: true,
+                    capLevelToPlayerSize: true,             // لا تحمّل جودة أعلى من حجم الشاشة
                     capLevelOnFPSDrop: true,
                     minAutoBitrate: 0,
                     
-                    // ===== تبديل سريع =====
+                    // ===== تبديل سريع للجودات =====
                     maxStarvationDelay: 4,
                     maxLoadingDelay: 4,
                     
-                    // ===== Buffer =====
+                    // ===== تخزين مؤقت محسّن =====
                     backBufferLength: 30,
                     maxBufferLength: 30,
                     maxMaxBufferLength: 60,
                     maxBufferSize: 60 * 1000 * 1000,
-                    maxBufferHole: 0.5,
+                    maxBufferHole: 0.3,
                     highBufferWatchdogPeriod: 2,
                     nudgeOffset: 0.1,
                     nudgeMaxRetry: 5,
                     maxFragLookUpTolerance: 0.25,
                     
-                    // ===== Live =====
+                    // ===== بث مباشر فوري =====
                     liveSyncDurationCount: 3,
-                    liveMaxLatencyDurationCount: 10,
+                    liveMaxLatencyDurationCount: 8,
                     liveDurationInfinity: false,
                     liveBackBufferLength: 30,
                     
                     // ===== تحميل مسبق =====
                     startFragPrefetch: true,
                     
-                    // ===== إعادة محاولة =====
-                    manifestLoadingTimeOut: 15000,
-                    manifestLoadingMaxRetry: 8,
+                    // ===== إعادة محاولة صامتة تماماً =====
+                    manifestLoadingTimeOut: 10000,
+                    manifestLoadingMaxRetry: 6,
                     manifestLoadingRetryDelay: 500,
                     manifestLoadingMaxRetryTimeout: 64000,
-                    levelLoadingTimeOut: 15000,
-                    levelLoadingMaxRetry: 8,
+                    levelLoadingTimeOut: 10000,
+                    levelLoadingMaxRetry: 6,
                     levelLoadingRetryDelay: 500,
                     levelLoadingMaxRetryTimeout: 64000,
-                    fragLoadingTimeOut: 25000,
-                    fragLoadingMaxRetry: 8,
+                    fragLoadingTimeOut: 20000,
+                    fragLoadingMaxRetry: 6,
                     fragLoadingRetryDelay: 500,
                     fragLoadingMaxRetryTimeout: 64000,
-                    appendErrorMaxRetry: 5,
+                    appendErrorMaxRetry: 3,
                     
-                    // ===== مراقبة =====
+                    // ===== مراقبة الأداء =====
                     fpsDroppedMonitoringPeriod: 5000,
                     fpsDroppedMonitoringThreshold: 0.2,
                     stretchShortVideoTrack: false,
@@ -2653,50 +2595,51 @@
                     
                     // ===== CORS =====
                     xhrSetup: function(xhr) {
-                        try { xhr.withCredentials = false; } catch(e) {}
+                        xhr.withCredentials = false;
                     }
                 };
 
-                try {
-                    hlsPlayer = new Hls(hlsConfig);
-                    hlsPlayer.attachMedia(video);
-                    hlsPlayer.loadSource(url);
+                hlsPlayer = new Hls(hlsConfig);
+                hlsPlayer.attachMedia(video);
+                hlsPlayer.loadSource(url);
 
-                    hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                        tryPlayVideo(onPlaying);
-                    });
+                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                    tryPlayVideo(onPlaying);
+                });
 
-                    hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
+                // استماع لتغير الجودة تلقائياً (لا رسالة - فقط مراقبة)
+                hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
 
-                    hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
-                        if (data.fatal) {
-                            switch (data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    try { hlsPlayer.startLoad(); } catch(e) {}
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    try { hlsPlayer.recoverMediaError(); } catch(e) {}
-                                    break;
-                                default:
-                                    clearTimeout(silentRetryTimer);
-                                    silentRetryTimer = setTimeout(() => {
-                                        if (retryCount < MAX_RETRIES && currentVideoUrl === url) {
-                                            retryCount++;
-                                            try {
-                                                if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
-                                                initializePlayer(url);
-                                            } catch(e) {}
-                                        } else {
-                                            loading.style.display = 'none';
-                                        }
-                                    }, 1500);
-                                    break;
-                            }
+                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                // تخفيض الجودة فوراً في حال مشاكل الشبكة
+                                if (hlsPlayer.currentLevel > 0) {
+                                    hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
+                                }
+                                // إعادة محاولة صامتة
+                                try { hlsPlayer.startLoad(); } catch(e) {}
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                try { hlsPlayer.recoverMediaError(); } catch(e) {}
+                                break;
+                            default:
+                                // إعادة محاولة صامتة بعد تأخير بسيط
+                                clearTimeout(silentRetryTimer);
+                                silentRetryTimer = setTimeout(() => {
+                                    if (hlsPlayer && currentVideoUrl === url) {
+                                        try {
+                                            hlsPlayer.destroy();
+                                            hlsPlayer = null;
+                                            initializePlayer(url);
+                                        } catch(e) {}
+                                    }
+                                }, 1500);
+                                break;
                         }
-                    });
-                } catch(e) {
-                    loading.style.display = 'none';
-                }
+                    }
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.preload = 'auto';
@@ -2708,7 +2651,7 @@
             }
         }
 
-        // DASH - نسخة متوافقة
+        // مشغل DASH احترافي - بدء فوري + ABR ذكي + صامت تماماً
         function initDashPlayer(url, video, loading, onPlaying) {
             if (window.dashjs && dashjs.MediaPlayer) {
                 try {
@@ -2729,8 +2672,8 @@
                             smallGapLimit: 1.5,
                             stableBufferTime: 12,
                             retryParameters: {
-                                timeout: 15000,
-                                maxAttempts: 8,
+                                timeout: 10000,
+                                maxAttempts: 6,
                                 baseDelay: 500,
                                 backoffFactor: 1.5
                             },
@@ -2766,12 +2709,13 @@
                     dashPlayer.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, onPlaying);
                     dashPlayer.on(dashjs.MediaPlayer.events.CAN_PLAY, onPlaying);
                     dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => {
+                        // إعادة محاولة صامتة
                         clearTimeout(silentRetryTimer);
                         silentRetryTimer = setTimeout(() => {
-                            if (retryCount < MAX_RETRIES && currentVideoUrl === url) {
-                                retryCount++;
+                            if (dashPlayer && currentVideoUrl === url) {
                                 try {
-                                    if (dashPlayer) { dashPlayer.reset(); dashPlayer = null; }
+                                    dashPlayer.reset();
+                                    dashPlayer = null;
                                     initializePlayer(url);
                                 } catch(e) {}
                             }
@@ -2785,7 +2729,7 @@
             }
         }
 
-        // MPEG-TS / FLV - نسخة متوافقة (بدون Worker)
+        // مشغل MPEG-TS / FLV احترافي - بدء فوري + صامت تماماً
         function initMpegtsPlayer(url, type, video, loading, onPlaying) {
             if (window.mpegts && mpegts.isSupported()) {
                 try {
@@ -2796,10 +2740,10 @@
                         isLive: true,
                         url: url
                     }, {
-                        enableWorker: false,             // ⚠️ مهم: بدون Worker للتوافق مع WebView
-                        enableStashBuffer: false,
+                        enableWorker: true,
+                        enableStashBuffer: false,        // تعطيل stash لتشغيل أسرع
                         stashInitialSize: 128 * 1024,
-                        liveBufferLatencyChasing: true,
+                        liveBufferLatencyChasing: true,  // مطاردة البث المباشر تلقائياً
                         liveBufferLatencyMaxLatency: 5.0,
                         liveBufferLatencyMinRemain: 2.0,
                         autoCleanupSourceBuffer: true,
@@ -2812,12 +2756,13 @@
                     
                     mpegtsPlayer.attachMediaElement(video);
                     mpegtsPlayer.on(mpegts.Events.ERROR, () => {
+                        // إعادة محاولة صامتة
                         clearTimeout(silentRetryTimer);
                         silentRetryTimer = setTimeout(() => {
-                            if (retryCount < MAX_RETRIES && currentVideoUrl === url) {
-                                retryCount++;
+                            if (mpegtsPlayer && currentVideoUrl === url) {
                                 try {
-                                    if (mpegtsPlayer) { mpegtsPlayer.destroy(); mpegtsPlayer = null; }
+                                    mpegtsPlayer.destroy();
+                                    mpegtsPlayer = null;
                                     initializePlayer(url);
                                 } catch(e) {}
                             }
@@ -2836,25 +2781,20 @@
             }
         }
 
-        // Native player
+        // مشغل الصيغ الأصلية (video.src مباشرة)
         function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
-            try {
-                video.src = url;
-                video.preload = 'auto';
-                video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
-                video.addEventListener('playing', onPlaying, { once: true });
-                video.addEventListener('error', () => {
-                    if (typeof fallbackFn === 'function') {
-                        fallbackFn();
-                    } else {
-                        loading.style.display = 'none';
-                    }
-                }, { once: true });
-                tryPlayVideo(onPlaying);
-            } catch(e) {
-                if (typeof fallbackFn === 'function') fallbackFn();
-                else loading.style.display = 'none';
-            }
+            video.src = url;
+            video.preload = 'auto';
+            video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
+            video.addEventListener('playing', onPlaying, { once: true });
+            video.addEventListener('error', () => {
+                if (typeof fallbackFn === 'function') {
+                    fallbackFn();
+                } else {
+                    loading.style.display = 'none';
+                }
+            }, { once: true });
+            tryPlayVideo(onPlaying);
         }
 
         function initializePlayer(url) {
@@ -2917,41 +2857,32 @@
 
                 case 'auto':
                 default:
-                    // جرّب HLS أولاً إذا كان الرابط يحتوي على m3u8 أو ما شابه
-                    if (url.indexOf('.m3u8') !== -1 || url.indexOf('playlist') !== -1 || url.indexOf('index') !== -1) {
-                        initHlsPlayer(url, video, loading, onPlaying);
-                    } else {
-                        try {
-                            video.src = url;
-                            video.preload = 'auto';
-                            const tryNativeThenHls = () => {
-                                const nativePlay = video.play();
-                                if (nativePlay && nativePlay.then) {
-                                    nativePlay.then(onPlaying).catch(() => {
-                                        try { video.removeAttribute('src'); video.load(); } catch(e) {}
-                                        initHlsPlayer(url, video, loading, onPlaying);
-                                    });
-                                } else {
-                                    initHlsPlayer(url, video, loading, onPlaying);
-                                }
-                            };
-                            
-                            video.addEventListener('loadedmetadata', tryNativeThenHls, { once: true });
-                            video.addEventListener('error', () => {
+                    video.src = url;
+                    video.preload = 'auto';
+                    const tryNativeThenHls = () => {
+                        const nativePlay = video.play();
+                        if (nativePlay && nativePlay.then) {
+                            nativePlay.then(onPlaying).catch(() => {
                                 try { video.removeAttribute('src'); video.load(); } catch(e) {}
                                 initHlsPlayer(url, video, loading, onPlaying);
-                            }, { once: true });
-                            
-                            setTimeout(() => {
-                                if (video.readyState === 0 && loading.style.display !== 'none') {
-                                    try { video.removeAttribute('src'); video.load(); } catch(e) {}
-                                    initHlsPlayer(url, video, loading, onPlaying);
-                                }
-                            }, 3500);
-                        } catch(e) {
+                            });
+                        } else {
                             initHlsPlayer(url, video, loading, onPlaying);
                         }
-                    }
+                    };
+                    
+                    video.addEventListener('loadedmetadata', tryNativeThenHls, { once: true });
+                    video.addEventListener('error', () => {
+                        try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                        initHlsPlayer(url, video, loading, onPlaying);
+                    }, { once: true });
+                    
+                    setTimeout(() => {
+                        if (video.readyState === 0 && loading.style.display !== 'none') {
+                            try { video.removeAttribute('src'); video.load(); } catch(e) {}
+                            initHlsPlayer(url, video, loading, onPlaying);
+                        }
+                    }, 3000);
                     break;
             }
 
@@ -2981,8 +2912,10 @@
                 document.getElementById('playerLoading').style.display = 'none';
             });
 
+            // إخفاء اللودر عند التوقف المفاجئ بعد نجاح التشغيل
             video.addEventListener('waiting', () => {
                 if (!playingStarted) return;
+                // لا نُظهر أي رسالة - فقط نسمح للمشغل بالتعامل
             });
 
             progressContainer.addEventListener('click', (e) => {
@@ -3051,8 +2984,7 @@
             const centerPlay = document.getElementById('centerPlayBtn');
             
             if (video.paused) {
-                const p = video.play();
-                if (p && p.catch) p.catch(()=>{});
+                video.play();
                 if (mpegtsPlayer) { try { mpegtsPlayer.play(); } catch(e){} }
                 isPlaying = true;
                 centerPlay.classList.remove('show');
@@ -3113,16 +3045,20 @@
             const container = document.querySelector('.video-player-container');
             const icon = document.getElementById('fullscreenIcon');
             
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                safeRequestFullscreen(container).then(() => {
-                    if (icon) icon.className = 'fa-solid fa-compress';
-                    safeLockOrientation('landscape');
-                }).catch(()=>{});
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().then(() => {
+                    icon.className = 'fa-solid fa-compress';
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                }).catch(() => {});
             } else {
-                safeExitFullscreen().then(() => {
-                    if (icon) icon.className = 'fa-solid fa-expand';
-                    safeUnlockOrientation();
-                });
+                document.exitFullscreen().then(() => {
+                    icon.className = 'fa-solid fa-expand';
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                }).catch(() => {});
             }
             showControls();
         }
@@ -3280,9 +3216,13 @@
             const video = document.getElementById('videoPlayer');
             const modal = document.getElementById('videoModal');
 
-            safeExitFullscreen().then(function(){
-                safeUnlockOrientation();
-            });
+            if (document.fullscreenElement) {
+                document.exitFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                }).catch(() => {});
+            }
             
             try { 
                 video.pause(); 
@@ -3852,16 +3792,13 @@
                     icon.className = document.fullscreenElement ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
                 }
                 if (document.fullscreenElement) {
-                    safeLockOrientation('landscape');
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
                 } else {
-                    safeUnlockOrientation();
-                }
-            });
-
-            document.addEventListener('webkitfullscreenchange', () => {
-                const icon = document.getElementById('fullscreenIcon');
-                if (icon) {
-                    icon.className = (document.webkitFullscreenElement) ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
                 }
             });
         });
