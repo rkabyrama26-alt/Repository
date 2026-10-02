@@ -390,13 +390,12 @@
             margin-bottom: 1.5rem;
         }
 
-        /* ===== تم تعديل هذا الجزء لإضافة صورة الخلفية للقنوات ===== */
         .channel-card {
             display: flex;
             align-items: center;
             gap: 0.875rem;
             width: 100%;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://i.ibb.co/Q7Qz9ky8/3c626fbd71f1cca564e0fe7b66f00c5e.webp') center/cover no-repeat;
+            background: var(--surface-glass);
             border-radius: 1.25rem;
             padding: 0.75rem 1rem;
             cursor: pointer;
@@ -407,10 +406,9 @@
             overflow: hidden;
         }
 
-        /* ===== تم تعديل هذا الجزء ليبقى الخلفية عند اللمس ===== */
         .channel-card:hover {
             transform: translateX(-0.25rem);
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://i.ibb.co/Q7Qz9ky8/3c626fbd71f1cca564e0fe7b66f00c5e.webp') center/cover no-repeat;
+            background: var(--surface-hover);
             box-shadow: 0 0.75rem 1.75rem rgba(99, 102, 241, 0.18);
             border-color: var(--border-glow);
         }
@@ -1381,14 +1379,17 @@
             height: 2.5rem;
         }
 
-        /* ===== تم تعديل هذا الجزء لإضافة صورة الخلفية للمباريات (الجدول) ===== */
+        /* ====== تم تعديل صورة خلفية بطاقات الجدول (القوائم ذات الشعارات) ====== */
         .match-card {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://i.ibb.co/Q7Qz9ky8/3c626fbd71f1cca564e0fe7b66f00c5e.webp') center/cover no-repeat;
+            background:
+                linear-gradient(rgba(3, 7, 18, 0.62), rgba(3, 7, 18, 0.62)),
+                url('https://i.ibb.co/Q7Qz9ky8/3c626fbd71f1cca564e0fe7b66f00c5e.webp') center center / cover no-repeat;
             border-radius: 1.25rem;
             padding: 1.125rem 1rem;
             margin-bottom: 0.75rem;
             backdrop-filter: blur(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
         .match-teams {
