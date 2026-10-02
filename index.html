@@ -1379,7 +1379,6 @@
             height: 2.5rem;
         }
 
-        /* ====== تم تعديل صورة خلفية بطاقات الجدول (القوائم ذات الشعارات) ====== */
         .match-card {
             background:
                 linear-gradient(rgba(3, 7, 18, 0.62), rgba(3, 7, 18, 0.62)),
@@ -2071,7 +2070,7 @@
             </div>
             <div class="share-action-btn" onclick="copyLink()">
                 <div class="share-action-icon"><i class="fa-regular fa-copy"></i></div>
-                <span data-key="copyLink">نسخ الرابط</span>
+                <span data-key="copyLink">نسخ الرابط ومشاركة</span>
             </div>
         </div>
         
@@ -2398,7 +2397,6 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        // ============ المشغل السريع المطوّر (نسخة احترافية - بدون أي رسائل) ============
         let hlsPlayer = null;
         let dashPlayer = null;
         let mpegtsPlayer = null;
@@ -2411,7 +2409,6 @@
         let loaderTimeout = null;
         let silentRetryTimer = null;
 
-        // كشف نوع البث تلقائياً من الرابط
         function detectStreamType(url) {
             if (!url) return 'unknown';
             const lower = url.toLowerCase();
@@ -2444,7 +2441,6 @@
             return 'auto';
         }
 
-        // دالة تشغيل الفيديو مع التعامل مع حظر الصوت التلقائي - بصمت تام
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
             video.muted = false;
@@ -2463,7 +2459,6 @@
             }
         }
 
-        // تنظيف جميع المشغلات
         function destroyAllPlayers() {
             if (hlsPlayer) {
                 try { hlsPlayer.destroy(); } catch(e) {}
@@ -2528,35 +2523,27 @@
             initializePlayer(currentVideoUrl);
         }
 
-        // مشغل HLS احترافي - بدء فوري + ABR ذكي + صامت تماماً
         function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
-                    // ===== أداء عالي =====
                     enableWorker: true,
                     progressive: true,
                     lowLatencyMode: false,
-                    
-                    // ===== بدء فوري فائق السرعة =====
-                    startLevel: 0,                          // ابدأ من أقل جودة = تشغيل فوري
-                    testBandwidth: true,                    // اختبر السرعة الحقيقية أثناء التحميل
-                    abrEwmaDefaultEstimate: 1500000,        // تقدير أولي 1.5Mbps
+                    startLevel: 0,
+                    testBandwidth: true,
+                    abrEwmaDefaultEstimate: 1500000,
                     abrEwmaFastLive: 3.0,
                     abrEwmaSlowLive: 9.0,
                     abrEwmaFastVoD: 3.0,
                     abrEwmaSlowVoD: 9.0,
-                    abrBandWidthFactor: 0.95,               // تسامح في التخفيض
-                    abrBandWidthUpFactor: 0.7,              // ترقية سريعة عند تحسّن الشبكة
+                    abrBandWidthFactor: 0.95,
+                    abrBandWidthUpFactor: 0.7,
                     abrMaxWithRealBitrate: true,
-                    capLevelToPlayerSize: true,             // لا تحمّل جودة أعلى من حجم الشاشة
+                    capLevelToPlayerSize: true,
                     capLevelOnFPSDrop: true,
                     minAutoBitrate: 0,
-                    
-                    // ===== تبديل سريع للجودات =====
                     maxStarvationDelay: 4,
                     maxLoadingDelay: 4,
-                    
-                    // ===== تخزين مؤقت محسّن =====
                     backBufferLength: 30,
                     maxBufferLength: 30,
                     maxMaxBufferLength: 60,
@@ -2566,17 +2553,11 @@
                     nudgeOffset: 0.1,
                     nudgeMaxRetry: 5,
                     maxFragLookUpTolerance: 0.25,
-                    
-                    // ===== بث مباشر فوري =====
                     liveSyncDurationCount: 3,
                     liveMaxLatencyDurationCount: 8,
                     liveDurationInfinity: false,
                     liveBackBufferLength: 30,
-                    
-                    // ===== تحميل مسبق =====
                     startFragPrefetch: true,
-                    
-                    // ===== إعادة محاولة صامتة تماماً =====
                     manifestLoadingTimeOut: 10000,
                     manifestLoadingMaxRetry: 6,
                     manifestLoadingRetryDelay: 500,
@@ -2590,14 +2571,10 @@
                     fragLoadingRetryDelay: 500,
                     fragLoadingMaxRetryTimeout: 64000,
                     appendErrorMaxRetry: 3,
-                    
-                    // ===== مراقبة الأداء =====
                     fpsDroppedMonitoringPeriod: 5000,
                     fpsDroppedMonitoringThreshold: 0.2,
                     stretchShortVideoTrack: false,
                     forceKeyFrameOnDiscontinuity: true,
-                    
-                    // ===== CORS =====
                     xhrSetup: function(xhr) {
                         xhr.withCredentials = false;
                     }
@@ -2611,25 +2588,21 @@
                     tryPlayVideo(onPlaying);
                 });
 
-                // استماع لتغير الجودة تلقائياً (لا رسالة - فقط مراقبة)
                 hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
 
                 hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                // تخفيض الجودة فوراً في حال مشاكل الشبكة
                                 if (hlsPlayer.currentLevel > 0) {
                                     hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
                                 }
-                                // إعادة محاولة صامتة
                                 try { hlsPlayer.startLoad(); } catch(e) {}
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
                                 try { hlsPlayer.recoverMediaError(); } catch(e) {}
                                 break;
                             default:
-                                // إعادة محاولة صامتة بعد تأخير بسيط
                                 clearTimeout(silentRetryTimer);
                                 silentRetryTimer = setTimeout(() => {
                                     if (hlsPlayer && currentVideoUrl === url) {
@@ -2655,7 +2628,6 @@
             }
         }
 
-        // مشغل DASH احترافي - بدء فوري + ABR ذكي + صامت تماماً
         function initDashPlayer(url, video, loading, onPlaying) {
             if (window.dashjs && dashjs.MediaPlayer) {
                 try {
@@ -2713,7 +2685,6 @@
                     dashPlayer.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, onPlaying);
                     dashPlayer.on(dashjs.MediaPlayer.events.CAN_PLAY, onPlaying);
                     dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => {
-                        // إعادة محاولة صامتة
                         clearTimeout(silentRetryTimer);
                         silentRetryTimer = setTimeout(() => {
                             if (dashPlayer && currentVideoUrl === url) {
@@ -2733,7 +2704,6 @@
             }
         }
 
-        // مشغل MPEG-TS / FLV احترافي - بدء فوري + صامت تماماً
         function initMpegtsPlayer(url, type, video, loading, onPlaying) {
             if (window.mpegts && mpegts.isSupported()) {
                 try {
@@ -2745,9 +2715,9 @@
                         url: url
                     }, {
                         enableWorker: true,
-                        enableStashBuffer: false,        // تعطيل stash لتشغيل أسرع
+                        enableStashBuffer: false,
                         stashInitialSize: 128 * 1024,
-                        liveBufferLatencyChasing: true,  // مطاردة البث المباشر تلقائياً
+                        liveBufferLatencyChasing: true,
                         liveBufferLatencyMaxLatency: 5.0,
                         liveBufferLatencyMinRemain: 2.0,
                         autoCleanupSourceBuffer: true,
@@ -2760,7 +2730,6 @@
                     
                     mpegtsPlayer.attachMediaElement(video);
                     mpegtsPlayer.on(mpegts.Events.ERROR, () => {
-                        // إعادة محاولة صامتة
                         clearTimeout(silentRetryTimer);
                         silentRetryTimer = setTimeout(() => {
                             if (mpegtsPlayer && currentVideoUrl === url) {
@@ -2785,7 +2754,6 @@
             }
         }
 
-        // مشغل الصيغ الأصلية (video.src مباشرة)
         function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
             video.src = url;
             video.preload = 'auto';
@@ -2916,10 +2884,8 @@
                 document.getElementById('playerLoading').style.display = 'none';
             });
 
-            // إخفاء اللودر عند التوقف المفاجئ بعد نجاح التشغيل
             video.addEventListener('waiting', () => {
                 if (!playingStarted) return;
-                // لا نُظهر أي رسالة - فقط نسمح للمشغل بالتعامل
             });
 
             progressContainer.addEventListener('click', (e) => {
@@ -3269,7 +3235,7 @@
                 language: "اللغة", shareApp: "مشاركة التطبيق", shareAppDesc: "شارك التطبيق مع أصدقائك",
                 shareTitle: "انشر تطبيق نجم الشاشات", shareSubtitle: "شكراً لدعمكم تطبيق نجم الشاشات",
                 facebook: "فيسبوك", whatsapp: "واتساب", telegram: "تيليجرام", instagram: "انستغرام",
-                messages: "رسالة", email: "البريد", viber: "فايبر", moreOptions: "المزيد", copyLink: "نسخ الرابط", cancel: "إلغاء",
+                messages: "رسالة", email: "البريد", viber: "فايبر", moreOptions: "المزيد", copyLink: "نسخ الرابط ومشاركة", cancel: "إلغاء",
                 socialSupport: "مواقع التواصل والدعم", telegramChannel: "قناة التلغرام", telegramDesc: "انضم لقناتنا على تلغرام",
                 youtubeChannel: "قناة اليوتيوب", youtubeDesc: "شاهد أحدث الفيديوهات والعروض",
                 emailSupport: "الدعم الفني", emailSupportDesc: "تواصل مع فريق نجم الشاشات",
@@ -3289,7 +3255,7 @@
                 language: "Language", shareApp: "Share App", shareAppDesc: "Share the app with your friends",
                 shareTitle: "Share Star Screens App", shareSubtitle: "Thank you for supporting Star Screens App",
                 facebook: "Facebook", whatsapp: "WhatsApp", telegram: "Telegram", instagram: "Instagram",
-                messages: "Messages", email: "Email", viber: "Viber", moreOptions: "More", copyLink: "Copy Link", cancel: "Cancel",
+                messages: "Messages", email: "Email", viber: "Viber", moreOptions: "More", copyLink: "Copy & Share Link", cancel: "Cancel",
                 socialSupport: "Social Media and Support", telegramChannel: "Telegram Channel", telegramDesc: "Join our channel on Telegram",
                 youtubeChannel: "YouTube Channel", youtubeDesc: "Watch the latest videos and shows",
                 emailSupport: "Technical Support", emailSupportDesc: "Contact Star Screens Team",
@@ -3543,20 +3509,53 @@
             return currentLanguage === 'ar' ? translations.ar.shareTextShort : translations.en.shareTextShort;
         }
 
+        // ======== تم التعديل: دالة "المزيد" تفتح قائمة المشاركة الأصلية في الهاتف ========
         async function shareMore() {
+            const shareTitle = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
+            const shareTextBody = getShareTextShort();
+            const sharePayload = {
+                title: shareTitle,
+                text: shareTextBody + '\n' + appUrl,
+                url: appUrl
+            };
+
+            // المحاولة 1: Web Share API (تفتح قائمة المشاركة الأصلية)
             if (navigator.share) {
                 try {
-                    await navigator.share({
-                        title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
-                        text: getShareTextShort(), url: appUrl
-                    });
+                    await navigator.share(sharePayload);
                     closeShareSheet();
-                } catch (err) { }
-            } else {
-                copyLink();
-                showToast(currentLanguage === 'ar' ? 'تم نسخ الرابط' : 'Link copied');
+                    return;
+                } catch (err) {
+                    // إذا قام المستخدم بإلغاء القائمة، لا نفعل شيء
+                    if (err && err.name === 'AbortError') {
+                        return;
+                    }
+                    // خلاف ذلك، ننتقل للخطة الاحتياطية
+                }
             }
+
+            // المحاولة 2: Android Intent (تعمل داخل تطبيقات WebView على أندرويد)
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            if (isAndroid) {
+                try {
+                    const intentUrl = 'intent://send#Intent;' +
+                        'action=android.intent.action.SEND;' +
+                        'type=text/plain;' +
+                        'S.android.intent.extra.SUBJECT=' + encodeURIComponent(shareTitle) + ';' +
+                        'S.android.intent.extra.TEXT=' + encodeURIComponent(shareTextBody + '\n' + appUrl) + ';' +
+                        'end';
+                    window.location.href = intentUrl;
+                    setTimeout(closeShareSheet, 1000);
+                    return;
+                } catch (e) {
+                    // متابعة للخطة النهائية
+                }
+            }
+
+            // المحاولة 3: نسخ الرابط كحل أخير
+            copyLink();
         }
+        // ======== نهاية التعديل ========
 
         function shareToFacebook() {
             const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}`;
