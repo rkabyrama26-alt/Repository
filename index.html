@@ -3509,7 +3509,6 @@
             return currentLanguage === 'ar' ? translations.ar.shareTextShort : translations.en.shareTextShort;
         }
 
-        // ======== تم التعديل: دالة "المزيد" تفتح قائمة المشاركة الأصلية في الهاتف ========
         async function shareMore() {
             const shareTitle = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
             const shareTextBody = getShareTextShort();
@@ -3519,22 +3518,18 @@
                 url: appUrl
             };
 
-            // المحاولة 1: Web Share API (تفتح قائمة المشاركة الأصلية)
             if (navigator.share) {
                 try {
                     await navigator.share(sharePayload);
                     closeShareSheet();
                     return;
                 } catch (err) {
-                    // إذا قام المستخدم بإلغاء القائمة، لا نفعل شيء
                     if (err && err.name === 'AbortError') {
                         return;
                     }
-                    // خلاف ذلك، ننتقل للخطة الاحتياطية
                 }
             }
 
-            // المحاولة 2: Android Intent (تعمل داخل تطبيقات WebView على أندرويد)
             const isAndroid = /Android/i.test(navigator.userAgent);
             if (isAndroid) {
                 try {
@@ -3548,14 +3543,11 @@
                     setTimeout(closeShareSheet, 1000);
                     return;
                 } catch (e) {
-                    // متابعة للخطة النهائية
                 }
             }
 
-            // المحاولة 3: نسخ الرابط كحل أخير
             copyLink();
         }
-        // ======== نهاية التعديل ========
 
         function shareToFacebook() {
             const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}`;
@@ -3571,8 +3563,15 @@
             setTimeout(closeShareSheet, 500);
         }
 
+        // ==================== تم التعديل: دالة مشاركة انستغرام ====================
         async function shareToInstagram() {
+            const shareTitle = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
             const shareText = getShareTextShort();
+            const fullText = shareText + '\n' + appUrl;
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+            // 1) محاولة مشاركة صورة عبر Web Share API (تفتح قائمة النظام وفيها انستغرام)
             try {
                 const canvas = document.createElement('canvas');
                 canvas.width = 1080; canvas.height = 1080;
@@ -3589,22 +3588,87 @@
                 ctx.font = '35px Alexandria, sans-serif';
                 ctx.fillText(appUrl, 540, 660);
 
-                canvas.toBlob(async (blob) => {
-                    if (!blob) return fallbackShare(shareText);
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+                if (blob) {
                     const file = new File([blob], 'star-screens.jpg', { type: 'image/jpeg' });
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App',
-                                text: shareText
-                            });
-                            closeShareSheet();
-                        } catch (err) { if (err.name !== 'AbortError') fallbackShare(shareText); }
-                    } else fallbackShare(shareText);
-                }, 'image/jpeg', 0.95);
-            } catch (e) { fallbackShare(shareText); }
+                        await navigator.share({
+                            files: [file],
+                            title: shareTitle,
+                            text: shareText
+                        });
+                        closeShareSheet();
+                        return;
+                    }
+                }
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
+            }
+
+            // 2) محاولة مشاركة نصية عبر Web Share API
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: shareTitle,
+                        text: shareText,
+                        url: appUrl
+                    });
+                    closeShareSheet();
+                    return;
+                } catch (e) {
+                    if (e && e.name === 'AbortError') return;
+                }
+            }
+
+            // 3) نسخ النص أولاً حتى يستطيع المستخدم لصقه في انستغرام
+            try {
+                await navigator.clipboard.writeText(fullText);
+            } catch (e) {
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = fullText;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                } catch (e2) {}
+            }
+
+            // 4) فتح تطبيق انستغرام مباشرة
+            let instagramOpened = false;
+            try {
+                if (isAndroid) {
+                    // على أندرويد: استخدم intent مع package انستغرام
+                    const intentUrl = 'intent://#Intent;package=com.instagram.android;scheme=instagram;end';
+                    window.location.href = intentUrl;
+                    instagramOpened = true;
+                } else if (isIOS) {
+                    // على iOS: استخدم scheme انستغرام
+                    window.location.href = 'instagram://app';
+                    instagramOpened = true;
+                } else {
+                    // على الحاسوب: افتح موقع انستغرام
+                    window.open('https://www.instagram.com/', '_blank');
+                    instagramOpened = true;
+                }
+            } catch (e) {
+                instagramOpened = false;
+            }
+
+            if (instagramOpened) {
+                showToast(currentLanguage === 'ar' 
+                    ? 'تم نسخ النص، الصقه في انستغرام' 
+                    : 'Text copied, paste it in Instagram');
+                setTimeout(closeShareSheet, 1500);
+                return;
+            }
+
+            // 5) الحل الأخير: نسخ الرابط
+            copyLink();
         }
+        // ==================== نهاية التعديل ====================
 
         async function fallbackShare(shareText) {
             if (navigator.share) {
