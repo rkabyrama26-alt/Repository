@@ -9,14 +9,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="//shd-gcp-live.edgenextcdn.net">
     <link rel="dns-prefetch" href="//shd-amg-fast.edgenextcdn.net">
+    <link rel="dns-prefetch" href="//sts.mydroon.com">
     <link rel="preconnect" href="https://shd-gcp-live.edgenextcdn.net" crossorigin>
     <link rel="preconnect" href="https://shd-amg-fast.edgenextcdn.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=block" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=block" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest/dist/mpegts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.7.11/dist/shaka-player.compiled.js"></script>
     
     <style>
         html {
@@ -1920,7 +1921,7 @@
 
     <div class="video-modal" id="videoModal">
         <div class="video-player-container">
-            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
+            <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" crossorigin="anonymous" disablePictureInPicture poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
             <div class="player-top-bar">
                 <button class="player-back-btn" onclick="closeVideoPlayer()">
@@ -2221,6 +2222,27 @@
 
         let currentCategory = null;
 
+        const prefetchedUrls = new Set();
+        function prefetchChannel(encodedUrl) {
+            try {
+                const url = decodeURIComponent(encodedUrl);
+                if (prefetchedUrls.has(url)) return;
+                prefetchedUrls.add(url);
+
+                const type = detectStreamType(url);
+                if (type === 'hls') {
+                    fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit' })
+                        .then(r => r.text()).catch(() => {});
+                } else {
+                    fetch(url, { method: 'HEAD', mode: 'no-cors', credentials: 'omit' }).catch(() => {});
+                }
+                if (prefetchedUrls.size > 40) {
+                    const first = prefetchedUrls.values().next().value;
+                    prefetchedUrls.delete(first);
+                }
+            } catch (e) {}
+        }
+
         async function loadXtreamChannels() {
             if (xtreamLoading || xtreamLoaded) return;
             xtreamLoading = true;
@@ -2345,9 +2367,13 @@
                     const ch = cat.channels[i];
                     const safeName = String(ch.name || '').replace(/'/g, "\\'").replace(/"/g, '"');
                     const logo = ch.logo || defaultImgUrl;
+                    const encUrl = encodeURIComponent(ch.url);
                     
                     htmlParts[i] = `
-                        <div class="channel-card" onclick="playChannel('${encodeURIComponent(ch.url)}', '${safeName}')">
+                        <div class="channel-card" 
+                             onmouseenter="prefetchChannel('${encUrl}')"
+                             ontouchstart="prefetchChannel('${encUrl}')"
+                             onclick="playChannel('${encUrl}', '${safeName}')">
                             <div class="channel-logo-wrap">
                                 <img src="${logo}" alt="" loading="lazy" onerror="this.src='${defaultImgUrl}'">
                             </div>
@@ -2374,8 +2400,13 @@
 
             const grid = document.getElementById('channelsGrid');
             
-            grid.innerHTML = cat.channels.map((ch) => `
-                <div class="channel-card" onclick="playChannel('${encodeURIComponent(ch.url)}', '${ch.name.replace(/'/g, "\\'")}')">
+            grid.innerHTML = cat.channels.map((ch) => {
+                const encUrl = encodeURIComponent(ch.url);
+                return `
+                <div class="channel-card"
+                     onmouseenter="prefetchChannel('${encUrl}')"
+                     ontouchstart="prefetchChannel('${encUrl}')"
+                     onclick="playChannel('${encUrl}', '${ch.name.replace(/'/g, "\\'")}')">
                     <div class="channel-logo-wrap">
                         <img src="${ch.logo}" alt="${ch.name}" onerror="this.style.opacity='0.15'">
                     </div>
@@ -2384,7 +2415,7 @@
                     </div>
                     <span class="live-badge">مباشر</span>
                 </div>
-            `).join('');
+            `;}).join('');
 
             document.querySelector('.viewport-area').scrollTop = 0;
         }
@@ -2396,9 +2427,12 @@
             document.querySelector('.viewport-area').scrollTop = 0;
         }
 
-        let hlsPlayer = null;
-        let dashPlayer = null;
+        // ============================================================
+        // ===== المحرك القوي (مدمج من المشغل الثاني - بدون retry) =====
+        // ============================================================
+        let hlsInstance = null;
         let mpegtsPlayer = null;
+        let shakaPlayer = null;
         let currentVideoUrl = '';
         let currentStreamType = '';
         let controlsTimeout;
@@ -2406,14 +2440,11 @@
         let autoMuted = false;
         let playingStarted = false;
         let loaderTimeout = null;
-        let silentRetryTimer = null;
-        let stallRecoveryTimer = null;
-        let lastStallRecovery = 0;
 
         function detectStreamType(url) {
             if (!url) return 'unknown';
             const lower = url.toLowerCase();
-            const clean = lower.split('?')[0].split('#')[0];
+            const clean = lower.split('?')[0].split('#')[0].split('|')[0];
 
             if (lower.startsWith('rtmp://') || lower.startsWith('rtmps://')) return 'rtmp';
             if (lower.startsWith('rtsp://')) return 'rtsp';
@@ -2442,6 +2473,23 @@
             return 'auto';
         }
 
+        function parseDrmUrl(full) {
+            const parts = String(full).split('|');
+            let manifest = parts[0].trim().replace(/\?+$/, '');
+            const drm = { scheme: '', keyId: '', key: '' };
+            if (parts.length > 1) {
+                const params = new URLSearchParams(parts.slice(1).join('|'));
+                drm.scheme = (params.get('drmScheme') || '').toLowerCase();
+                const lic = params.get('drmLicense') || '';
+                const idx = lic.indexOf(':');
+                if (idx > -1) {
+                    drm.keyId = lic.slice(0, idx).trim();
+                    drm.key = lic.slice(idx + 1).trim();
+                }
+            }
+            return { manifest: manifest, drm: drm };
+        }
+
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
             video.muted = false;
@@ -2461,13 +2509,9 @@
         }
 
         function destroyAllPlayers() {
-            if (hlsPlayer) {
-                try { hlsPlayer.destroy(); } catch(e) {}
-                hlsPlayer = null;
-            }
-            if (dashPlayer) {
-                try { dashPlayer.reset(); } catch(e) {}
-                dashPlayer = null;
+            if (hlsInstance) {
+                try { hlsInstance.destroy(); } catch(e) {}
+                hlsInstance = null;
             }
             if (mpegtsPlayer) {
                 try {
@@ -2478,13 +2522,10 @@
                 } catch(e) {}
                 mpegtsPlayer = null;
             }
-            if (silentRetryTimer) {
-                clearTimeout(silentRetryTimer);
-                silentRetryTimer = null;
-            }
-            if (stallRecoveryTimer) {
-                clearTimeout(stallRecoveryTimer);
-                stallRecoveryTimer = null;
+            if (shakaPlayer) {
+                const sp = shakaPlayer;
+                shakaPlayer = null;
+                try { sp.destroy().catch(() => {}); } catch (e) {}
             }
             playingStarted = false;
         }
@@ -2523,259 +2564,159 @@
             clearTimeout(loaderTimeout);
             loaderTimeout = setTimeout(() => {
                 loading.style.display = 'none';
-            }, 8000);
+            }, 6000);
             
             initializePlayer(currentVideoUrl);
         }
 
-        function initHlsPlayer(url, video, loading, onPlaying) {
-            if (window.Hls && Hls.isSupported()) {
-                const hlsConfig = {
-                    enableWorker: true,
-                    progressive: false,
-                    lowLatencyMode: false,
-
-                    startLevel: -1,
-                    testBandwidth: false,
-                    abrEwmaDefaultEstimate: 3000000,
-
-                    abrEwmaFastLive: 4.0,
-                    abrEwmaSlowLive: 12.0,
-                    abrBandWidthFactor: 0.9,
-                    abrBandWidthUpFactor: 0.7,
-                    abrMaxWithRealBitrate: true,
-                    capLevelToPlayerSize: false,
-                    capLevelOnFPSDrop: false,
-
-                    maxBufferLength: 60,
-                    maxMaxBufferLength: 120,
-                    maxBufferSize: 120 * 1000 * 1000,
-                    maxBufferHole: 1.0,
-                    backBufferLength: 30,
-
-                    liveSyncDurationCount: 3,
-                    liveMaxLatencyDurationCount: 10,
-                    liveDurationInfinity: true,
-                    liveBackBufferLength: 30,
-
-                    startFragPrefetch: true,
-                    maxStarvationDelay: 8,
-                    maxLoadingDelay: 8,
-                    highBufferWatchdogPeriod: 1,
-                    nudgeOffset: 0.2,
-                    nudgeMaxRetry: 10,
-                    maxFragLookUpTolerance: 0.5,
-
-                    manifestLoadingTimeOut: 10000,
-                    manifestLoadingMaxRetry: 8,
-                    manifestLoadingRetryDelay: 300,
-                    manifestLoadingMaxRetryTimeout: 60000,
-                    levelLoadingTimeOut: 10000,
-                    levelLoadingMaxRetry: 8,
-                    levelLoadingRetryDelay: 300,
-                    levelLoadingMaxRetryTimeout: 60000,
-                    fragLoadingTimeOut: 30000,
-                    fragLoadingMaxRetry: 10,
-                    fragLoadingRetryDelay: 300,
-                    fragLoadingMaxRetryTimeout: 60000,
-                    appendErrorMaxRetry: 10,
-
-                    fpsDroppedMonitoringPeriod: 5000,
-                    fpsDroppedMonitoringThreshold: 0.2,
-                    stretchShortVideoTrack: true,
-                    forceKeyFrameOnDiscontinuity: true,
-
-                    xhrSetup: function(xhr) {
-                        xhr.withCredentials = false;
+        function createHls(url, video, loading, onPlaying) {
+            if (!(window.Hls && Hls.isSupported())) {
+                loading.style.display = 'none';
+                return;
+            }
+            hlsInstance = new Hls({
+                enableWorker: true,
+                progressive: true,
+                lowLatencyMode: false,
+                // بدء فوري بأقل جودة ثم التحسن تلقائياً
+                startLevel: 0,
+                abrEwmaDefaultEstimate: 1000000,
+                capLevelToPlayerSize: true,
+                backBufferLength: 30,
+                maxBufferLength: 60,
+                maxMaxBufferLength: 90,
+                maxBufferSize: 120 * 1000 * 1000,
+                maxBufferHole: 0.5,
+                manifestLoadingTimeOut: 8000,
+                manifestLoadingMaxRetry: 4,
+                manifestLoadingRetryDelay: 1000,
+                levelLoadingTimeOut: 8000,
+                levelLoadingMaxRetry: 4,
+                levelLoadingRetryDelay: 1000,
+                fragLoadingTimeOut: 12000,
+                fragLoadingMaxRetry: 5,
+                fragLoadingRetryDelay: 1000,
+                startFragPrefetch: true,
+                testBandwidth: true,
+                liveSyncDurationCount: 5,
+                liveMaxLatencyDurationCount: 10,
+                nudgeOffset: 0.1,
+                nudgeMaxRetry: 5,
+                starveThreshold: 2.0,
+                xhrSetup: function(xhr) {
+                    xhr.withCredentials = false;
+                }
+            });
+            hlsInstance.loadSource(url);
+            hlsInstance.attachMedia(video);
+            hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+                tryPlayVideo(onPlaying);
+            });
+            hlsInstance.on(Hls.Events.FRAG_LOADED, () => {
+                if (!playingStarted) tryPlayVideo(onPlaying);
+            });
+            hlsInstance.on(Hls.Events.ERROR, (e, data) => {
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            try { hlsInstance.startLoad(); } catch(err) {}
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            try { hlsInstance.recoverMediaError(); } catch(err) {}
+                            break;
+                        default:
+                            loading.style.display = 'none';
+                            break;
                     }
-                };
+                }
+            });
+        }
 
-                hlsPlayer = new Hls(hlsConfig);
-                hlsPlayer.attachMedia(video);
-                hlsPlayer.loadSource(url);
-
-                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    tryPlayVideo(onPlaying);
-                });
-
-                hlsPlayer.on(Hls.Events.LEVEL_LOADED, (e, data) => {
-                    if (data && data.details && data.details.live) {
-                        try { hlsPlayer.nextLevel = hlsPlayer.currentLevel; } catch(err) {}
-                    }
-                });
-
-                hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        switch (data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                try { hlsPlayer.startLoad(); } catch(e) {}
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                try { hlsPlayer.recoverMediaError(); } catch(e) {}
-                                break;
-                            default:
-                                clearTimeout(silentRetryTimer);
-                                silentRetryTimer = setTimeout(() => {
-                                    if (hlsPlayer && currentVideoUrl === url) {
-                                        try {
-                                            hlsPlayer.destroy();
-                                            hlsPlayer = null;
-                                            initializePlayer(url);
-                                        } catch(e) {}
-                                    }
-                                }, 1500);
-                                break;
-                        }
-                    }
-                });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
+        function createDash(manifest, drm, video, loading, onPlaying) {
+            if (!(window.shaka && shaka.Player.isBrowserSupported())) {
+                // fallback: native
+                video.src = manifest;
                 video.preload = 'auto';
                 video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
-                video.addEventListener('playing', onPlaying, { once: true });
                 tryPlayVideo(onPlaying);
-            } else {
-                loading.style.display = 'none';
+                return;
             }
-        }
-
-        function initDashPlayer(url, video, loading, onPlaying) {
-            if (window.dashjs && dashjs.MediaPlayer) {
-                try {
-                    dashPlayer = dashjs.MediaPlayer().create();
-                    dashPlayer.updateSettings({
-                        streaming: {
-                            lowLatencyMode: false,
-                            rebufferingGoal: 3,
-                            bufferingGoal: 60,
-                            bufferBehind: 30,
-                            bufferToKeep: 30,
-                            bufferTimeAtTopQuality: 60,
-                            bufferTimeAtTopQualityLongForm: 90,
-                            longFormContentDurationThreshold: 600,
-                            fastSwitchEnabled: false,
-                            jumpGaps: true,
-                            jumpLargeGaps: true,
-                            smallGapLimit: 1.5,
-                            stableBufferTime: 20,
-                            retryParameters: {
-                                timeout: 10000,
-                                maxAttempts: 8,
-                                baseDelay: 300,
-                                backoffFactor: 1.5
-                            },
-                            liveDelay: 4,
-                            liveCatchup: {
-                                maxDrift: 1.2,
-                                playbackRate: 0.5,
-                                latencyTarget: 4
-                            },
-                            abr: {
-                                ABRStrategy: 'abrDynamic',
-                                bandwidthSafetyFactor: 0.9,
-                                additionalAbrRules: {
-                                    insufficientBufferRule: true,
-                                    switchHistoryRule: true,
-                                    droppedFramesRule: false,
-                                    abandonRequestsRule: true
-                                }
-                            }
-                        },
-                        abr: {
-                            enabled: true,
-                            initialBitrate: { audio: -1, video: -1 },
-                            autoSwitchBitrate: { audio: true, video: true },
-                            defaultBandwidthEstimate: 3000000,
-                            switchInterval: 10,
-                            bandwidthUpgradeTarget: 0.85,
-                            bandwidthDowngradeTarget: 0.95
-                        }
-                    });
-                    dashPlayer.initialize(video, url, true);
-                    
-                    dashPlayer.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, onPlaying);
-                    dashPlayer.on(dashjs.MediaPlayer.events.CAN_PLAY, onPlaying);
-                    dashPlayer.on(dashjs.MediaPlayer.events.ERROR, () => {
-                        clearTimeout(silentRetryTimer);
-                        silentRetryTimer = setTimeout(() => {
-                            if (dashPlayer && currentVideoUrl === url) {
-                                try {
-                                    dashPlayer.reset();
-                                    dashPlayer = null;
-                                    initializePlayer(url);
-                                } catch(e) {}
-                            }
-                        }, 1500);
-                    });
-                } catch(e) {
-                    loading.style.display = 'none';
+            try { shaka.polyfill.installAll(); } catch (e) {}
+            shakaPlayer = new shaka.Player(video);
+            const cfg = {
+                streaming: {
+                    lowLatencyMode: false,
+                    rebufferingGoal: 8,
+                    bufferingGoal: 45,
+                    bufferBehind: 45,
+                    retryParameters: { timeout: 12000, maxAttempts: 6, baseDelay: 1000, backoffFactor: 2 }
+                },
+                abr: {
+                    enabled: true,
+                    defaultBandwidthEstimate: 1500000,
+                    switchInterval: 10,
+                    bandwidthUpgradeTarget: 0.85,
+                    bandwidthDowngradeTarget: 0.95
                 }
-            } else {
-                loading.style.display = 'none';
+            };
+            if (drm && drm.keyId && drm.key) {
+                cfg.drm = { clearKeys: {} };
+                cfg.drm.clearKeys[drm.keyId] = drm.key;
             }
+            shakaPlayer.configure(cfg);
+            shakaPlayer.addEventListener('error', () => {
+                loading.style.display = 'none';
+            });
+            shakaPlayer.load(manifest).then(() => {
+                tryPlayVideo(onPlaying);
+            }).catch(() => {
+                loading.style.display = 'none';
+            });
         }
 
-        function initMpegtsPlayer(url, type, video, loading, onPlaying) {
-            if (window.mpegts && mpegts.isSupported()) {
-                try {
-                    const mpegtsType = (type === 'flv') ? 'flv' : 'm2ts';
-                    
-                    mpegtsPlayer = mpegts.createPlayer({
-                        type: mpegtsType,
-                        isLive: true,
-                        url: url
-                    }, {
-                        enableWorker: true,
-                        enableStashBuffer: true,
-                        stashInitialSize: 512 * 1024,
-                        liveBufferLatencyChasing: true,
-                        liveBufferLatencyMaxLatency: 6.0,
-                        liveBufferLatencyMinRemain: 2.5,
-                        autoCleanupSourceBuffer: true,
-                        autoCleanupMaxBackwardDuration: 60,
-                        autoCleanupMinBackwardDuration: 40,
-                        lazyLoad: false,
-                        lazyLoadMaxDuration: 0,
-                        reuseRedirectedURL: true
-                    });
-                    
-                    mpegtsPlayer.attachMediaElement(video);
-                    mpegtsPlayer.on(mpegts.Events.ERROR, () => {
-                        clearTimeout(silentRetryTimer);
-                        silentRetryTimer = setTimeout(() => {
-                            if (mpegtsPlayer && currentVideoUrl === url) {
-                                try {
-                                    mpegtsPlayer.destroy();
-                                    mpegtsPlayer = null;
-                                    initializePlayer(url);
-                                } catch(e) {}
-                            }
-                        }, 1500);
-                    });
-                    
-                    mpegtsPlayer.on(mpegts.Events.MEDIA_INFO, onPlaying);
-                    
-                    mpegtsPlayer.load();
-                    tryPlayVideo(onPlaying);
-                } catch(e) {
+        function createMpegts(url, type, video, loading, onPlaying) {
+            if (!(window.mpegts && mpegts.isSupported())) {
+                loading.style.display = 'none';
+                return;
+            }
+            const mpegtsType = (type === 'flv') ? 'flv' : 'm2ts';
+            try {
+                mpegtsPlayer = mpegts.createPlayer({
+                    type: mpegtsType,
+                    isLive: true,
+                    url: url
+                }, {
+                    enableWorker: true,
+                    enableStashBuffer: true,
+                    stashInitialSize: 256 * 1024,
+                    liveBufferLatencyChasing: false,
+                    liveBufferLatencyMaxLatency: 5.0,
+                    liveBufferLatencyMinRemain: 2.0,
+                    autoCleanupSourceBuffer: true,
+                    autoCleanupMaxBackwardDuration: 40,
+                    autoCleanupMinBackwardDuration: 30,
+                    lazyLoad: false,
+                    reuseRedirectedURL: true
+                });
+                mpegtsPlayer.attachMediaElement(video);
+                mpegtsPlayer.on(mpegts.Events.ERROR, () => {
                     loading.style.display = 'none';
-                }
-            } else {
+                });
+                mpegtsPlayer.on(mpegts.Events.MEDIA_INFO, onPlaying);
+                mpegtsPlayer.load();
+                tryPlayVideo(onPlaying);
+            } catch(e) {
                 loading.style.display = 'none';
             }
         }
 
-        function initNativePlayer(url, video, loading, onPlaying, fallbackFn) {
+        function createNative(url, video, loading, onPlaying) {
             video.src = url;
             video.preload = 'auto';
             video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
             video.addEventListener('playing', onPlaying, { once: true });
             video.addEventListener('error', () => {
-                if (typeof fallbackFn === 'function') {
-                    fallbackFn();
-                } else {
-                    loading.style.display = 'none';
-                }
+                loading.style.display = 'none';
             }, { once: true });
             tryPlayVideo(onPlaying);
         }
@@ -2799,19 +2740,25 @@
 
             switch(type) {
                 case 'hls':
-                    initHlsPlayer(url, video, loading, onPlaying);
+                case 'rtmp':
+                case 'rtsp':
+                case 'rtp':
+                case 'udp':
+                    createHls(url, video, loading, onPlaying);
                     break;
 
-                case 'dash':
-                    initDashPlayer(url, video, loading, onPlaying);
+                case 'dash': {
+                    const parsed = parseDrmUrl(url);
+                    createDash(parsed.manifest, parsed.drm, video, loading, onPlaying);
                     break;
+                }
 
                 case 'flv':
-                    initMpegtsPlayer(url, 'flv', video, loading, onPlaying);
+                    createMpegts(url, 'flv', video, loading, onPlaying);
                     break;
 
                 case 'mpegts':
-                    initMpegtsPlayer(url, 'mpegts', video, loading, onPlaying);
+                    createMpegts(url, 'mpegts', video, loading, onPlaying);
                     break;
 
                 case 'mp4':
@@ -2822,50 +2769,20 @@
                 case 'mp3':
                 case 'mpeg':
                 case 'ogg':
-                    initNativePlayer(url, video, loading, onPlaying, () => {
-                        if (window.mpegts && mpegts.isSupported()) {
-                            initMpegtsPlayer(url, 'mpegts', video, loading, onPlaying);
-                        } else {
-                            loading.style.display = 'none';
-                        }
-                    });
-                    break;
-
-                case 'rtmp':
-                case 'rtsp':
-                case 'rtp':
-                case 'udp':
-                    initHlsPlayer(url, video, loading, onPlaying);
+                    createNative(url, video, loading, onPlaying);
                     break;
 
                 case 'auto':
                 default:
+                    // محاولة الطريقة الأصلية أولاً (native) وإن فشل فوراً نستخدم HLS
                     video.src = url;
                     video.preload = 'auto';
-                    const tryNativeThenHls = () => {
-                        const nativePlay = video.play();
-                        if (nativePlay && nativePlay.then) {
-                            nativePlay.then(onPlaying).catch(() => {
-                                try { video.removeAttribute('src'); video.load(); } catch(e) {}
-                                initHlsPlayer(url, video, loading, onPlaying);
-                            });
-                        } else {
-                            initHlsPlayer(url, video, loading, onPlaying);
-                        }
-                    };
-                    
-                    video.addEventListener('loadedmetadata', tryNativeThenHls, { once: true });
+                    video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
                     video.addEventListener('error', () => {
                         try { video.removeAttribute('src'); video.load(); } catch(e) {}
-                        initHlsPlayer(url, video, loading, onPlaying);
+                        createHls(url, video, loading, onPlaying);
                     }, { once: true });
-                    
-                    setTimeout(() => {
-                        if (video.readyState === 0 && loading.style.display !== 'none') {
-                            try { video.removeAttribute('src'); video.load(); } catch(e) {}
-                            initHlsPlayer(url, video, loading, onPlaying);
-                        }
-                    }, 3000);
+                    tryPlayVideo(onPlaying);
                     break;
             }
 
@@ -2892,51 +2809,7 @@
             video.addEventListener('playing', () => {
                 playingStarted = true;
                 clearTimeout(loaderTimeout);
-                clearTimeout(stallRecoveryTimer);
-                stallRecoveryTimer = null;
                 document.getElementById('playerLoading').style.display = 'none';
-            });
-
-            video.addEventListener('waiting', () => {
-                if (!playingStarted) return;
-                clearTimeout(stallRecoveryTimer);
-                stallRecoveryTimer = setTimeout(() => {
-                    const now = Date.now();
-                    if (now - lastStallRecovery < 5000) return;
-                    lastStallRecovery = now;
-
-                    if (hlsPlayer) {
-                        try {
-                            if (hlsPlayer.currentLevel > 0) {
-                                hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
-                            }
-                            hlsPlayer.startLoad();
-                        } catch(e) {}
-                    }
-                    if (dashPlayer) {
-                        try { dashPlayer.seek(dashPlayer.duration()); } catch(e) {}
-                    }
-                    if (mpegtsPlayer) {
-                        try { mpegtsPlayer.play(); } catch(e) {}
-                    }
-                }, 2500);
-            });
-
-            video.addEventListener('stalled', () => {
-                if (!playingStarted) return;
-                clearTimeout(stallRecoveryTimer);
-                stallRecoveryTimer = setTimeout(() => {
-                    const now = Date.now();
-                    if (now - lastStallRecovery < 5000) return;
-                    lastStallRecovery = now;
-
-                    if (hlsPlayer) {
-                        try { hlsPlayer.startLoad(); } catch(e) {}
-                    }
-                    if (mpegtsPlayer) {
-                        try { mpegtsPlayer.play(); } catch(e) {}
-                    }
-                }, 2500);
             });
 
             progressContainer.addEventListener('click', (e) => {
@@ -3096,10 +2969,13 @@
 
         function goToLiveEdge() {
             const video = document.getElementById('videoPlayer');
-            if (hlsPlayer && hlsPlayer.liveSyncPosition) {
-                video.currentTime = hlsPlayer.liveSyncPosition;
-            } else if (dashPlayer && dashPlayer.seek) {
-                try { dashPlayer.seek(dashPlayer.duration()); } catch(e) {}
+            if (hlsInstance && hlsInstance.liveSyncPosition) {
+                video.currentTime = hlsInstance.liveSyncPosition;
+            } else if (shakaPlayer && shakaPlayer.seekRange) {
+                try {
+                    const range = shakaPlayer.seekRange();
+                    if (range && range.end) video.currentTime = range.end;
+                } catch(e) {}
             } else if (mpegtsPlayer) {
                 try { mpegtsPlayer.play(); } catch(e) {}
             } else {
@@ -3114,49 +2990,52 @@
             const optionsContainer = document.getElementById('qualityOptions');
             optionsContainer.innerHTML = '';
 
-            if (hlsPlayer && hlsPlayer.levels && hlsPlayer.levels.length > 1) {
+            if (hlsInstance && hlsInstance.levels && hlsInstance.levels.length > 1) {
                 const autoDiv = document.createElement('div');
-                autoDiv.className = `popup-option ${hlsPlayer.currentLevel === -1 ? 'active' : ''}`;
+                autoDiv.className = `popup-option ${hlsInstance.currentLevel === -1 ? 'active' : ''}`;
                 autoDiv.innerHTML = '<span>تلقائي (موصى به للسرعة)</span><i class="fa-solid fa-check"></i>';
                 autoDiv.onclick = () => {
-                    hlsPlayer.currentLevel = -1;
+                    hlsInstance.currentLevel = -1;
                     closePopups();
                 };
                 optionsContainer.appendChild(autoDiv);
 
-                hlsPlayer.levels.forEach((level, index) => {
+                hlsInstance.levels.forEach((level, index) => {
                     const height = level.height || '?';
                     const div = document.createElement('div');
-                    div.className = `popup-option ${hlsPlayer.currentLevel === index ? 'active' : ''}`;
+                    div.className = `popup-option ${hlsInstance.currentLevel === index ? 'active' : ''}`;
                     div.innerHTML = `<span>${height}p</span>`;
                     div.onclick = () => {
-                        hlsPlayer.currentLevel = index;
+                        hlsInstance.currentLevel = index;
                         closePopups();
                     };
                     optionsContainer.appendChild(div);
                 });
             }
-            else if (dashPlayer && typeof dashPlayer.getBitrateInfoListFor === 'function') {
+            else if (shakaPlayer && typeof shakaPlayer.getVariantTracks === 'function') {
                 try {
-                    const bitrateList = dashPlayer.getBitrateInfoListFor('video') || [];
-                    if (bitrateList.length > 1) {
+                    const tracks = shakaPlayer.getVariantTracks() || [];
+                    const heights = new Set();
+                    tracks.forEach(t => { if (t.height) heights.add(t.height); });
+                    if (heights.size > 1) {
                         const autoDiv = document.createElement('div');
                         autoDiv.className = 'popup-option active';
                         autoDiv.innerHTML = '<span>تلقائي (موصى به للسرعة)</span><i class="fa-solid fa-check"></i>';
                         autoDiv.onclick = () => {
-                            dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: true } } } });
+                            shakaPlayer.configure({ abr: { enabled: true } });
                             closePopups();
                         };
                         optionsContainer.appendChild(autoDiv);
 
-                        bitrateList.forEach((info, index) => {
-                            const height = info.height || Math.round((info.bitrate || 0) / 1000) + 'kbps';
+                        Array.from(heights).sort((a,b) => b-a).forEach(h => {
                             const div = document.createElement('div');
                             div.className = 'popup-option';
-                            div.innerHTML = `<span>${height}p</span>`;
+                            div.innerHTML = `<span>${h}p</span>`;
                             div.onclick = () => {
-                                dashPlayer.updateSettings({ streaming: { abr: { autoSwitchBitrate: { video: false } } } });
-                                dashPlayer.setQualityFor('video', index, true);
+                                try {
+                                    shakaPlayer.configure({ abr: { enabled: false } });
+                                    shakaPlayer.selectVariantTrack(tracks.find(t => t.height === h), true);
+                                } catch(e) {}
                                 closePopups();
                             };
                             optionsContainer.appendChild(div);
@@ -3184,29 +3063,47 @@
 
             const video = document.getElementById('videoPlayer');
 
-            if (dashPlayer && typeof dashPlayer.getTracksFor === 'function') {
+            if (hlsInstance && hlsInstance.audioTracks && hlsInstance.audioTracks.length > 1) {
+                const current = hlsInstance.audioTrack;
+                hlsInstance.audioTracks.forEach((t, i) => {
+                    let label = t.name || t.lang || ('تعليق ' + (i + 1));
+                    const low = String(label).toLowerCase();
+                    if (low.includes('arabic') || low === 'ar') label = 'تعليق عربي';
+                    else if (low.includes('english') || low === 'en') label = 'تعليق أجنبي';
+                    const div = document.createElement('div');
+                    div.className = `popup-option ${i === current ? 'active' : ''}`;
+                    div.innerHTML = `<span>${label}</span>${i === current ? '<i class="fa-solid fa-check"></i>' : ''}`;
+                    div.onclick = () => {
+                        hlsInstance.audioTrack = i;
+                        closePopups();
+                    };
+                    optionsContainer.appendChild(div);
+                });
+            }
+            else if (shakaPlayer && typeof shakaPlayer.getAudioLanguagesAndRoles === 'function') {
                 try {
-                    const audioTracks = dashPlayer.getTracksFor('audio') || [];
-                    if (audioTracks.length > 1) {
-                        audioTracks.forEach((track, index) => {
-                            const label = track.lang || track.labels && track.labels.audio || ('تعليق ' + (index + 1));
+                    const langs = shakaPlayer.getAudioLanguagesAndRoles() || [];
+                    if (langs.length > 1) {
+                        const current = shakaPlayer.getConfiguration().preferredAudioLanguage;
+                        langs.forEach((l) => {
+                            const label = l.language || 'تعليق';
                             const div = document.createElement('div');
-                            div.className = 'popup-option';
+                            div.className = `popup-option ${current === l.language ? 'active' : ''}`;
                             div.innerHTML = `<span>${label}</span>`;
                             div.onclick = () => {
-                                dashPlayer.setCurrentTrack(track);
+                                shakaPlayer.configure({ preferredAudioLanguage: l.language });
                                 closePopups();
                             };
                             optionsContainer.appendChild(div);
                         });
-                        popup.classList.add('active');
-                        showControls();
-                        return;
+                    } else {
+                        optionsContainer.innerHTML = '<div class="popup-option active"><span>تعليق افتراضي</span><i class="fa-solid fa-check"></i></div>';
                     }
-                } catch(e) {}
+                } catch(e) {
+                    optionsContainer.innerHTML = '<div class="popup-option active"><span>تعليق افتراضي</span><i class="fa-solid fa-check"></i></div>';
+                }
             }
-
-            if (video.audioTracks && video.audioTracks.length > 1) {
+            else if (video.audioTracks && video.audioTracks.length > 1) {
                 Array.from(video.audioTracks).forEach((track, index) => {
                     const div = document.createElement('div');
                     div.className = `popup-option ${track.enabled ? 'active' : ''}`;
@@ -3274,7 +3171,6 @@
         let newsData = [];
         let newsInterval;
 
-        // ====== رابط المشاركة الجديد (MediaFire) ======
         const appUrl = 'https://www.mediafire.com/file/p74oa8zjv5casip/NewProject6_release.apk/file';
 
         const translations = {
@@ -3605,7 +3501,6 @@
             copyLink();
         }
 
-        // ===== مشاركة فيسبوك: يظهر النص والرابط =====
         function shareToFacebook() {
             const quote = getShareTextShort() + '\n' + appUrl;
             const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}"e=${encodeURIComponent(quote)}`;
@@ -3613,20 +3508,17 @@
             setTimeout(closeShareSheet, 500);
         }
 
-        // ===== مشاركة واتساب: يظهر النص والرابط =====
         function shareToWhatsApp() {
             const text = getShareTextShort() + '\n' + appUrl;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             setTimeout(closeShareSheet, 500);
         }
 
-        // ===== مشاركة تيليجرام: يظهر النص والرابط =====
         function shareToTelegram() {
             window.open(`https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(getShareTextShort())}`, '_blank');
             setTimeout(closeShareSheet, 500);
         }
 
-        // ===== مشاركة انستغرام: يظهر الرابط على الصورة =====
         async function shareToInstagram() {
             const shareText = getShareTextShort();
             try {
@@ -3690,14 +3582,12 @@
             }
         }
 
-        // ===== مشاركة رسالة SMS: يظهر النص والرابط =====
         function shareToMessages() {
             const text = getShareTextShort() + '\n' + appUrl;
             window.location.href = `sms:?body=${encodeURIComponent(text)}`;
             setTimeout(closeShareSheet, 800);
         }
 
-        // ===== مشاركة بريد إلكتروني: يظهر النص والرابط =====
         function shareToEmail() {
             const subject = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
             const body = getShareTextShort() + '\n\n' + appUrl;
@@ -3705,14 +3595,12 @@
             setTimeout(closeShareSheet, 800);
         }
 
-        // ===== مشاركة فايبر: يظهر النص والرابط =====
         function shareToViber() {
             const text = getShareTextShort() + '\n' + appUrl;
             window.location.href = `viber://forward?text=${encodeURIComponent(text)}`;
             setTimeout(closeShareSheet, 800);
         }
 
-        // ===== نسخ الرابط =====
         async function copyLink() {
             const fullMsg = getShareTextShort() + '\n' + appUrl;
             try {
