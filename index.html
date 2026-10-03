@@ -1817,7 +1817,7 @@
             </div>
 
             <div id="pane-series" class="section-pane">
-                <iframe src="https://th-wheat.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
+                <iframe src="https://agi-rust.vercel.app/" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
             </div>
 
             <div id="pane-news" class="section-pane">
@@ -2278,7 +2278,6 @@
             } catch (err) {
                 console.error('Xtream load error:', err);
                 xtreamLoading = false;
-                showToast('فشل تحميل قنوات الاشتراك');
             }
         }
 
@@ -2408,6 +2407,8 @@
         let playingStarted = false;
         let loaderTimeout = null;
         let silentRetryTimer = null;
+        let stallRecoveryTimer = null;
+        let lastStallRecovery = 0;
 
         function detectStreamType(url) {
             if (!url) return 'unknown';
@@ -2481,6 +2482,10 @@
                 clearTimeout(silentRetryTimer);
                 silentRetryTimer = null;
             }
+            if (stallRecoveryTimer) {
+                clearTimeout(stallRecoveryTimer);
+                stallRecoveryTimer = null;
+            }
             playingStarted = false;
         }
 
@@ -2523,58 +2528,70 @@
             initializePlayer(currentVideoUrl);
         }
 
+        // ===== إعدادات HLS محسّنة: بدء فوري + استقرار عالي للقنوات ذات جودة واحدة =====
         function initHlsPlayer(url, video, loading, onPlaying) {
             if (window.Hls && Hls.isSupported()) {
                 const hlsConfig = {
                     enableWorker: true,
-                    progressive: true,
+                    progressive: false,
                     lowLatencyMode: false,
-                    startLevel: 0,
-                    testBandwidth: true,
-                    abrEwmaDefaultEstimate: 1500000,
-                    abrEwmaFastLive: 3.0,
-                    abrEwmaSlowLive: 9.0,
-                    abrEwmaFastVoD: 3.0,
-                    abrEwmaSlowVoD: 9.0,
-                    abrBandWidthFactor: 0.95,
+
+                    // بدء فوري على أول مستوى (يسرّع فتح القناة)
+                    startLevel: -1,
+                    testBandwidth: false,
+                    abrEwmaDefaultEstimate: 3000000,
+
+                    // خفض حساسية التبديل لتقليل التقطيع
+                    abrEwmaFastLive: 4.0,
+                    abrEwmaSlowLive: 12.0,
+                    abrBandWidthFactor: 0.9,
                     abrBandWidthUpFactor: 0.7,
                     abrMaxWithRealBitrate: true,
-                    capLevelToPlayerSize: true,
-                    capLevelOnFPSDrop: true,
-                    minAutoBitrate: 0,
-                    maxStarvationDelay: 4,
-                    maxLoadingDelay: 4,
+                    capLevelToPlayerSize: false,
+                    capLevelOnFPSDrop: false,
+
+                    // مخازن مؤقتة كبيرة لضمان استقرار القنوات ذات جودة واحدة
+                    maxBufferLength: 60,
+                    maxMaxBufferLength: 120,
+                    maxBufferSize: 120 * 1000 * 1000,
+                    maxBufferHole: 1.0,
                     backBufferLength: 30,
-                    maxBufferLength: 30,
-                    maxMaxBufferLength: 60,
-                    maxBufferSize: 60 * 1000 * 1000,
-                    maxBufferHole: 0.3,
-                    highBufferWatchdogPeriod: 2,
-                    nudgeOffset: 0.1,
-                    nudgeMaxRetry: 5,
-                    maxFragLookUpTolerance: 0.25,
+
+                    // Live latency معقول لمنع التقطيع
                     liveSyncDurationCount: 3,
-                    liveMaxLatencyDurationCount: 8,
-                    liveDurationInfinity: false,
+                    liveMaxLatencyDurationCount: 10,
+                    liveDurationInfinity: true,
                     liveBackBufferLength: 30,
+
+                    // تسريع بدء التشغيل
                     startFragPrefetch: true,
+                    maxStarvationDelay: 8,
+                    maxLoadingDelay: 8,
+                    highBufferWatchdogPeriod: 1,
+                    nudgeOffset: 0.2,
+                    nudgeMaxRetry: 10,
+                    maxFragLookUpTolerance: 0.5,
+
+                    // إعادة محاولات قوية لتفادي الأخطاء المؤقتة
                     manifestLoadingTimeOut: 10000,
-                    manifestLoadingMaxRetry: 6,
-                    manifestLoadingRetryDelay: 500,
-                    manifestLoadingMaxRetryTimeout: 64000,
+                    manifestLoadingMaxRetry: 8,
+                    manifestLoadingRetryDelay: 300,
+                    manifestLoadingMaxRetryTimeout: 60000,
                     levelLoadingTimeOut: 10000,
-                    levelLoadingMaxRetry: 6,
-                    levelLoadingRetryDelay: 500,
-                    levelLoadingMaxRetryTimeout: 64000,
-                    fragLoadingTimeOut: 20000,
-                    fragLoadingMaxRetry: 6,
-                    fragLoadingRetryDelay: 500,
-                    fragLoadingMaxRetryTimeout: 64000,
-                    appendErrorMaxRetry: 3,
+                    levelLoadingMaxRetry: 8,
+                    levelLoadingRetryDelay: 300,
+                    levelLoadingMaxRetryTimeout: 60000,
+                    fragLoadingTimeOut: 30000,
+                    fragLoadingMaxRetry: 10,
+                    fragLoadingRetryDelay: 300,
+                    fragLoadingMaxRetryTimeout: 60000,
+                    appendErrorMaxRetry: 10,
+
                     fpsDroppedMonitoringPeriod: 5000,
                     fpsDroppedMonitoringThreshold: 0.2,
-                    stretchShortVideoTrack: false,
+                    stretchShortVideoTrack: true,
                     forceKeyFrameOnDiscontinuity: true,
+
                     xhrSetup: function(xhr) {
                         xhr.withCredentials = false;
                     }
@@ -2588,15 +2605,17 @@
                     tryPlayVideo(onPlaying);
                 });
 
-                hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, () => {});
+                hlsPlayer.on(Hls.Events.LEVEL_LOADED, (e, data) => {
+                    // إذا كان البث بجودة واحدة فقط، نخفف من إعادة التحميل لمنع التقطيع
+                    if (data && data.details && data.details.live) {
+                        try { hlsPlayer.nextLevel = hlsPlayer.currentLevel; } catch(err) {}
+                    }
+                });
 
                 hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                if (hlsPlayer.currentLevel > 0) {
-                                    hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
-                                }
                                 try { hlsPlayer.startLoad(); } catch(e) {}
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
@@ -2635,29 +2654,29 @@
                     dashPlayer.updateSettings({
                         streaming: {
                             lowLatencyMode: false,
-                            rebufferingGoal: 4,
-                            bufferingGoal: 30,
-                            bufferBehind: 20,
-                            bufferToKeep: 20,
-                            bufferTimeAtTopQuality: 30,
-                            bufferTimeAtTopQualityLongForm: 40,
+                            rebufferingGoal: 3,
+                            bufferingGoal: 60,
+                            bufferBehind: 30,
+                            bufferToKeep: 30,
+                            bufferTimeAtTopQuality: 60,
+                            bufferTimeAtTopQualityLongForm: 90,
                             longFormContentDurationThreshold: 600,
-                            fastSwitchEnabled: true,
+                            fastSwitchEnabled: false,
                             jumpGaps: true,
                             jumpLargeGaps: true,
                             smallGapLimit: 1.5,
-                            stableBufferTime: 12,
+                            stableBufferTime: 20,
                             retryParameters: {
                                 timeout: 10000,
-                                maxAttempts: 6,
-                                baseDelay: 500,
+                                maxAttempts: 8,
+                                baseDelay: 300,
                                 backoffFactor: 1.5
                             },
-                            liveDelay: 3,
+                            liveDelay: 4,
                             liveCatchup: {
                                 maxDrift: 1.2,
                                 playbackRate: 0.5,
-                                latencyTarget: 3
+                                latencyTarget: 4
                             },
                             abr: {
                                 ABRStrategy: 'abrDynamic',
@@ -2665,7 +2684,7 @@
                                 additionalAbrRules: {
                                     insufficientBufferRule: true,
                                     switchHistoryRule: true,
-                                    droppedFramesRule: true,
+                                    droppedFramesRule: false,
                                     abandonRequestsRule: true
                                 }
                             }
@@ -2674,8 +2693,8 @@
                             enabled: true,
                             initialBitrate: { audio: -1, video: -1 },
                             autoSwitchBitrate: { audio: true, video: true },
-                            defaultBandwidthEstimate: 1500000,
-                            switchInterval: 8,
+                            defaultBandwidthEstimate: 3000000,
+                            switchInterval: 10,
                             bandwidthUpgradeTarget: 0.85,
                             bandwidthDowngradeTarget: 0.95
                         }
@@ -2715,14 +2734,14 @@
                         url: url
                     }, {
                         enableWorker: true,
-                        enableStashBuffer: false,
-                        stashInitialSize: 128 * 1024,
+                        enableStashBuffer: true,
+                        stashInitialSize: 512 * 1024,
                         liveBufferLatencyChasing: true,
-                        liveBufferLatencyMaxLatency: 5.0,
-                        liveBufferLatencyMinRemain: 2.0,
+                        liveBufferLatencyMaxLatency: 6.0,
+                        liveBufferLatencyMinRemain: 2.5,
                         autoCleanupSourceBuffer: true,
-                        autoCleanupMaxBackwardDuration: 40,
-                        autoCleanupMinBackwardDuration: 30,
+                        autoCleanupMaxBackwardDuration: 60,
+                        autoCleanupMinBackwardDuration: 40,
                         lazyLoad: false,
                         lazyLoadMaxDuration: 0,
                         reuseRedirectedURL: true
@@ -2881,11 +2900,52 @@
             video.addEventListener('playing', () => {
                 playingStarted = true;
                 clearTimeout(loaderTimeout);
+                clearTimeout(stallRecoveryTimer);
+                stallRecoveryTimer = null;
                 document.getElementById('playerLoading').style.display = 'none';
             });
 
+            // ===== معالجة التقطيع (Stall Recovery) =====
             video.addEventListener('waiting', () => {
                 if (!playingStarted) return;
+                clearTimeout(stallRecoveryTimer);
+                stallRecoveryTimer = setTimeout(() => {
+                    const now = Date.now();
+                    if (now - lastStallRecovery < 5000) return;
+                    lastStallRecovery = now;
+
+                    if (hlsPlayer) {
+                        try {
+                            if (hlsPlayer.currentLevel > 0) {
+                                hlsPlayer.nextLevel = Math.max(0, hlsPlayer.currentLevel - 1);
+                            }
+                            hlsPlayer.startLoad();
+                        } catch(e) {}
+                    }
+                    if (dashPlayer) {
+                        try { dashPlayer.seek(dashPlayer.duration()); } catch(e) {}
+                    }
+                    if (mpegtsPlayer) {
+                        try { mpegtsPlayer.play(); } catch(e) {}
+                    }
+                }, 2500);
+            });
+
+            video.addEventListener('stalled', () => {
+                if (!playingStarted) return;
+                clearTimeout(stallRecoveryTimer);
+                stallRecoveryTimer = setTimeout(() => {
+                    const now = Date.now();
+                    if (now - lastStallRecovery < 5000) return;
+                    lastStallRecovery = now;
+
+                    if (hlsPlayer) {
+                        try { hlsPlayer.startLoad(); } catch(e) {}
+                    }
+                    if (mpegtsPlayer) {
+                        try { mpegtsPlayer.play(); } catch(e) {}
+                    }
+                }, 2500);
             });
 
             progressContainer.addEventListener('click', (e) => {
@@ -3222,7 +3282,9 @@
         let currentNewsIndex = 0;
         let newsData = [];
         let newsInterval;
-        const appUrl = window.location.href;
+
+        // ====== رابط المشاركة الجديد (MediaFire) ======
+        const appUrl = 'https://www.mediafire.com/file/p74oa8zjv5casip/NewProject6_release.apk/file';
 
         const translations = {
             ar: {
@@ -3242,8 +3304,8 @@
                 navHome: "الرئيسية", navChannels: "قنوات", navSchedule: "جدول", navSeries: "مسلسلات", navNews: "أخبار", navSettings: "الإعدادات",
                 now: "الآن", minutesAgo: "منذ", minute: "دقيقة", hour: "ساعة", day: "يوم",
                 starScreens: "نجم الشاشات", linkCopied: "تم نسخ الرابط بنجاح!",
-                shareText: "📺 تطبيق نجم الشاشات\nأفضل منصة للبث المباشر\n",
-                shareTextShort: "تطبيق نجم الشاشات - أفضل منصة للبث المباشر"
+                shareText: "تطبيق نجم الشاشات - أفضل منصة للبث المباشر ومشاهدة المباريات والمسلسلات\n",
+                shareTextShort: "تطبيق نجم الشاشات - أفضل منصة للبث المباشر ومشاهدة المباريات والمسلسلات"
             },
             en: {
                 live: "Live", heroTitle: "Professional Integrated Platform", heroSubtitle: "Enjoy a high-performance streaming experience without interruption",
@@ -3262,8 +3324,8 @@
                 navHome: "Home", navChannels: "Channels", navSchedule: "Schedule", navSeries: "Series", navNews: "News", navSettings: "Settings",
                 now: "Now", minutesAgo: "", minute: "minute", hour: "hour", day: "day",
                 starScreens: "Star Screens", linkCopied: "Link copied successfully!",
-                shareText: " Star Screens App\nBest Live Streaming Platform\n",
-                shareTextShort: "Star Screens App - Best Live Streaming Platform"
+                shareText: "Star Screens App - Best Live Streaming Platform for Matches and Series\n",
+                shareTextShort: "Star Screens App - Best Live Streaming Platform for Matches and Series"
             }
         };
 
@@ -3503,13 +3565,14 @@
         }
 
         function getShareText() {
-            return currentLanguage === 'ar' ? translations.ar.shareText + appUrl : translations.en.shareText + appUrl;
+            return currentLanguage === 'ar' 
+                ? translations.ar.shareText + appUrl 
+                : translations.en.shareText + appUrl;
         }
         function getShareTextShort() {
             return currentLanguage === 'ar' ? translations.ar.shareTextShort : translations.en.shareTextShort;
         }
 
-        // ======== تم التعديل: دالة "المزيد" تفتح قائمة المشاركة الأصلية في الهاتف ========
         async function shareMore() {
             const shareTitle = currentLanguage === 'ar' ? 'تطبيق نجم الشاشات' : 'Star Screens App';
             const shareTextBody = getShareTextShort();
@@ -3519,22 +3582,18 @@
                 url: appUrl
             };
 
-            // المحاولة 1: Web Share API (تفتح قائمة المشاركة الأصلية)
             if (navigator.share) {
                 try {
                     await navigator.share(sharePayload);
                     closeShareSheet();
                     return;
                 } catch (err) {
-                    // إذا قام المستخدم بإلغاء القائمة، لا نفعل شيء
                     if (err && err.name === 'AbortError') {
                         return;
                     }
-                    // خلاف ذلك، ننتقل للخطة الاحتياطية
                 }
             }
 
-            // المحاولة 2: Android Intent (تعمل داخل تطبيقات WebView على أندرويد)
             const isAndroid = /Android/i.test(navigator.userAgent);
             if (isAndroid) {
                 try {
@@ -3548,14 +3607,11 @@
                     setTimeout(closeShareSheet, 1000);
                     return;
                 } catch (e) {
-                    // متابعة للخطة النهائية
                 }
             }
 
-            // المحاولة 3: نسخ الرابط كحل أخير
             copyLink();
         }
-        // ======== نهاية التعديل ========
 
         function shareToFacebook() {
             const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}`;
