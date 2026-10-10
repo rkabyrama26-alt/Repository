@@ -2209,16 +2209,134 @@
             }
         };
 
+        // ============================================================
+        // ===== إعدادات Xtream (محسّنة للسرعة القصوى) =====
+        // ============================================================
         const XTREAM_CONFIG = {
             host: 'http://cname1.elg-26.com:8080',
             username: 'Abdo20250505',
             password: 'hze7pmru27',
-            maxChannels: 900
+            maxChannelsPerCategory: 800
         };
-        
-        let xtreamCategories = {};
+
+        const XTREAM_DEFAULT_LOGO = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
+
+        // مخزن مؤقت في الذاكرة فقط (لا localStorage ولا sessionStorage)
+        let xtreamCategories = [];        // [{category_id, category_name, parent_id}]
+        let xtreamStreamsByCat = {};       // { catId: [ {name, logo, url} ] }
         let xtreamLoaded = false;
         let xtreamLoading = false;
+
+        // جلب جميع الفئات (سريع جداً) - يتم استدعاؤه أولاً
+        async function loadXtreamCategories() {
+            if (xtreamLoading || xtreamLoaded) return;
+            xtreamLoading = true;
+
+            const base = `${XTREAM_CONFIG.host}/player_api.php?username=${encodeURIComponent(XTREAM_CONFIG.username)}&password=${encodeURIComponent(XTREAM_CONFIG.password)}`;
+
+            try {
+                const res = await fetch(`${base}&action=get_live_categories`, { cache: 'no-store' });
+                const cats = await res.json();
+                if (!Array.isArray(cats)) throw new Error('bad categories');
+                xtreamCategories = cats;
+                renderXtreamCategories(); // عرض فوري
+            } catch (e) {
+                console.error('Xtream categories error:', e);
+                xtreamLoading = false;
+                return;
+            }
+
+            // في الخلفية: جلب كل القنوات لمعرفة الأعداد والصور (بدون حجب واجهة المستخدم)
+            try {
+                const res2 = await fetch(`${base}&action=get_live_streams`, { cache: 'no-store' });
+                const streams = await res2.json();
+                if (Array.isArray(streams)) {
+                    const grouped = {};
+                    for (let i = 0; i < streams.length; i++) {
+                        const s = streams[i];
+                        if (!s || s.stream_id == null) continue;
+                        const cid = String(s.category_id || '0');
+                        if (!grouped[cid]) grouped[cid] = [];
+                        grouped[cid].push({
+                            name: s.name || ('قناة ' + s.stream_id),
+                            logo: s.stream_icon || '',
+                            url: `${XTREAM_CONFIG.host}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${s.stream_id}.m3u8`
+                        });
+                    }
+                    xtreamStreamsByCat = grouped;
+                    xtreamLoaded = true;
+                    renderXtreamCategories(); // إعادة العرض مع الأعداد والصور
+                }
+            } catch (e) {
+                console.warn('Xtream streams preload skipped:', e);
+            }
+
+            xtreamLoading = false;
+        }
+
+        // جلب قنوات فئة واحدة فقط (عند الضغط) - أسرع بكثير
+        async function fetchCategoryChannels(catId) {
+            if (xtreamStreamsByCat[catId]) return xtreamStreamsByCat[catId];
+
+            const base = `${XTREAM_CONFIG.host}/player_api.php?username=${encodeURIComponent(XTREAM_CONFIG.username)}&password=${encodeURIComponent(XTREAM_CONFIG.password)}`;
+            const res = await fetch(`${base}&action=get_live_streams&category_id=${encodeURIComponent(catId)}`, { cache: 'no-store' });
+            const streams = await res.json();
+            const channels = (streams || []).slice(0, XTREAM_CONFIG.maxChannelsPerCategory).map(s => ({
+                name: s.name || ('قناة ' + s.stream_id),
+                logo: s.stream_icon || '',
+                url: `${XTREAM_CONFIG.host}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${s.stream_id}.m3u8`
+            }));
+            xtreamStreamsByCat[catId] = channels;
+            return channels;
+        }
+
+        function renderXtreamCategories() {
+            const grid = document.getElementById('mainCategoriesGrid');
+            if (!grid) return;
+            // إزالة البطاقات القديمة فقط
+            grid.querySelectorAll('.xtream-cat-card').forEach(el => el.remove());
+            if (!xtreamCategories.length) return;
+
+            const fragment = document.createDocumentFragment();
+            let catNumber = 1;
+
+            for (let i = 0; i < xtreamCategories.length; i++) {
+                const cat = xtreamCategories[i];
+                if (!cat || cat.category_id == null) continue;
+
+                const catId = String(cat.category_id);
+                const channels = xtreamStreamsByCat[catId];
+                const count = channels ? channels.length : null;
+
+                let firstLogo = '';
+                if (channels && channels.length) {
+                    for (let j = 0; j < channels.length; j++) {
+                        if (channels[j].logo) { firstLogo = channels[j].logo; break; }
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = 'category-card xtream-cat-card';
+                card.setAttribute('data-cat-id', catId);
+                card.onclick = (function(id) {
+                    return function() { openCategory('xtream_' + id); };
+                })(catId);
+
+                card.innerHTML = `
+                    <div class="category-icon-wrap">
+                        <img class="category-icon-img" src="${firstLogo || XTREAM_DEFAULT_LOGO}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${XTREAM_DEFAULT_LOGO}'">
+                        ${count !== null ? `<div class="category-count-badge">${count}</div>` : ''}
+                    </div>
+                    <div class="category-card-title">${catNumber}</div>
+                `;
+
+                cat._displayIndex = catNumber;
+                fragment.appendChild(card);
+                catNumber++;
+            }
+
+            grid.appendChild(fragment);
+        }
 
         let currentCategory = null;
 
@@ -2231,151 +2349,64 @@
 
                 const type = detectStreamType(url);
                 if (type === 'hls') {
-                    fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit' })
+                    // Preload للـ manifest لتسريع التشغيل
+                    fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'force-cache' })
                         .then(r => r.text()).catch(() => {});
                 } else {
                     fetch(url, { method: 'HEAD', mode: 'no-cors', credentials: 'omit' }).catch(() => {});
                 }
-                if (prefetchedUrls.size > 40) {
+                if (prefetchedUrls.size > 60) {
                     const first = prefetchedUrls.values().next().value;
                     prefetchedUrls.delete(first);
                 }
             } catch (e) {}
         }
 
-        async function loadXtreamChannels() {
-            if (xtreamLoading || xtreamLoaded) return;
-            xtreamLoading = true;
-            
-            try {
-                const base = `${XTREAM_CONFIG.host}/player_api.php?username=${encodeURIComponent(XTREAM_CONFIG.username)}&password=${encodeURIComponent(XTREAM_CONFIG.password)}`;
-                
-                const [catRes, streamRes] = await Promise.all([
-                    fetch(`${base}&action=get_live_categories`).then(r => r.json()),
-                    fetch(`${base}&action=get_live_streams`).then(r => r.json())
-                ]);
-                
-                if (!Array.isArray(catRes) || !Array.isArray(streamRes)) {
-                    throw new Error('بيانات Xtream غير صالحة');
-                }
-                
-                const catNameMap = {};
-                catRes.forEach(c => {
-                    if (c && c.category_id != null) {
-                        catNameMap[String(c.category_id)] = c.category_name || 'قنوات';
-                    }
-                });
-                
-                const grouped = {};
-                let totalCount = 0;
-                
-                for (let i = 0; i < streamRes.length; i++) {
-                    if (totalCount >= XTREAM_CONFIG.maxChannels) break;
-                    
-                    const s = streamRes[i];
-                    if (!s || s.stream_id == null) continue;
-                    
-                    const cid = String(s.category_id || '0');
-                    const catName = catNameMap[cid] || 'قنوات أخرى';
-                    
-                    if (!grouped[cid]) {
-                        grouped[cid] = { name: catName, channels: [] };
-                    }
-                    
-                    grouped[cid].channels.push({
-                        name: s.name || ('قناة ' + s.stream_id),
-                        logo: s.stream_icon || '',
-                        url: `${XTREAM_CONFIG.host}/live/${XTREAM_CONFIG.username}/${XTREAM_CONFIG.password}/${s.stream_id}.m3u8`
-                    });
-                    
-                    totalCount++;
-                }
-                
-                xtreamCategories = grouped;
-                xtreamLoaded = true;
-                xtreamLoading = false;
-                
-                renderXtreamCategories();
-                
-            } catch (err) {
-                console.error('Xtream load error:', err);
-                xtreamLoading = false;
-            }
-        }
-
-        function renderXtreamCategories() {
-            const grid = document.getElementById('mainCategoriesGrid');
-            const catKeys = Object.keys(xtreamCategories);
-            
-            if (catKeys.length === 0) return;
-            
-            let catNumber = 1;
-            const defaultImgUrl = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
-            
-            catKeys.forEach(catId => {
-                const cat = xtreamCategories[catId];
-                if (!cat.channels || cat.channels.length === 0) return;
-                
-                const count = cat.channels.length;
-                const firstLogo = (cat.channels.find(c => c.logo) || {}).logo || '';
-                
-                const card = document.createElement('div');
-                card.className = 'category-card';
-                const key = 'xtream_' + catId;
-                card.onclick = () => openCategory(key);
-                
-                const imgHTML = `
-                    <img class="category-icon-img" 
-                         src="${firstLogo || defaultImgUrl}" 
-                         alt="Channel" 
-                         onerror="this.src='${defaultImgUrl}'; this.style.opacity='1';">
-                `;
-                
-                card.innerHTML = `
-                    <div class="category-icon-wrap">
-                        ${imgHTML}
-                        <div class="category-count-badge">${count}</div>
-                    </div>
-                    <div class="category-card-title">${catNumber}</div>
-                `;
-                
-                cat.displayIndex = catNumber;
-                catNumber++;
-                
-                grid.appendChild(card);
-            });
-        }
-
-        function openCategory(catKey) {
+        async function openCategory(catKey) {
             if (catKey && catKey.startsWith('xtream_')) {
                 const catId = catKey.replace('xtream_', '');
-                const cat = xtreamCategories[catId];
+                const cat = xtreamCategories.find(c => String(c.category_id) === catId);
                 if (!cat) return;
                 currentCategory = catKey;
-                
+
                 document.getElementById('channelsCategoriesView').style.display = 'none';
                 document.getElementById('channelsListView').style.display = 'block';
-                
-                const displayName = cat.displayIndex ? `قنوات ${cat.displayIndex}` : cat.name;
-                document.getElementById('categoryTitle').textContent = `${displayName} (${cat.channels.length})`;
-                
+
+                const displayName = cat._displayIndex ? `قنوات ${cat._displayIndex}` : (cat.category_name || 'قنوات');
                 const grid = document.getElementById('channelsGrid');
-                const defaultImgUrl = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
-                
-                const htmlParts = new Array(cat.channels.length);
-                for (let i = 0; i < cat.channels.length; i++) {
-                    const ch = cat.channels[i];
-                    const safeName = String(ch.name || '').replace(/'/g, "\\'").replace(/"/g, '"');
-                    const logo = ch.logo || defaultImgUrl;
+
+                let channels = xtreamStreamsByCat[catId];
+
+                if (!channels) {
+                    // عرض مؤشر تحميل بسيط ثم جلب قنوات هذه الفئة فقط
+                    document.getElementById('categoryTitle').textContent = `${displayName} (جاري التحميل...)`;
+                    grid.innerHTML = `<div class="schedule-loading"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i><span>جاري تحميل القنوات...</span></div>`;
+                    document.querySelector('.viewport-area').scrollTop = 0;
+
+                    try {
+                        channels = await fetchCategoryChannels(catId);
+                    } catch (e) {
+                        grid.innerHTML = `<div class="schedule-loading" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem;"></i><span>فشل تحميل القنوات. تحقق من الاتصال.</span></div>`;
+                        return;
+                    }
+                }
+
+                document.getElementById('categoryTitle').textContent = `${displayName} (${channels.length})`;
+
+                const htmlParts = new Array(channels.length);
+                for (let i = 0; i < channels.length; i++) {
+                    const ch = channels[i];
+                    const safeName = String(ch.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const logo = ch.logo || XTREAM_DEFAULT_LOGO;
                     const encUrl = encodeURIComponent(ch.url);
-                    
+
                     htmlParts[i] = `
                         <div class="channel-card" 
                              onmouseenter="prefetchChannel('${encUrl}')"
                              ontouchstart="prefetchChannel('${encUrl}')"
                              onclick="playChannel('${encUrl}', '${safeName}')">
                             <div class="channel-logo-wrap">
-                                <img src="${logo}" alt="" loading="lazy" onerror="this.src='${defaultImgUrl}'">
+                                <img src="${logo}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${XTREAM_DEFAULT_LOGO}'">
                             </div>
                             <div class="channel-info">
                                 <div class="channel-name">${ch.name || ''}</div>
@@ -2385,11 +2416,12 @@
                     `;
                 }
                 grid.innerHTML = htmlParts.join('');
-                
+
                 document.querySelector('.viewport-area').scrollTop = 0;
                 return;
             }
-            
+
+            // ===== الفئات المضمّنة مسبقاً =====
             const cat = categoriesData[catKey];
             if (!cat) return;
             currentCategory = catKey;
@@ -2578,7 +2610,6 @@
                 enableWorker: true,
                 progressive: true,
                 lowLatencyMode: false,
-                // بدء فوري بأقل جودة ثم التحسن تلقائياً
                 startLevel: 0,
                 abrEwmaDefaultEstimate: 1000000,
                 capLevelToPlayerSize: true,
@@ -2634,7 +2665,6 @@
 
         function createDash(manifest, drm, video, loading, onPlaying) {
             if (!(window.shaka && shaka.Player.isBrowserSupported())) {
-                // fallback: native
                 video.src = manifest;
                 video.preload = 'auto';
                 video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
@@ -2774,7 +2804,6 @@
 
                 case 'auto':
                 default:
-                    // محاولة الطريقة الأصلية أولاً (native) وإن فشل فوراً نستخدم HLS
                     video.src = url;
                     video.preload = 'auto';
                     video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
@@ -3749,7 +3778,8 @@
             updateLanguageSelection();
             initTelegramPopup();
             
-            loadXtreamChannels();
+            // بدء تحميل فئات Xtream فوراً وبأسرع طريقة ممكنة
+            loadXtreamCategories();
 
             document.addEventListener('fullscreenchange', () => {
                 const icon = document.getElementById('fullscreenIcon');
