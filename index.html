@@ -1643,140 +1643,6 @@
                 gap: 0.5rem;
             }
         }
-
-        /* ============================================================
-           ===== أنماط خاصة بنسخة التلفزيون فقط (TV) =====
-           لا تؤثر على نسخة الهاتف إطلاقاً
-           ============================================================ */
-        body.is-tv * {
-            cursor: default !important;
-        }
-
-        body.is-tv .category-card:focus,
-        body.is-tv .channel-card:focus,
-        body.is-tv .dock-tab-btn:focus,
-        body.is-tv .stack-item:focus,
-        body.is-tv .player-btn:focus,
-        body.is-tv .back-btn:focus,
-        body.is-tv .share-grid-item:focus,
-        body.is-tv .share-action-btn:focus,
-        body.is-tv .sheet-language-option:focus,
-        body.is-tv .share-cancel-button:focus,
-        body.is-tv .nav-dot:focus,
-        body.is-tv .match-card:focus,
-        body.is-tv .grid-card:focus,
-        body.is-tv a:focus,
-        body.is-tv button:focus,
-        body.is-tv .popup-option:focus,
-        body.is-tv .share-close-btn:focus,
-        body.is-tv .player-center-play:focus,
-        body.is-tv .player-progress-container:focus {
-            outline: 0.25rem solid #38bdf8 !important;
-            outline-offset: 0.1875rem !important;
-            box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.35), 0 0 1.875rem rgba(56, 189, 248, 0.65) !important;
-            transform: scale(1.06);
-            z-index: 200 !important;
-            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
-            border-radius: inherit;
-        }
-
-        body.is-tv .dock-tab-btn:focus {
-            background: rgba(56, 189, 248, 0.22) !important;
-            color: #38bdf8 !important;
-        }
-
-        body.is-tv .dock-tab-btn:focus i,
-        body.is-tv .dock-tab-btn:focus span {
-            color: #38bdf8 !important;
-        }
-
-        body.is-tv .player-btn:focus {
-            background: rgba(56, 189, 248, 0.35) !important;
-            border-color: #38bdf8 !important;
-            transform: scale(1.18);
-        }
-
-        body.is-tv .channel-card:focus {
-            background: rgba(99, 102, 241, 0.18) !important;
-            transform: scale(1.04) translateX(-0.25rem);
-        }
-
-        body.is-tv .channel-card:focus .channel-logo-wrap img {
-            transform: scale(1.12);
-        }
-
-        body.is-tv .category-card:focus .category-icon-wrap {
-            box-shadow: 0 0 1.5625rem rgba(56, 189, 248, 0.7) !important;
-        }
-
-        body.is-tv .stack-item:focus {
-            background: rgba(99, 102, 241, 0.18) !important;
-            transform: scale(1.02) translateX(-0.1875rem);
-        }
-
-        body.is-tv .share-grid-item:focus,
-        body.is-tv .share-action-btn:focus {
-            transform: scale(1.12);
-        }
-
-        body.is-tv .match-card:focus {
-            transform: scale(1.03);
-            background-color: rgba(99, 102, 241, 0.15) !important;
-        }
-
-        body.is-tv .back-btn:focus {
-            background: rgba(56, 189, 248, 0.35) !important;
-        }
-
-        body.is-tv .popup-option:focus {
-            background: rgba(99, 102, 241, 0.4) !important;
-            color: #38bdf8 !important;
-            transform: scale(1.03);
-        }
-
-        /* Larger TV text on big screens */
-        body.is-tv .player-channel-name {
-            font-size: 1.3rem;
-        }
-
-        body.is-tv .popup-option {
-            padding: 0.875rem 1rem;
-            font-size: 1rem;
-        }
-
-        /* Focus hint for empty areas */
-        body.is-tv .viewport-area:focus {
-            outline: none;
-        }
-
-        /* TV Unmute prompt overlay */
-        .tv-unmute-prompt {
-            display: none;
-            position: absolute;
-            top: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #ffffff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 700;
-            z-index: 50;
-            border: 0.125rem solid rgba(56, 189, 248, 0.6);
-            animation: pulseUnmute 1.5s infinite;
-            direction: rtl;
-            text-align: center;
-        }
-
-        .tv-unmute-prompt.show {
-            display: block;
-        }
-
-        @keyframes pulseUnmute {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.55; }
-        }
     </style>
     
     <script>
@@ -2057,8 +1923,6 @@
         <div class="video-player-container">
             <video class="video-element" id="videoPlayer" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" crossorigin="anonymous" disablePictureInPicture poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
             
-            <div class="tv-unmute-prompt" id="tvUnmutePrompt">اضغط أي زر في الريموت لتشغيل الصوت 🔊</div>
-
             <div class="player-top-bar">
                 <button class="player-back-btn" onclick="closeVideoPlayer()">
                     <i class="fa-solid fa-arrow-right"></i>
@@ -2236,27 +2100,6 @@
     </div>
 
     <script>
-        // ============================================================
-        // ===== كشف التلفزيون (TV Detection) =====
-        // ============================================================
-        const IS_TV = (function () {
-            const ua = (navigator.userAgent || '').toLowerCase();
-            // أنظمة TV المعروفة
-            if (/android.*(tv|aft)|tizen|web0s|webos|smarttv|hbbtv|netcast|viera|bravia|appletv|tvos|googletv|dlna|smart-tv|kodi/i.test(ua)) return true;
-            // شاشة كبيرة بدون لمس
-            const noTouch = (typeof window.ontouchstart === 'undefined') && (navigator.maxTouchPoints === 0);
-            if (window.innerWidth >= 1280 && noTouch) return true;
-            return false;
-        })();
-
-        // تطبيق كلاس على الـ body إن كان TV
-        if (IS_TV) {
-            document.documentElement.classList.add('is-tv');
-            document.addEventListener('DOMContentLoaded', () => {
-                document.body.classList.add('is-tv');
-            });
-        }
-
         const categoriesData = {
             mbc: {
                 name: 'قنوات ام بي سي',
@@ -2333,12 +2176,12 @@
             bein_sports: {
                 name: 'قنوات بين سبورت',
                 channels: [
-                    { name: 'بين سبورت 1', logo: 'https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp', url: 'http://vip8.sharkgate.xyz/live/7949770923/0238215923/212349.m3u8#Intent;action=android.intent.action.VIEW;type=video/*;package=com.xpola.playe' },
-                    { name: 'بين سبورت 2', logo: 'https://i.ibb.co/xt2Y3S7D/Picsart-26-07-15-13-15-19-901.webp', url: 'http://vip8.sharkgate.xyz/live/7949770923/0238215923/212350.m3u8#Intent;action=android.intent.action.VIEW;type=video/*;package=com.xpola.player;S' },
-                    { name: 'بين سبورت 3', logo: 'https://i.ibb.co/yc8tDt88/Picsart-26-07-15-13-15-25-585.webp', url: 'http://vip8.sharkgate.xyz/live/7949770923/0238215923/212352.m3u8#Intent;action=android.intent.action.VIEW;type=video/*;package=com.xpola.play' },
-                    { name: 'بين سبورت 4', logo: 'https://i.ibb.co/Rkt9q1p1/Picsart-26-07-15-13-15-31-227.webp', url: 'http://vip8.sharkgate.xyz/live/7949770923/0238215923/212353.m3u8#Intent;action=android.intent.action.VIEW;type=video/*;package=com.xpola.player;S' },
-                    { name: 'بين سبورت 5', logo: 'https://i.ibb.co/SwST6BGB/Picsart-26-07-15-13-15-37-276.webp', url: 'http://vip8.sharkgate.xyz/live/7949770923/0238215923/212354.m3u8#Intent;action=android.intent.action.VIEW;type=video/*;package=com.xpola.play' },
-                    { name: 'بين سبورت 6', logo: 'https://i.ibb.co/XfR68j7Z/Picsart-26-07-15-13-15-42-650.webp', url: 'http://vip8.sharkgate.xyz/live/7949770923/0238215923/212355.m3u8#Intent;action=android.intent.action.VIEW;type=video/*;package=com.xpola.play' }
+                    { name: 'بين سبورت 1', logo: 'https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/1.m3u8' },
+                    { name: 'بين سبورت 2', logo: 'https://i.ibb.co/xt2Y3S7D/Picsart-26-07-15-13-15-19-901.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/2.m3u8' },
+                    { name: 'بين سبورت 3', logo: 'https://i.ibb.co/yc8tDt88/Picsart-26-07-15-13-15-25-585.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/3.m3u8' },
+                    { name: 'بين سبورت 4', logo: 'https://i.ibb.co/Rkt9q1p1/Picsart-26-07-15-13-15-31-227.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/4.m3u8' },
+                    { name: 'بين سبورت 5', logo: 'https://i.ibb.co/SwST6BGB/Picsart-26-07-15-13-15-37-276.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/5.m3u8' },
+                    { name: 'بين سبورت 6', logo: 'https://i.ibb.co/XfR68j7Z/Picsart-26-07-15-13-15-42-650.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/6.m3u8' }
                 ]
             },
             iraqi_channels: {
@@ -2367,7 +2210,7 @@
         };
 
         // ============================================================
-        // ===== إعدادات Xtream =====
+        // ===== إعدادات Xtream (محسّنة للسرعة القصوى) =====
         // ============================================================
         const XTREAM_CONFIG = {
             host: 'http://cname1.elg-26.com:8080',
@@ -2378,11 +2221,13 @@
 
         const XTREAM_DEFAULT_LOGO = 'https://i.ibb.co/JWnKpWvH/Picsart-26-09-24-13-39-13-713.webp';
 
-        let xtreamCategories = [];
-        let xtreamStreamsByCat = {};
+        // مخزن مؤقت في الذاكرة فقط (لا localStorage ولا sessionStorage)
+        let xtreamCategories = [];        // [{category_id, category_name, parent_id}]
+        let xtreamStreamsByCat = {};       // { catId: [ {name, logo, url} ] }
         let xtreamLoaded = false;
         let xtreamLoading = false;
 
+        // جلب جميع الفئات (سريع جداً) - يتم استدعاؤه أولاً
         async function loadXtreamCategories() {
             if (xtreamLoading || xtreamLoaded) return;
             xtreamLoading = true;
@@ -2394,13 +2239,14 @@
                 const cats = await res.json();
                 if (!Array.isArray(cats)) throw new Error('bad categories');
                 xtreamCategories = cats;
-                renderXtreamCategories();
+                renderXtreamCategories(); // عرض فوري
             } catch (e) {
                 console.error('Xtream categories error:', e);
                 xtreamLoading = false;
                 return;
             }
 
+            // في الخلفية: جلب كل القنوات لمعرفة الأعداد والصور (بدون حجب واجهة المستخدم)
             try {
                 const res2 = await fetch(`${base}&action=get_live_streams`, { cache: 'no-store' });
                 const streams = await res2.json();
@@ -2419,7 +2265,7 @@
                     }
                     xtreamStreamsByCat = grouped;
                     xtreamLoaded = true;
-                    renderXtreamCategories();
+                    renderXtreamCategories(); // إعادة العرض مع الأعداد والصور
                 }
             } catch (e) {
                 console.warn('Xtream streams preload skipped:', e);
@@ -2428,6 +2274,7 @@
             xtreamLoading = false;
         }
 
+        // جلب قنوات فئة واحدة فقط (عند الضغط) - أسرع بكثير
         async function fetchCategoryChannels(catId) {
             if (xtreamStreamsByCat[catId]) return xtreamStreamsByCat[catId];
 
@@ -2446,6 +2293,7 @@
         function renderXtreamCategories() {
             const grid = document.getElementById('mainCategoriesGrid');
             if (!grid) return;
+            // إزالة البطاقات القديمة فقط
             grid.querySelectorAll('.xtream-cat-card').forEach(el => el.remove());
             if (!xtreamCategories.length) return;
 
@@ -2470,7 +2318,6 @@
                 const card = document.createElement('div');
                 card.className = 'category-card xtream-cat-card';
                 card.setAttribute('data-cat-id', catId);
-                if (IS_TV) card.setAttribute('tabindex', '0');
                 card.onclick = (function(id) {
                     return function() { openCategory('xtream_' + id); };
                 })(catId);
@@ -2502,7 +2349,8 @@
 
                 const type = detectStreamType(url);
                 if (type === 'hls') {
-                    fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit' })
+                    // Preload للـ manifest لتسريع التشغيل
+                    fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'force-cache' })
                         .then(r => r.text()).catch(() => {});
                 } else {
                     fetch(url, { method: 'HEAD', mode: 'no-cors', credentials: 'omit' }).catch(() => {});
@@ -2530,6 +2378,7 @@
                 let channels = xtreamStreamsByCat[catId];
 
                 if (!channels) {
+                    // عرض مؤشر تحميل بسيط ثم جلب قنوات هذه الفئة فقط
                     document.getElementById('categoryTitle').textContent = `${displayName} (جاري التحميل...)`;
                     grid.innerHTML = `<div class="schedule-loading"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; color: var(--accent-primary);"></i><span>جاري تحميل القنوات...</span></div>`;
                     document.querySelector('.viewport-area').scrollTop = 0;
@@ -2547,17 +2396,14 @@
                 const htmlParts = new Array(channels.length);
                 for (let i = 0; i < channels.length; i++) {
                     const ch = channels[i];
-                    const safeName = String(ch.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeName = String(ch.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '"');
                     const logo = ch.logo || XTREAM_DEFAULT_LOGO;
                     const encUrl = encodeURIComponent(ch.url);
 
                     htmlParts[i] = `
                         <div class="channel-card" 
-                             data-url="${encUrl}"
-                             ${IS_TV ? 'tabindex="0"' : ''}
                              onmouseenter="prefetchChannel('${encUrl}')"
                              ontouchstart="prefetchChannel('${encUrl}')"
-                             onfocus="prefetchChannel('${encUrl}')"
                              onclick="playChannel('${encUrl}', '${safeName}')">
                             <div class="channel-logo-wrap">
                                 <img src="${logo}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${XTREAM_DEFAULT_LOGO}'">
@@ -2572,10 +2418,10 @@
                 grid.innerHTML = htmlParts.join('');
 
                 document.querySelector('.viewport-area').scrollTop = 0;
-                if (IS_TV) setTimeout(focusFirstInteractive, 150);
                 return;
             }
 
+            // ===== الفئات المضمّنة مسبقاً =====
             const cat = categoriesData[catKey];
             if (!cat) return;
             currentCategory = catKey;
@@ -2590,11 +2436,8 @@
                 const encUrl = encodeURIComponent(ch.url);
                 return `
                 <div class="channel-card"
-                     data-url="${encUrl}"
-                     ${IS_TV ? 'tabindex="0"' : ''}
                      onmouseenter="prefetchChannel('${encUrl}')"
                      ontouchstart="prefetchChannel('${encUrl}')"
-                     onfocus="prefetchChannel('${encUrl}')"
                      onclick="playChannel('${encUrl}', '${ch.name.replace(/'/g, "\\'")}')">
                     <div class="channel-logo-wrap">
                         <img src="${ch.logo}" alt="${ch.name}" onerror="this.style.opacity='0.15'">
@@ -2607,7 +2450,6 @@
             `;}).join('');
 
             document.querySelector('.viewport-area').scrollTop = 0;
-            if (IS_TV) setTimeout(focusFirstInteractive, 150);
         }
 
         function closeCategory() {
@@ -2615,11 +2457,10 @@
             document.getElementById('channelsListView').style.display = 'none';
             currentCategory = null;
             document.querySelector('.viewport-area').scrollTop = 0;
-            if (IS_TV) setTimeout(focusFirstInteractive, 150);
         }
 
         // ============================================================
-        // ===== المحرك القوي =====
+        // ===== المحرك القوي (مدمج من المشغل الثاني - بدون retry) =====
         // ============================================================
         let hlsInstance = null;
         let mpegtsPlayer = null;
@@ -2683,33 +2524,6 @@
 
         function tryPlayVideo(onPlaying) {
             const video = document.getElementById('videoPlayer');
-            
-            // ==== TV فقط: سلوك مختلف ====
-            if (IS_TV) {
-                // على TV: نجرب التشغيل بدون كتم أولاً
-                video.muted = false;
-                autoMuted = false;
-                const p = video.play();
-                if (p && p.then) {
-                    p.then(() => {
-                        if (typeof onPlaying === 'function') onPlaying();
-                    }).catch(() => {
-                        // فشل - نبدأ بصوت مكتوم ثم ننتظر أول ضغطة ريموت
-                        autoMuted = true;
-                        video.muted = true;
-                        const p2 = video.play();
-                        if (p2 && p2.then) {
-                            p2.then(() => {
-                                if (typeof onPlaying === 'function') onPlaying();
-                                showTVUnmutePrompt();
-                            }).catch(() => {});
-                        }
-                    });
-                }
-                return;
-            }
-            
-            // ==== الهاتف/الكمبيوتر: السلوك الأصلي ====
             video.muted = false;
             autoMuted = false;
             const p = video.play();
@@ -2724,18 +2538,6 @@
                     }).catch(() => {});
                 });
             }
-        }
-
-        function showTVUnmutePrompt() {
-            const prompt = document.getElementById('tvUnmutePrompt');
-            if (!prompt) return;
-            prompt.classList.add('show');
-            setTimeout(() => prompt.classList.remove('show'), 6000);
-        }
-
-        function hideTVUnmutePrompt() {
-            const prompt = document.getElementById('tvUnmutePrompt');
-            if (prompt) prompt.classList.remove('show');
         }
 
         function destroyAllPlayers() {
@@ -2777,98 +2579,65 @@
             modal.classList.add('active');
             loading.style.display = 'block';
             centerPlay.classList.remove('show');
-            hideTVUnmutePrompt();
 
             video.style.objectFit = 'contain';
 
-            // ==== TV: لا نستخدم requestFullscreen التلقائي (يفشل على TV) ====
-            // المودال أصلاً fullscreen (position: fixed; inset: 0)
-            if (!IS_TV) {
-                const container = document.querySelector('.video-player-container');
-                if (container.requestFullscreen) {
-                    container.requestFullscreen().then(() => {
-                        if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock('landscape').catch(() => {});
-                        }
-                    }).catch(() => {});
-                }
+            const container = document.querySelector('.video-player-container');
+            if (container.requestFullscreen) {
+                container.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                }).catch(() => {});
             }
             
             showControls();
             
             clearTimeout(loaderTimeout);
-            // TV: وقت انتظار أطول
             loaderTimeout = setTimeout(() => {
                 loading.style.display = 'none';
-            }, IS_TV ? 10000 : 6000);
+            }, 6000);
             
             initializePlayer(currentVideoUrl);
-
-            // TV: نضع التركيز على زر الرجوع ليتحكم المستخدم بالريموت
-            if (IS_TV) {
-                setTimeout(() => {
-                    const backBtn = document.querySelector('.player-back-btn');
-                    if (backBtn) {
-                        if (!backBtn.hasAttribute('tabindex')) backBtn.setAttribute('tabindex', '0');
-                        backBtn.focus();
-                    }
-                }, 400);
-            }
         }
 
         function createHls(url, video, loading, onPlaying) {
             if (!(window.Hls && Hls.isSupported())) {
                 loading.style.display = 'none';
-                // TV fallback: native HLS
-                if (IS_TV && video.canPlayType && video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
-                    video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
-                    tryPlayVideo(onPlaying);
-                }
                 return;
             }
-
-            // ==== TV: إعدادات مختلفة لضمان العمل على TV ====
-            const hlsConfig = {
-                enableWorker: !IS_TV,          // TV: عطّل Worker (يفشل على معظم TV)
-                progressive: !IS_TV,
+            hlsInstance = new Hls({
+                enableWorker: true,
+                progressive: true,
                 lowLatencyMode: false,
+                startLevel: 0,
                 abrEwmaDefaultEstimate: 1000000,
                 capLevelToPlayerSize: true,
                 backBufferLength: 30,
-                maxBufferLength: IS_TV ? 90 : 60,
-                maxMaxBufferLength: IS_TV ? 120 : 90,
+                maxBufferLength: 60,
+                maxMaxBufferLength: 90,
                 maxBufferSize: 120 * 1000 * 1000,
-                maxBufferHole: IS_TV ? 1.0 : 0.5,
-                manifestLoadingTimeOut: IS_TV ? 15000 : 8000,
+                maxBufferHole: 0.5,
+                manifestLoadingTimeOut: 8000,
                 manifestLoadingMaxRetry: 4,
                 manifestLoadingRetryDelay: 1000,
-                levelLoadingTimeOut: IS_TV ? 15000 : 8000,
+                levelLoadingTimeOut: 8000,
                 levelLoadingMaxRetry: 4,
                 levelLoadingRetryDelay: 1000,
-                fragLoadingTimeOut: IS_TV ? 20000 : 12000,
+                fragLoadingTimeOut: 12000,
                 fragLoadingMaxRetry: 5,
                 fragLoadingRetryDelay: 1000,
                 startFragPrefetch: true,
-                testBandwidth: !IS_TV,
-                liveSyncDurationCount: IS_TV ? 6 : 5,
-                liveMaxLatencyDurationCount: IS_TV ? 15 : 10,
+                testBandwidth: true,
+                liveSyncDurationCount: 5,
+                liveMaxLatencyDurationCount: 10,
                 nudgeOffset: 0.1,
                 nudgeMaxRetry: 5,
                 starveThreshold: 2.0,
                 xhrSetup: function(xhr) {
                     xhr.withCredentials = false;
                 }
-            };
-            
-            // على TV: ابدأ بأدنى جودة للتشغيل السريع، ثم ارتقِ تلقائياً
-            if (!IS_TV) {
-                hlsConfig.startLevel = 0;
-            } else {
-                hlsConfig.startLevel = -1;
-            }
-
-            hlsInstance = new Hls(hlsConfig);
+            });
             hlsInstance.loadSource(url);
             hlsInstance.attachMedia(video);
             hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -2947,7 +2716,7 @@
                     isLive: true,
                     url: url
                 }, {
-                    enableWorker: !IS_TV,
+                    enableWorker: true,
                     enableStashBuffer: true,
                     stashInitialSize: 256 * 1024,
                     liveBufferLatencyChasing: false,
@@ -3107,27 +2876,10 @@
                     video.muted = false;
                     autoMuted = false;
                     updateVolumeIcon();
-                    hideTVUnmutePrompt();
                 }
             };
             modal.addEventListener('pointerdown', unmuteHandler);
             video.addEventListener('click', unmuteHandler);
-
-            // ==== TV: فك الكتم عند أي زر من الريموت ====
-            if (IS_TV) {
-                const tvUnmuteKey = (e) => {
-                    if (autoMuted && video.muted && !video.paused) {
-                        video.muted = false;
-                        autoMuted = false;
-                        updateVolumeIcon();
-                        hideTVUnmutePrompt();
-                    }
-                };
-                if (!window.__tvUnmuteKeyAttached) {
-                    document.addEventListener('keydown', tvUnmuteKey, true);
-                    window.__tvUnmuteKeyAttached = true;
-                }
-            }
         }
 
         function updateVolumeIcon() {
@@ -3142,14 +2894,12 @@
             const modal = document.getElementById('videoModal');
             modal.classList.add('show-controls');
             clearTimeout(controlsTimeout);
-            // TV: أبقِ التحكم ظاهراً أطول
-            const delay = IS_TV ? 6000 : 3500;
             controlsTimeout = setTimeout(() => {
                 if (isPlaying) {
                     modal.classList.remove('show-controls');
                     closePopups();
                 }
-            }, delay);
+            }, 3500);
         }
 
         function togglePlay() {
@@ -3199,7 +2949,6 @@
             video.muted = !video.muted;
             autoMuted = false;
             updateVolumeIcon();
-            hideTVUnmutePrompt();
             showControls();
         }
 
@@ -3220,17 +2969,15 @@
             const icon = document.getElementById('fullscreenIcon');
             
             if (!document.fullscreenElement) {
-                if (container.requestFullscreen) {
-                    container.requestFullscreen().then(() => {
-                        if (icon) icon.className = 'fa-solid fa-compress';
-                        if (!IS_TV && screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock('landscape').catch(() => {});
-                        }
-                    }).catch(() => {});
-                }
+                container.requestFullscreen().then(() => {
+                    icon.className = 'fa-solid fa-compress';
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    }
+                }).catch(() => {});
             } else {
                 document.exitFullscreen().then(() => {
-                    if (icon) icon.className = 'fa-solid fa-expand';
+                    icon.className = 'fa-solid fa-expand';
                     if (screen.orientation && screen.orientation.unlock) {
                         screen.orientation.unlock();
                     }
@@ -3275,7 +3022,6 @@
             if (hlsInstance && hlsInstance.levels && hlsInstance.levels.length > 1) {
                 const autoDiv = document.createElement('div');
                 autoDiv.className = `popup-option ${hlsInstance.currentLevel === -1 ? 'active' : ''}`;
-                if (IS_TV) autoDiv.setAttribute('tabindex', '0');
                 autoDiv.innerHTML = '<span>تلقائي (موصى به للسرعة)</span><i class="fa-solid fa-check"></i>';
                 autoDiv.onclick = () => {
                     hlsInstance.currentLevel = -1;
@@ -3287,7 +3033,6 @@
                     const height = level.height || '?';
                     const div = document.createElement('div');
                     div.className = `popup-option ${hlsInstance.currentLevel === index ? 'active' : ''}`;
-                    if (IS_TV) div.setAttribute('tabindex', '0');
                     div.innerHTML = `<span>${height}p</span>`;
                     div.onclick = () => {
                         hlsInstance.currentLevel = index;
@@ -3304,7 +3049,6 @@
                     if (heights.size > 1) {
                         const autoDiv = document.createElement('div');
                         autoDiv.className = 'popup-option active';
-                        if (IS_TV) autoDiv.setAttribute('tabindex', '0');
                         autoDiv.innerHTML = '<span>تلقائي (موصى به للسرعة)</span><i class="fa-solid fa-check"></i>';
                         autoDiv.onclick = () => {
                             shakaPlayer.configure({ abr: { enabled: true } });
@@ -3315,7 +3059,6 @@
                         Array.from(heights).sort((a,b) => b-a).forEach(h => {
                             const div = document.createElement('div');
                             div.className = 'popup-option';
-                            if (IS_TV) div.setAttribute('tabindex', '0');
                             div.innerHTML = `<span>${h}p</span>`;
                             div.onclick = () => {
                                 try {
@@ -3339,16 +3082,6 @@
             
             popup.classList.add('active');
             showControls();
-            
-            if (IS_TV) {
-                setTimeout(() => {
-                    const first = optionsContainer.querySelector('.popup-option');
-                    if (first) {
-                        if (!first.hasAttribute('tabindex')) first.setAttribute('tabindex', '0');
-                        first.focus();
-                    }
-                }, 100);
-            }
         }
 
         function openAudioPopup() {
@@ -3368,7 +3101,6 @@
                     else if (low.includes('english') || low === 'en') label = 'تعليق أجنبي';
                     const div = document.createElement('div');
                     div.className = `popup-option ${i === current ? 'active' : ''}`;
-                    if (IS_TV) div.setAttribute('tabindex', '0');
                     div.innerHTML = `<span>${label}</span>${i === current ? '<i class="fa-solid fa-check"></i>' : ''}`;
                     div.onclick = () => {
                         hlsInstance.audioTrack = i;
@@ -3386,7 +3118,6 @@
                             const label = l.language || 'تعليق';
                             const div = document.createElement('div');
                             div.className = `popup-option ${current === l.language ? 'active' : ''}`;
-                            if (IS_TV) div.setAttribute('tabindex', '0');
                             div.innerHTML = `<span>${label}</span>`;
                             div.onclick = () => {
                                 shakaPlayer.configure({ preferredAudioLanguage: l.language });
@@ -3405,7 +3136,6 @@
                 Array.from(video.audioTracks).forEach((track, index) => {
                     const div = document.createElement('div');
                     div.className = `popup-option ${track.enabled ? 'active' : ''}`;
-                    if (IS_TV) div.setAttribute('tabindex', '0');
                     div.innerHTML = `<span>${track.label || 'تعليق ' + (index + 1)}</span>`;
                     if (track.enabled) div.innerHTML += '<i class="fa-solid fa-check"></i>';
                     
@@ -3422,28 +3152,11 @@
             
             popup.classList.add('active');
             showControls();
-
-            if (IS_TV) {
-                setTimeout(() => {
-                    const first = optionsContainer.querySelector('.popup-option');
-                    if (first) {
-                        if (!first.hasAttribute('tabindex')) first.setAttribute('tabindex', '0');
-                        first.focus();
-                    }
-                }, 100);
-            }
         }
 
         function closePopups() {
             document.getElementById('qualityPopup').classList.remove('active');
             document.getElementById('audioPopup').classList.remove('active');
-            // إرجاع التركيز لزر الجودة على TV
-            if (IS_TV) {
-                const q = document.querySelector('.player-controls-right .player-btn[title="الجودة"]');
-                if (q && document.activeElement && document.activeElement.closest('.player-popup')) {
-                    q.focus();
-                }
-            }
         }
 
         function closeVideoPlayer() {
@@ -3466,17 +3179,11 @@
             
             clearTimeout(loaderTimeout);
             destroyAllPlayers();
-            hideTVUnmutePrompt();
             
             modal.classList.remove('active', 'show-controls');
             closePopups();
             isPlaying = false;
             playingStarted = false;
-
-            // TV: إرجاع التركيز لأول عنصر في القنوات
-            if (IS_TV) {
-                setTimeout(() => focusFirstInteractive(), 150);
-            }
         }
 
         function formatTime(seconds) {
@@ -3561,9 +3268,6 @@
             } else {
                 if (newsInterval) clearInterval(newsInterval);
             }
-
-            // TV: إرجاع التركيز إلى أول عنصر في الصفحة الجديدة
-            if (IS_TV) setTimeout(focusFirstInteractive, 200);
         }
 
         async function translateText(text) {
@@ -3701,7 +3405,6 @@
                 if (newsData.length > 1) {
                     const dot = document.createElement('div');
                     dot.className = `nav-dot ${index === 0 ? 'active' : ''}`;
-                    if (IS_TV) dot.setAttribute('tabindex', '0');
                     dot.onclick = () => goToNewsSlide(index);
                     navContainer.appendChild(dot);
                 }
@@ -3733,18 +3436,11 @@
             document.getElementById('languageOverlay').classList.add('active');
             document.getElementById('languageSheet').classList.add('active');
             updateLanguageSelection();
-            if (IS_TV) {
-                setTimeout(() => {
-                    const s = document.getElementById('sheet-lang-' + currentLanguage);
-                    if (s) s.focus();
-                }, 350);
-            }
         }
 
         function closeLanguageSheet() {
             document.getElementById('languageOverlay').classList.remove('active');
             document.getElementById('languageSheet').classList.remove('active');
-            if (IS_TV) setTimeout(focusFirstInteractive, 150);
         }
 
         function changeLanguage(lang) {
@@ -3770,18 +3466,11 @@
         function openShareSheet() {
             document.getElementById('shareOverlay').classList.add('active');
             document.getElementById('shareSheet').classList.add('active');
-            if (IS_TV) {
-                setTimeout(() => {
-                    const first = document.querySelector('.share-grid-item');
-                    if (first) first.focus();
-                }, 350);
-            }
         }
 
         function closeShareSheet() {
             document.getElementById('shareOverlay').classList.remove('active');
             document.getElementById('shareSheet').classList.remove('active');
-            if (IS_TV) setTimeout(focusFirstInteractive, 150);
         }
 
         function showToast(message) {
@@ -4001,7 +3690,6 @@
                     const awayTeamNameAr = translateTeamName(awayTeam.shortDisplayName || awayTeam.name);
                     const matchCard = document.createElement('div');
                     matchCard.className = 'match-card';
-                    if (IS_TV) matchCard.setAttribute('tabindex', '0');
                     matchCard.innerHTML = `
                         <div class="match-teams">
                             <div class="match-team">
@@ -4073,22 +3761,12 @@
             setTimeout(() => {
                 const overlay = document.getElementById('tgPopupOverlay');
                 if (overlay) overlay.classList.add('active');
-                if (IS_TV) {
-                    setTimeout(() => {
-                        const btn = document.querySelector('.tg-btn-join');
-                        if (btn) {
-                            if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex', '0');
-                            btn.focus();
-                        }
-                    }, 250);
-                }
             }, 50);
         }
 
         function closeTelegramPopup() {
             const overlay = document.getElementById('tgPopupOverlay');
             if (overlay) overlay.classList.remove('active');
-            if (IS_TV) setTimeout(focusFirstInteractive, 150);
         }
 
         function joinTelegram() {
@@ -4096,334 +3774,11 @@
             closeTelegramPopup();
         }
 
-        // ============================================================
-        // ===== TV Remote Control Navigation (خاص بالتلفزيون فقط) =====
-        // ============================================================
-        function isElementVisible(el) {
-            if (!el) return false;
-            let node = el;
-            while (node && node !== document.body) {
-                const style = window.getComputedStyle(node);
-                if (style.display === 'none' || style.visibility === 'hidden') return false;
-                const op = parseFloat(style.opacity);
-                if (!isNaN(op) && op === 0) return false;
-                node = node.parentElement;
-            }
-            const rect = el.getBoundingClientRect();
-            return rect.width > 2 && rect.height > 2;
-        }
-
-        function getFocusableElements() {
-            const selectors = [
-                '.category-card', '.channel-card', '.dock-tab-btn', '.stack-item',
-                '.back-btn', '.player-btn', '.share-grid-item', '.share-action-btn',
-                '.sheet-language-option', '.share-cancel-button', '.nav-dot',
-                '.match-card', '.grid-card', '.popup-option', '.share-close-btn',
-                '.player-center-play', '.player-progress-container',
-                '.player-back-btn', '.player-live-badge',
-                '.tg-btn-join', '.tg-btn-cancel',
-                'button', 'a[href]'
-            ];
-            const all = document.querySelectorAll(selectors.join(','));
-            const result = [];
-            all.forEach(el => {
-                if (el.disabled) return;
-                if (!isElementVisible(el)) return;
-                // تجنب التكرار
-                if (result.indexOf(el) === -1) result.push(el);
-            });
-            return result;
-        }
-
-        function focusFirstInteractive() {
-            if (!IS_TV) return;
-            const videoModal = document.getElementById('videoModal');
-            if (videoModal && videoModal.classList.contains('active')) {
-                // داخل المشغل
-                const backBtn = document.querySelector('.player-back-btn');
-                if (backBtn && isElementVisible(backBtn)) {
-                    if (!backBtn.hasAttribute('tabindex')) backBtn.setAttribute('tabindex', '0');
-                    backBtn.focus();
-                    return;
-                }
-            }
-
-            const listView = document.getElementById('channelsListView');
-            const catView = document.getElementById('channelsCategoriesView');
-
-            if (listView && listView.style.display !== 'none') {
-                const firstChannel = document.querySelector('#channelsGrid .channel-card');
-                if (firstChannel) { firstChannel.focus(); return; }
-                const backBtn = document.querySelector('#channelsListView .back-btn');
-                if (backBtn) { backBtn.focus(); return; }
-            }
-
-            if (catView && catView.style.display !== 'none') {
-                const firstCat = document.querySelector('#mainCategoriesGrid .category-card');
-                if (firstCat) { firstCat.focus(); return; }
-            }
-
-            // حسب القسم النشط
-            const activePane = document.querySelector('.section-pane.active');
-            if (activePane) {
-                const first = activePane.querySelector(
-                    '.category-card, .channel-card, .match-card, .stack-item, .nav-dot, .grid-card'
-                );
-                if (first && isElementVisible(first)) {
-                    if (!first.hasAttribute('tabindex')) first.setAttribute('tabindex', '0');
-                    first.focus();
-                    return;
-                }
-            }
-
-            // افتراضي: التبويب النشط
-            const activeTab = document.querySelector('.dock-tab-btn.active');
-            if (activeTab) activeTab.focus();
-        }
-
-        function tvMoveFocus(dir) {
-            const current = document.activeElement;
-            const focusables = getFocusableElements();
-
-            if (!current || current === document.body || focusables.indexOf(current) === -1) {
-                // لا يوجد عنصر محدد: اختر الأول في الاتجاه
-                if (dir === 'up') {
-                    // حاول الصعود إلى شريط التبويبات
-                    const activeTab = document.querySelector('.dock-tab-btn.active');
-                    if (activeTab) { activeTab.focus(); return; }
-                }
-                if (focusables.length > 0) focusables[0].focus();
-                return;
-            }
-
-            const curRect = current.getBoundingClientRect();
-            const curX = curRect.left + curRect.width / 2;
-            const curY = curRect.top + curRect.height / 2;
-
-            let best = null;
-            let bestScore = Infinity;
-
-            focusables.forEach(el => {
-                if (el === current) return;
-                const rect = el.getBoundingClientRect();
-                if (rect.width === 0 || rect.height === 0) return;
-
-                const x = rect.left + rect.width / 2;
-                const y = rect.top + rect.height / 2;
-                const dx = x - curX;
-                const dy = y - curY;
-
-                let valid = false, primary = 0, secondary = 0;
-
-                if (dir === 'right' && dx > 8) { valid = true; primary = dx; secondary = Math.abs(dy); }
-                else if (dir === 'left' && dx < -8) { valid = true; primary = -dx; secondary = Math.abs(dy); }
-                else if (dir === 'down' && dy > 8) { valid = true; primary = dy; secondary = Math.abs(dx); }
-                else if (dir === 'up' && dy < -8) { valid = true; primary = -dy; secondary = Math.abs(dx); }
-
-                if (valid) {
-                    // تفضيل العناصر في نفس الخط/العمود
-                    const score = primary + secondary * 2.5;
-                    if (score < bestScore) {
-                        bestScore = score;
-                        best = el;
-                    }
-                }
-            });
-
-            // إذا لم يجد أي عنصر في الاتجاه، اسمح بالتنقل الدائري في التبويبات
-            if (!best) {
-                if ((dir === 'up' || dir === 'down') && current.classList.contains('dock-tab-btn')) {
-                    // التنقل بين التبويبات يتم يمين/يسار فعلاً، تجاهل
-                    return;
-                }
-                if (dir === 'down') {
-                    // انزل إلى أول عنصر في القسم النشط
-                    const activePane = document.querySelector('.section-pane.active');
-                    if (activePane) {
-                        const first = activePane.querySelector('.category-card, .channel-card, .match-card, .stack-item');
-                        if (first && isElementVisible(first)) {
-                            if (!first.hasAttribute('tabindex')) first.setAttribute('tabindex', '0');
-                            first.focus();
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (best) {
-                try {
-                    best.focus();
-                    try {
-                        best.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-                    } catch (e) {
-                        best.scrollIntoView(false);
-                    }
-                } catch (e) {}
-            }
-        }
-
-        function handleTVBack() {
-            // 1. المشغل
-            if (document.getElementById('videoModal').classList.contains('active')) {
-                // إن كان popup مفتوحاً أغلقه أولاً
-                if (document.getElementById('qualityPopup').classList.contains('active') ||
-                    document.getElementById('audioPopup').classList.contains('active')) {
-                    closePopups();
-                    return;
-                }
-                closeVideoPlayer();
-                return;
-            }
-            // 2. النوافذ المنبثقة
-            if (document.getElementById('shareSheet').classList.contains('active')) {
-                closeShareSheet();
-                return;
-            }
-            if (document.getElementById('languageSheet').classList.contains('active')) {
-                closeLanguageSheet();
-                return;
-            }
-            if (document.getElementById('tgPopupOverlay').classList.contains('active')) {
-                closeTelegramPopup();
-                return;
-            }
-            // 3. قائمة القنوات
-            if (document.getElementById('channelsListView').style.display !== 'none') {
-                closeCategory();
-                return;
-            }
-            // 4. افتراضي: التركيز على التبويب النشط
-            const activeTab = document.querySelector('.dock-tab-btn.active');
-            if (activeTab) activeTab.focus();
-        }
-
-        function handleTVKey(e) {
-            if (!IS_TV) return;
-            const key = e.key;
-            const code = e.keyCode;
-
-            // زر الرجوع بمختلف الأنظمة
-            const isBack = key === 'Escape' || code === 27 || code === 461 || code === 10009 ||
-                           code === 8 || key === 'Backspace' || key === 'GoBack' ||
-                           key === 'BrowserBack' || key === 'Back';
-
-            if (isBack) {
-                e.preventDefault();
-                e.stopPropagation();
-                handleTVBack();
-                return;
-            }
-
-            // زر OK/Enter
-            const isEnter = key === 'Enter' || code === 13 || key === ' ' || code === 32 ||
-                            code === 23 || code === 66 || key === 'Select';
-
-            if (isEnter) {
-                const el = document.activeElement;
-                if (el && el !== document.body) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // داخل المشغل: زر Enter على الفيديو = تشغيل/إيقاف
-                    if (el.id === 'videoPlayer' || el.classList.contains('video-element')) {
-                        togglePlay();
-                        return;
-                    }
-                    // زر Enter في المشغل على أي زر = نفّذ
-                    el.click();
-                }
-                return;
-            }
-
-            // أزرار الوسائط
-            if (code === 179 || code === 415 || code === 10252) { // Play/Pause
-                if (document.getElementById('videoModal').classList.contains('active')) {
-                    e.preventDefault();
-                    togglePlay();
-                }
-                return;
-            }
-            if (code === 417 || code === 228) { // Fast Forward
-                if (document.getElementById('videoModal').classList.contains('active')) {
-                    e.preventDefault();
-                    skipForward();
-                }
-                return;
-            }
-            if (code === 412 || code === 227) { // Rewind
-                if (document.getElementById('videoModal').classList.contains('active')) {
-                    e.preventDefault();
-                    skipBackward();
-                }
-                return;
-            }
-
-            // التنقل بالأسهم
-            const dirs = {
-                'ArrowUp': 'up', 'ArrowDown': 'down', 'ArrowLeft': 'left', 'ArrowRight': 'right',
-                'Up': 'up', 'Down': 'down', 'Left': 'left', 'Right': 'right'
-            };
-            let dir = dirs[key];
-            if (!dir) {
-                if (code === 38) dir = 'up';
-                else if (code === 40) dir = 'down';
-                else if (code === 37) dir = 'left';
-                else if (code === 39) dir = 'right';
-            }
-
-            if (dir) {
-                e.preventDefault();
-                e.stopPropagation();
-                tvMoveFocus(dir);
-            }
-        }
-
-        function setupTVNavigation() {
-            if (!IS_TV) return;
-
-            document.body.classList.add('is-tv');
-
-            // إضافة tabindex لكل العناصر القابلة للنقر
-            const makeFocusable = () => {
-                const selectors = [
-                    '.category-card', '.channel-card', '.dock-tab-btn', '.stack-item',
-                    '.back-btn', '.player-btn', '.share-grid-item', '.share-action-btn',
-                    '.sheet-language-option', '.share-cancel-button', '.match-card', '.grid-card'
-                ];
-                document.querySelectorAll(selectors.join(',')).forEach(el => {
-                    if (!el.hasAttribute('tabindex') && isElementVisible(el)) {
-                        el.setAttribute('tabindex', '0');
-                    }
-                });
-            };
-            makeFocusable();
-
-            // مراقبة إضافة عناصر جديدة
-            const observer = new MutationObserver(() => {
-                makeFocusable();
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-
-            // مستمع لوحة المفاتيح (التقاط مبكر)
-            document.addEventListener('keydown', handleTVKey, true);
-
-            // التركيز الافتراضي
-            setTimeout(focusFirstInteractive, 800);
-        }
-
-        // بدء TV
-        if (IS_TV) {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', setupTVNavigation);
-            } else {
-                setupTVNavigation();
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             updateLanguageSelection();
             initTelegramPopup();
             
+            // بدء تحميل فئات Xtream فوراً وبأسرع طريقة ممكنة
             loadXtreamCategories();
 
             document.addEventListener('fullscreenchange', () => {
@@ -4432,7 +3787,7 @@
                     icon.className = document.fullscreenElement ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
                 }
                 if (document.fullscreenElement) {
-                    if (!IS_TV && screen.orientation && screen.orientation.lock) {
+                    if (screen.orientation && screen.orientation.lock) {
                         screen.orientation.lock('landscape').catch(() => {});
                     }
                 } else {
