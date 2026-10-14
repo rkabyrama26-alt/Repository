@@ -2179,12 +2179,12 @@
             bein_sports: {
                 name: 'قنوات بين سبورت',
                 channels: [
-                    { name: 'بين سبورت 1', logo: 'https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/1.m3u8' },
-                    { name: 'بين سبورت 2', logo: 'https://i.ibb.co/xt2Y3S7D/Picsart-26-07-15-13-15-19-901.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/2.m3u8' },
-                    { name: 'بين سبورت 3', logo: 'https://i.ibb.co/yc8tDt88/Picsart-26-07-15-13-15-25-585.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/3.m3u8' },
-                    { name: 'بين سبورت 4', logo: 'https://i.ibb.co/Rkt9q1p1/Picsart-26-07-15-13-15-31-227.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/4.m3u8' },
-                    { name: 'بين سبورت 5', logo: 'https://i.ibb.co/SwST6BGB/Picsart-26-07-15-13-15-37-276.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/5.m3u8' },
-                    { name: 'بين سبورت 6', logo: 'https://i.ibb.co/XfR68j7Z/Picsart-26-07-15-13-15-42-650.webp', url: 'http://cname1.elg-26.com:8080/live/Abdo20250505/hze7pmru27/6.m3u8' }
+                    { name: 'بين سبورت 1', logo: 'https://i.ibb.co/rG9f37XH/Picsart-26-07-15-13-15-13-584.webp', url: 'http://primetv.cc.cd/beIN1HD/index.m3u8' },
+                    { name: 'بين سبورت 2', logo: 'https://i.ibb.co/xt2Y3S7D/Picsart-26-07-15-13-15-19-901.webp', url: 'http://primetv.cc.cd/beIN2FHD/index.m3u8' },
+                    { name: 'بين سبورت 3', logo: 'https://i.ibb.co/yc8tDt88/Picsart-26-07-15-13-15-25-585.webp', url: 'http://primetv.cc.cd/beIN3FHD/index.m3u8' },
+                    { name: 'بين سبورت 4', logo: 'https://i.ibb.co/Rkt9q1p1/Picsart-26-07-15-13-15-31-227.webp', url: 'http://primetv.cc.cd/beIN4FHD/index.m3u8' },
+                    { name: 'بين سبورت 5', logo: 'https://i.ibb.co/SwST6BGB/Picsart-26-07-15-13-15-37-276.webp', url: 'http://primetv.cc.cd/beIN5FHD/index.m3u8' },
+                    { name: 'بين سبورت 6', logo: 'https://i.ibb.co/XfR68j7Z/Picsart-26-07-15-13-15-42-650.webp', url: 'http://primetv.cc.cd/beIN6FHD/index.m3u8' }
                 ]
             },
             iraqi_channels: {
@@ -2216,9 +2216,9 @@
         // ===== إعدادات Xtream (محسّنة للسرعة القصوى) =====
         // ============================================================
         const XTREAM_CONFIG = {
-            host: 'http://cname1.elg-26.com:8080',
-            username: 'Abdo20250505',
-            password: 'hze7pmru27',
+            host: 'http://clsmarview.club:2082',
+            username: '63663214',
+            password: '51163728',
             maxChannelsPerCategory: 800
         };
 
@@ -2671,7 +2671,7 @@
         }
 
         // ============================================================
-        // ===== HLS Engine - بدء فوري + عدادات قوية للنت الضعيف =====
+        // ===== HLS Engine - إعدادات تحاكي ExoPlayer (Media3) =====
         // ============================================================
         function createHls(url, video, loading, onPlaying) {
             if (!(window.Hls && Hls.isSupported())) {
@@ -2679,68 +2679,70 @@
                 return;
             }
             hlsInstance = new Hls({
+                // ===== ExoPlayer (Media3) Equivalent Configuration =====
                 enableWorker: true,
                 lowLatencyMode: false,
-                progressive: true,                    // ← يبدأ التحليل والتحميل بالتوازي = أسرع
 
-                // ===== بدء من أقل جودة + بسرعة =====
-                startLevel: 0,
+                // ===== LoadControl: Buffer sizes (ExoPlayer DefaultLoadControl) =====
+                // ExoPlayer: minBufferMs=50000, maxBufferMs=50000, bufferForPlaybackMs=2500, bufferForPlaybackAfterRebufferMs=5000
+                backBufferLength: 30,                 // ExoPlayer DefaultAllocator backBuffer = 30s
+                maxBufferLength: 50,                  // ExoPlayer DefaultLoadControl maxBufferMs = 50s
+                maxMaxBufferLength: 120,              // سقف عند الشبكات الجيدة
+                maxBufferSize: 60 * 1000 * 1000,      // 60MB (قريب من ExoPlayer DefaultAllocator 64MB)
+                maxBufferHole: 0.5,
+                highBufferWatchdogPeriod: 2,
+
+                // ===== Fast Startup =====
+                startLevel: 0,                        // ExoPlayer يبدأ بأدنى جودة ثم يترقى
                 capLevelToPlayerSize: true,
                 autoStartLoad: true,
-                testBandwidth: false,                 // ← لا يضيع وقت في اختبار السرعة
+                testBandwidth: false,                 // ExoPlayer لا يختبر السرعة قبل البدء
+                startFragPrefetch: true,              // يجيب أول جزء فوراً
 
-                // ===== ABR عدواني جداً - يفضل الجودة المنخفضة المستقرّة =====
-                abrEwmaDefaultEstimate: 200000,       // ← 200kbps تقدير أولي = قرار سريع
-                abrEwmaFastLive: 1.0,
-                abrEwmaSlowLive: 6.0,
-                abrBandWidthFactor: 0.70,
-                abrBandWidthUpFactor: 0.55,
+                // ===== HLS Live: mimic ExoPlayer HlsMediaSource defaults =====
+                // ExoPlayer: targetOffsetMs = 3 segments behind live edge
+                liveSyncDurationCount: 3,
+                liveMaxLatencyDurationCount: 6,
+                liveDurationInfinity: true,
+                liveBackBufferLength: 30,
+                initialLiveManifestSize: 1,
+
+                // ===== ABR (ExoPlayer AdaptiveTrackSelection) =====
+                // ExoPlayer: 30000kbps estimate, aggressive downgrade, conservative upgrade
+                abrEwmaDefaultEstimate: 500000,       // تقدير أولي 500kbps (ExoPlayer يستخدم 30Mbps كسقف مع هذا الافتراضي المحسّن)
+                abrEwmaFastLive: 3.0,
+                abrEwmaSlowLive: 9.0,
+                abrBandWidthFactor: 0.95,             // ExoPlayer يستخدم نسبة 0.95 للتخفيض
+                abrBandWidthUpFactor: 0.70,           // ExoPlayer يستخدم 0.7 للترقية (حذر)
                 abrMaxWithRealBitrate: true,
-                maxStarvationDelay: 1.5,
-                maxLoadingDelay: 1.5,
+                maxStarvationDelay: 4,
+                maxLoadingDelay: 4,
                 minAutoBitrate: 0,
 
-                // ===== تخزين مؤقت كبير يتحمل تقطيع النت =====
-                backBufferLength: 30,
-                maxBufferLength: 60,                  // ← يبدأ بـ 60 ثم يكبر تلقائياً
-                maxMaxBufferLength: 240,
-                maxBufferSize: 240 * 1000 * 1000,
-                maxBufferHole: 0.2,
-                highBufferWatchdogPeriod: 1.5,
-
-                // ===== timeouts سخية للشبكات الضعيفة =====
-                manifestLoadingTimeOut: 20000,
-                manifestLoadingMaxRetry: 6,           // ← retry أقل بالبداية = بدء أسرع
-                manifestLoadingRetryDelay: 400,
+                // ===== Timeouts & Retry (ExoPlayer DefaultLoadErrorHandlingPolicy = 3 attempts) =====
+                manifestLoadingTimeOut: 10000,
+                manifestLoadingMaxRetry: 4,
+                manifestLoadingRetryDelay: 500,
                 manifestLoadingMaxRetryTimeout: 64000,
-                levelLoadingTimeOut: 20000,
-                levelLoadingMaxRetry: 6,
-                levelLoadingRetryDelay: 400,
+                levelLoadingTimeOut: 10000,
+                levelLoadingMaxRetry: 4,
+                levelLoadingRetryDelay: 500,
                 levelLoadingMaxRetryTimeout: 64000,
-                fragLoadingTimeOut: 30000,
-                fragLoadingMaxRetry: 8,
-                fragLoadingRetryDelay: 400,
+                fragLoadingTimeOut: 20000,
+                fragLoadingMaxRetry: 6,
+                fragLoadingRetryDelay: 500,
                 fragLoadingMaxRetryTimeout: 64000,
 
-                // ===== إعدادات البث المباشر - انضمام أسرع =====
-                liveSyncDurationCount: 2,             // ← 2 segments فقط = بدء فوري (كان 3)
-                liveMaxLatencyDurationCount: 10,
-                liveDurationInfinity: true,
-                liveBackBufferLength: 0,
-                initialLiveManifestSize: 1,           // ← يبدأ من أول جزء بدون انتظار
-
-                startFragPrefetch: true,              // ← يجيب أول جزء فوراً
+                // ===== Recovery (ExoPlayer uses soft nudge, no aggressive restart) =====
                 preferManagedMediaSource: true,
-
-                // ===== تعافي ناعم بدون أي رسائل =====
-                nudgeOffset: 0.3,
-                nudgeMaxRetry: 12,
+                nudgeOffset: 0.1,
+                nudgeMaxRetry: 10,
                 maxFragLookUpTolerance: 0.25,
-                appendErrorMaxRetry: 6,
+                appendErrorMaxRetry: 5,
 
                 xhrSetup: function(xhr) {
                     xhr.withCredentials = false;
-                    xhr.timeout = 30000;
+                    xhr.timeout = 20000;
                 },
                 fetchSetup: function(context, initParams) {
                     initParams.credentials = 'omit';
@@ -2754,14 +2756,14 @@
 
             hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
                 tryPlayVideo(onPlaying);
-                // ← بعد البدء، نزيد الـ buffer تدريجياً للاستقرار
+                // بعد البدء، نسمح بزيادة الـ buffer تدريجياً (مثل ExoPlayer عندما يستقر الاتصال)
                 setTimeout(() => {
                     if (hlsInstance) {
                         try {
-                            hlsInstance.config.maxBufferLength = 120;
+                            hlsInstance.config.maxBufferLength = 90;
                         } catch(e) {}
                     }
-                }, 3000);
+                }, 4000);
             });
             hlsInstance.on(Hls.Events.FRAG_LOADED, () => {
                 if (!playingStarted) tryPlayVideo(onPlaying);
@@ -2780,7 +2782,7 @@
                             break;
                     }
                 } else {
-                    // ===== هبوط صامت للجودة عند أي مشكلة =====
+                    // هبوط صامت للجودة عند أي مشكلة (مثل ExoPlayer AdaptiveTrackSelection)
                     if (data.details === 'bufferStalledError' ||
                         data.details === 'bufferSeekOverHole' ||
                         data.details === 'fragParsingError' ||
@@ -2795,7 +2797,7 @@
                 }
             });
 
-            // ===== عند توقف الفيديو (waiting) نخفض الجودة فوراً =====
+            // عند توقف الفيديو نخفض الجودة فوراً (ExoPlayer downgrade behavior)
             const stallHandler = () => {
                 if (hlsInstance && hlsInstance.autoLevelEnabled) {
                     const lvl = hlsInstance.currentLevel;
@@ -2807,7 +2809,7 @@
             video.addEventListener('waiting', stallHandler);
             video.addEventListener('stalled', stallHandler);
 
-            // ===== مراقب دوري: إذا الفيديو واقف نحاول نخفض الجودة =====
+            // مراقب دوري: إذا الفيديو واقف نخفض الجودة
             if (stallWatchTimer) clearInterval(stallWatchTimer);
             stallWatchTimer = setInterval(() => {
                 if (!hlsInstance) return;
@@ -2842,14 +2844,14 @@
             const cfg = {
                 streaming: {
                     lowLatencyMode: false,
-                    rebufferingGoal: 4,             // ← بدء أسرع
+                    rebufferingGoal: 4,
                     bufferingGoal: 30,
                     bufferBehind: 45,
                     retryParameters: { timeout: 20000, maxAttempts: 6, baseDelay: 400, backoffFactor: 1.5 }
                 },
                 abr: {
                     enabled: true,
-                    defaultBandwidthEstimate: 300000, // ← تقدير أولي منخفض = بدء أسرع
+                    defaultBandwidthEstimate: 300000,
                     switchInterval: 4,
                     bandwidthUpgradeTarget: 0.75,
                     bandwidthDowngradeTarget: 0.95
@@ -2890,7 +2892,7 @@
                 }, {
                     enableWorker: true,
                     enableStashBuffer: true,
-                    stashInitialSize: 128 * 1024,       // ← أصغر = بدء أسرع
+                    stashInitialSize: 128 * 1024,
                     liveBufferLatencyChasing: false,
                     liveBufferLatencyMaxLatency: 5.0,
                     liveBufferLatencyMinRemain: 2.0,
@@ -2921,7 +2923,6 @@
             video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
             video.addEventListener('playing', onPlaying, { once: true });
             video.addEventListener('error', () => {
-                // محاولة أخيرة عبر HLS (قد يكون ts/h264 خام يخدم كـ HLS)
                 try {
                     video.removeAttribute('src');
                     video.load();
@@ -2993,7 +2994,6 @@
 
                 case 'auto':
                 default:
-                    // جرّب Native أولاً (أسرع للملفات)، وإن فشل → HLS
                     video.src = url;
                     video.preload = 'auto';
                     video.addEventListener('loadedmetadata', () => tryPlayVideo(onPlaying), { once: true });
